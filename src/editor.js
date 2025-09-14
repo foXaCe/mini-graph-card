@@ -118,8 +118,6 @@ const TRANSLATIONS_FR = {
   'An error occurred while rendering the editor:': 'Une erreur s\'est produite lors du rendu de l\'éditeur :',
 
   // Debug info
-  'Debug: Config loaded = ': 'Debug : Config chargée = ',
-  ', Entities = ': ', Entités = ',
 
   // Advanced sections
   'Primary Y-Axis': 'Axe Y principal',
@@ -141,6 +139,9 @@ const TRANSLATIONS_FR = {
   'Show in Legend': 'Afficher dans la légende',
   'Smoothing': 'Lissage',
   'Fixed Value': 'Valeur fixe',
+  'Entities': 'Entités',
+  'Add, configure and manage all your entities': 'Ajoutez, configurez et gérez toutes vos entités',
+  'Remove Entity': 'Supprimer l\'entité',
 };
 
 // Get browser language
@@ -394,13 +395,10 @@ export default class MiniGraphCardEditor extends LitElement {
           <div class="header">
             <h2>${t('Mini Graph Card Configuration')}</h2>
             <p>${t('Complete configuration for all options')}</p>
-            <div class="debug-info">
-              <small>${t('Debug: Config loaded = ')}${!!this._config}${t(', Entities = ')}${this._entities.length}</small>
-            </div>
           </div>
 
-          <!-- REQUIRED SETTINGS -->
-          ${this.renderSection('required', `🔧 ${t('Required Settings')}`, t('Basic configuration required for the card'), html`
+          <!-- ENTITIES MANAGEMENT -->
+          ${this.renderSection('entities', `🏠 ${t('Entities')}`, t('Add, configure and manage all your entities'), html`
             ${this._entities.length === 0 ? html`
               <div class="form-group">
                 <label>${t('Primary Entity (will be converted to entities list)')}:</label>
@@ -408,15 +406,42 @@ export default class MiniGraphCardEditor extends LitElement {
               </div>
             ` : ''}
 
-            <div class="form-group">
-              <label>${t('Entities List')}:</label>
+            <div class="entities-section">
               ${this._entities.map((entity, index) => html`
-                <div class="entity-row">
-                  ${this.renderEntityPicker(
+                <div class="entity-management-row">
+                  <div class="entity-picker-section">
+                    ${this.renderEntityPicker(
     typeof entity === 'string' ? entity : entity.entity,
     ev => this._entityListChanged(ev, index),
   )}
+                  </div>
+                  <div class="entity-info-section">
+                    ${(() => {
+    const entityId = typeof entity === 'string' ? entity : entity.entity;
+    const entityInfo = this.getEntityInfo(entityId);
+    return html`
+                        <div class="entity-display">
+                          <ha-icon .icon="${entityInfo.icon}" class="entity-icon"></ha-icon>
+                          <div class="entity-details">
+                            <div class="entity-friendly-name">${entityInfo.friendlyName}</div>
+                            <div class="entity-id">${entityInfo.entityId}</div>
+                          </div>
+                        </div>
+                      `;
+  })()}
+                  </div>
+                  <div class="entity-actions">
+                    <button class="btn-configure" @click="${() => this._toggleEntityConfig(index)}">
+                      ${this._isEntityConfigExpanded(index) ? t('Hide') : t('Configure')}
+                    </button>
+                    <button class="btn-remove" @click="${() => this._removeEntity(index)}" title="${t('Remove Entity')}">×</button>
+                  </div>
                 </div>
+                ${this._isEntityConfigExpanded(index) ? html`
+                  <div class="entity-config-expanded">
+                    ${this.renderEntityConfig(entity, index)}
+                  </div>
+                ` : ''}
               `)}
               <button class="btn-add" @click="${this._addEntity}">${t('Add Entity')}</button>
             </div>
@@ -885,37 +910,6 @@ export default class MiniGraphCardEditor extends LitElement {
             </div>
           `)}
 
-          <!-- ENTITY CONFIGURATION -->
-          ${this.renderSection('entities', `🔧 ${t('Entity Configuration')}`, t('Per-entity configuration and customization'), html`
-            <div class="entities-info">
-              ${t('Configure individual entity settings. These override global settings for specific entities.')}
-            </div>
-
-            ${this._entities.map((entity, index) => html`
-              <div class="entity-config">
-                <div class="entity-config-header">
-                  ${(() => {
-    const entityId = typeof entity === 'string' ? entity : entity.entity;
-    const entityInfo = this.getEntityInfo(entityId);
-    return html`
-                      <div class="entity-info">
-                        <ha-icon .icon="${entityInfo.icon}" class="entity-icon"></ha-icon>
-                        <div class="entity-details">
-                          <div class="entity-friendly-name">${entityInfo.friendlyName}</div>
-                          <div class="entity-id">${entityInfo.entityId}</div>
-                        </div>
-                      </div>
-                    `;
-  })()}
-                  <button @click="${() => this._toggleEntityConfig(index)}">
-                    ${this._isEntityConfigExpanded(index) ? t('Hide') : t('Configure')}
-                  </button>
-                </div>
-
-                ${this._isEntityConfigExpanded(index) ? this.renderEntityConfig(entity, index) : ''}
-              </div>
-            `)}
-          `)}
         </div>
       `;
     } catch (error) {
@@ -1601,6 +1595,97 @@ export default class MiniGraphCardEditor extends LitElement {
         text-overflow: ellipsis;
         white-space: nowrap;
         margin-top: 2px;
+      }
+
+      .entities-section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .entity-management-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 16px;
+        align-items: center;
+        padding: 16px;
+        border: 1px solid var(--divider-color);
+        border-radius: 8px;
+        background: var(--card-background-color);
+      }
+
+      .entity-picker-section {
+        min-width: 0;
+      }
+
+      .entity-info-section {
+        min-width: 0;
+      }
+
+      .entity-display {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+      }
+
+      .entity-display .entity-icon {
+        margin-right: 12px;
+        flex-shrink: 0;
+      }
+
+      .entity-display .entity-details {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .entity-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      .btn-configure {
+        background: var(--primary-color);
+        color: var(--text-primary-color);
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        min-width: 80px;
+      }
+
+      .btn-configure:hover {
+        opacity: 0.9;
+      }
+
+      .btn-remove {
+        background: var(--error-color);
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .btn-remove:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+
+      .entity-config-expanded {
+        margin-top: 12px;
+        padding: 16px;
+        border: 1px solid var(--divider-color);
+        border-radius: 8px;
+        background: var(--secondary-background-color);
       }
 
 
