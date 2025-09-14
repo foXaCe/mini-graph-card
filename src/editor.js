@@ -894,7 +894,19 @@ export default class MiniGraphCardEditor extends LitElement {
             ${this._entities.map((entity, index) => html`
               <div class="entity-config">
                 <div class="entity-config-header">
-                  <span class="entity-name">${typeof entity === 'string' ? entity : entity.entity}</span>
+                  ${(() => {
+    const entityId = typeof entity === 'string' ? entity : entity.entity;
+    const entityInfo = this.getEntityInfo(entityId);
+    return html`
+                      <div class="entity-info">
+                        <ha-icon .icon="${entityInfo.icon}" class="entity-icon"></ha-icon>
+                        <div class="entity-details">
+                          <div class="entity-friendly-name">${entityInfo.friendlyName}</div>
+                          <div class="entity-id">${entityInfo.entityId}</div>
+                        </div>
+                      </div>
+                    `;
+  })()}
                   <button @click="${() => this._toggleEntityConfig(index)}">
                     ${this._isEntityConfigExpanded(index) ? t('Hide') : t('Configure')}
                   </button>
@@ -1061,6 +1073,56 @@ export default class MiniGraphCardEditor extends LitElement {
         </div>
       </div>
     `;
+  }
+
+  // Helper methods
+  getEntityInfo(entityId) {
+    if (!this.hass || !this.hass.states) {
+      return {
+        entityId,
+        friendlyName: entityId,
+        icon: 'mdi:help-circle',
+        domain: entityId.split('.')[0] || 'unknown',
+      };
+    }
+
+    const entityState = this.hass.states[entityId];
+    if (!entityState) {
+      return {
+        entityId,
+        friendlyName: entityId,
+        icon: 'mdi:help-circle-outline',
+        domain: entityId.split('.')[0] || 'unknown',
+      };
+    }
+
+    return {
+      entityId,
+      friendlyName: entityState.attributes.friendly_name || entityId,
+      icon: entityState.attributes.icon || this.getDefaultIcon(entityId),
+      domain: entityId.split('.')[0] || 'unknown',
+      state: entityState.state,
+    };
+  }
+
+  getDefaultIcon(entityId) {
+    const domain = entityId.split('.')[0];
+    const iconMap = {
+      sensor: 'mdi:gauge',
+      binary_sensor: 'mdi:radiobox-blank',
+      switch: 'mdi:toggle-switch',
+      light: 'mdi:lightbulb',
+      climate: 'mdi:thermostat',
+      cover: 'mdi:window-shutter',
+      fan: 'mdi:fan',
+      lock: 'mdi:lock',
+      camera: 'mdi:camera',
+      media_player: 'mdi:cast',
+      device_tracker: 'mdi:account',
+      sun: 'mdi:white-balance-sunny',
+      weather: 'mdi:weather-partly-cloudy',
+    };
+    return iconMap[domain] || 'mdi:help-circle';
   }
 
   // Event handlers
@@ -1501,15 +1563,46 @@ export default class MiniGraphCardEditor extends LitElement {
         min-width: 80px;
       }
 
-      .entity-name {
+      .entity-info {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        min-width: 0;
+        margin-right: 16px;
+      }
+
+      .entity-icon {
+        color: var(--state-icon-color, var(--state-icon-unavailable-color, #bdbdbd));
+        width: 24px;
+        height: 24px;
+        margin-right: 12px;
+        flex-shrink: 0;
+      }
+
+      .entity-details {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .entity-friendly-name {
         font-weight: 500;
         color: var(--primary-text-color);
-        flex: 1;
+        font-size: 0.95em;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        margin-right: 16px;
       }
+
+      .entity-id {
+        color: var(--secondary-text-color);
+        font-size: 0.8em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-top: 2px;
+      }
+
 
       .entity-config-content {
         padding: 16px;
