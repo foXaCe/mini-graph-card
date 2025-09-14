@@ -1,9 +1,6 @@
 import { LitElement, html, css } from 'lit-element';
 import { fireEvent } from 'custom-card-helpers';
 
-console.log('🔧 Mini Graph Card Editor: Starting to load...');
-console.warn('🔧 MINI-GRAPH-CARD EDITOR IS LOADING - DEBUG MODE ACTIVE');
-console.trace('🔧 Editor loading trace');
 
 // French translations
 const TRANSLATIONS_FR = {
@@ -146,7 +143,6 @@ const t = (key) => {
 
 export default class MiniGraphCardEditor extends LitElement {
   static get properties() {
-    console.log('🔧 Mini Graph Card Editor: Defining properties...');
     return {
       hass: Object,
       _config: Object,
@@ -156,7 +152,6 @@ export default class MiniGraphCardEditor extends LitElement {
 
   constructor() {
     super();
-    console.log('🔧 Mini Graph Card Editor: Constructor called');
     this._expandedSections = {
       required: true,
       display: false,
@@ -170,57 +165,47 @@ export default class MiniGraphCardEditor extends LitElement {
   }
 
   setConfig(config) {
-    console.log('🔧 Mini Graph Card Editor: setConfig called with:', config);
     this._config = { ...config };
-    console.log('🔧 Mini Graph Card Editor: Config set to:', this._config);
   }
 
-  // Configuration getters with logging
+  // Configuration getters
   get _entity() {
     const val = (this._config && this._config.entity) || '';
-    console.log('🔧 Editor: _entity =', val);
     return val;
   }
 
   get _entities() {
     const val = (this._config && this._config.entities) || [];
-    console.log('🔧 Editor: _entities =', val);
     return val;
   }
 
   get _name() {
     const val = (this._config && this._config.name) || '';
-    console.log('🔧 Editor: _name =', val);
     return val;
   }
 
   get _icon() {
     const val = (this._config && this._config.icon) || '';
-    console.log('🔧 Editor: _icon =', val);
     return val;
   }
 
   get _icon_image() {
     const val = (this._config && this._config.icon_image) || '';
-    console.log('🔧 Editor: _icon_image =', val);
     return val;
   }
 
   get _unit() {
     const val = (this._config && this._config.unit) || '';
-    console.log('🔧 Editor: _unit =', val);
     return val;
   }
 
   get _height() {
     const val = (this._config && this._config.height) || 100;
-    console.log('🔧 Editor: _height =', val);
     return val;
   }
 
   get _line_width() {
     const val = (this._config && this._config.line_width) || 5;
-    console.log('🔧 Editor: _line_width =', val);
     return val;
   }
 
@@ -228,173 +213,141 @@ export default class MiniGraphCardEditor extends LitElement {
     const val = Array.isArray(this._config && this._config.line_color)
       ? this._config.line_color.join(', ')
       : ((this._config && this._config.line_color) || '');
-    console.log('🔧 Editor: _line_color =', val);
     return val;
   }
 
   get _bar_spacing() {
     const val = (this._config && this._config.bar_spacing) || 4;
-    console.log('🔧 Editor: _bar_spacing =', val);
     return val;
   }
 
   get _animate() {
     const val = this._config ? (this._config.animate !== false) : true;
-    console.log('🔧 Editor: _animate =', val);
     return val;
   }
 
   get _hours_to_show() {
     const val = (this._config && this._config.hours_to_show) || 24;
-    console.log('🔧 Editor: _hours_to_show =', val);
     return val;
   }
 
   get _points_per_hour() {
     const val = (this._config && this._config.points_per_hour) || 0.5;
-    console.log('🔧 Editor: _points_per_hour =', val);
     return val;
   }
 
   get _aggregate_func() {
     const val = (this._config && this._config.aggregate_func) || 'avg';
-    console.log('🔧 Editor: _aggregate_func =', val);
     return val;
   }
 
   get _group_by() {
     const val = (this._config && this._config.group_by) || 'interval';
-    console.log('🔧 Editor: _group_by =', val);
     return val;
   }
 
   get _update_interval() {
     const val = (this._config && this._config.update_interval) || '';
-    console.log('🔧 Editor: _update_interval =', val);
     return val;
   }
 
   get _hour24() {
     const val = (this._config && this._config.hour24) || false;
-    console.log('🔧 Editor: _hour24 =', val);
     return val;
   }
 
   get _lower_bound() {
     const val = (this._config && this._config.lower_bound !== undefined) ? this._config.lower_bound : '';
-    console.log('🔧 Editor: _lower_bound =', val);
     return val;
   }
 
   get _upper_bound() {
     const val = (this._config && this._config.upper_bound !== undefined) ? this._config.upper_bound : '';
-    console.log('🔧 Editor: _upper_bound =', val);
     return val;
   }
 
   get _min_bound_range() {
     const val = (this._config && this._config.min_bound_range) || '';
-    console.log('🔧 Editor: _min_bound_range =', val);
     return val;
   }
 
   get _smoothing() {
     const val = this._config ? (this._config.smoothing !== false) : true;
-    console.log('🔧 Editor: _smoothing =', val);
     return val;
   }
 
   get _logarithmic() {
     const val = (this._config && this._config.logarithmic) || false;
-    console.log('🔧 Editor: _logarithmic =', val);
     return val;
   }
 
   get _color_thresholds() {
     const val = (this._config && this._config.color_thresholds) || [];
-    console.log('🔧 Editor: _color_thresholds =', val);
     return val;
   }
 
   get _color_thresholds_transition() {
     const val = (this._config && this._config.color_thresholds_transition) || 'smooth';
-    console.log('🔧 Editor: _color_thresholds_transition =', val);
     return val;
   }
 
   get _font_size() {
     const val = (this._config && this._config.font_size) || 100;
-    console.log('🔧 Editor: _font_size =', val);
     return val;
   }
 
   get _font_size_header() {
     const val = (this._config && this._config.font_size_header) || 14;
-    console.log('🔧 Editor: _font_size_header =', val);
     return val;
   }
 
   get _align_header() {
     const val = (this._config && this._config.align_header) || 'default';
-    console.log('🔧 Editor: _align_header =', val);
     return val;
   }
 
   get _align_icon() {
     const val = (this._config && this._config.align_icon) || 'right';
-    console.log('🔧 Editor: _align_icon =', val);
     return val;
   }
 
   get _align_state() {
     const val = (this._config && this._config.align_state) || 'left';
-    console.log('🔧 Editor: _align_state =', val);
     return val;
   }
 
   get _decimals() {
     const val = (this._config && this._config.decimals !== undefined) ? this._config.decimals : '';
-    console.log('🔧 Editor: _decimals =', val);
     return val;
   }
 
   get _cache() {
     const val = this._config ? (this._config.cache !== false) : true;
-    console.log('🔧 Editor: _cache =', val);
     return val;
   }
 
   get _compress() {
     const val = this._config ? (this._config.compress !== false) : true;
-    console.log('🔧 Editor: _compress =', val);
     return val;
   }
 
   get _group() {
     const val = (this._config && this._config.group) || false;
-    console.log('🔧 Editor: _group =', val);
     return val;
   }
 
   get _show() {
     const val = (this._config && this._config.show) || {};
-    console.log('🔧 Editor: _show =', val);
     return val;
   }
 
   get _tap_action() {
     const val = (this._config && this._config.tap_action) || { action: 'more-info' };
-    console.log('🔧 Editor: _tap_action =', val);
     return val;
   }
 
   render() {
-    console.log('🔧 Mini Graph Card Editor: render() called');
-    console.log('🔧 Mini Graph Card Editor: hass =', !!this.hass);
-    console.log('🔧 Mini Graph Card Editor: _config =', this._config);
-
     if (!this.hass) {
-      console.log('🔧 Mini Graph Card Editor: No hass object, showing loading...');
       return html`
         <div class="loading">
           <h3>${t('Loading Home Assistant...')}</h3>
@@ -402,8 +355,6 @@ export default class MiniGraphCardEditor extends LitElement {
         </div>
       `;
     }
-
-    console.log('🔧 Mini Graph Card Editor: Rendering full editor interface');
 
     try {
       return html`
@@ -925,7 +876,6 @@ export default class MiniGraphCardEditor extends LitElement {
         </div>
       `;
     } catch (error) {
-      console.error('🔧 Mini Graph Card Editor: Error in render():', error);
       return html`
         <div class="error">
           <h3>${t('Editor Error')}</h3>
@@ -937,7 +887,6 @@ export default class MiniGraphCardEditor extends LitElement {
   }
 
   renderSection(key, title, description, content) {
-    console.log(`🔧 Editor: Rendering section ${key}`);
     const isExpanded = this._expandedSections[key];
 
     return html`
@@ -955,7 +904,6 @@ export default class MiniGraphCardEditor extends LitElement {
   }
 
   renderEntityPicker(value, handler) {
-    console.log('🔧 Editor: Rendering entity picker with value:', value);
     try {
       if (this.hass && customElements.get('ha-entity-picker')) {
         return html`
@@ -968,7 +916,7 @@ export default class MiniGraphCardEditor extends LitElement {
         `;
       }
     } catch (error) {
-      console.warn('🔧 Editor: ha-entity-picker not available, using fallback:', error);
+      // Fallback silently to simple input
     }
 
     // Fallback to simple input
@@ -989,7 +937,6 @@ export default class MiniGraphCardEditor extends LitElement {
   }
 
   renderIconPicker(value, handler) {
-    console.log('🔧 Editor: Rendering icon picker with value:', value);
     try {
       if (this.hass && customElements.get('ha-icon-picker')) {
         return html`
@@ -1001,7 +948,7 @@ export default class MiniGraphCardEditor extends LitElement {
         `;
       }
     } catch (error) {
-      console.warn('🔧 Editor: ha-icon-picker not available, using fallback:', error);
+      // Fallback silently to simple input
     }
 
     // Fallback to simple input
@@ -1085,9 +1032,8 @@ export default class MiniGraphCardEditor extends LitElement {
     `;
   }
 
-  // Event handlers with logging
+  // Event handlers
   _toggleSection(key) {
-    console.log(`🔧 Editor: Toggling section ${key}`);
     this._expandedSections = {
       ...this._expandedSections,
       [key]: !this._expandedSections[key],
@@ -1096,53 +1042,41 @@ export default class MiniGraphCardEditor extends LitElement {
   }
 
   _primaryEntityChanged(ev) {
-    console.log('🔧 Editor: Primary entity changed:', ev);
     const value = (ev.detail && ev.detail.value) || (ev.target && ev.target.value);
-    console.log('🔧 Editor: New entity value:', value);
 
     if (value && !this._entities.length) {
       this._config = { ...this._config, entities: [value] };
       delete this._config.entity;
-      console.log('🔧 Editor: Updated config:', this._config);
       fireEvent(this, 'config-changed', { config: this._config });
     }
   }
 
   _addEntity() {
-    console.log('🔧 Editor: Adding new entity');
     const entities = [...this._entities, ''];
     this._config = { ...this._config, entities };
-    console.log('🔧 Editor: New entities list:', entities);
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
   _removeEntity(index) {
-    console.log('🔧 Editor: Removing entity at index:', index);
     const entities = [...this._entities];
     entities.splice(index, 1);
     this._config = { ...this._config, entities };
-    console.log('🔧 Editor: Entities after removal:', entities);
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
   _entityListChanged(ev, index) {
-    console.log('🔧 Editor: Entity list changed at index:', index, ev);
     const value = (ev.detail && ev.detail.value) || (ev.target && ev.target.value);
-    console.log('🔧 Editor: New entity value:', value);
 
     if (!value) return;
 
     const entities = [...this._entities];
     entities[index] = value;
     this._config = { ...this._config, entities };
-    console.log('🔧 Editor: Updated entities list:', entities);
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
   _valueChanged(ev, key) {
-    console.log('🔧 Editor: Value changed for key:', key, ev);
     if (!this._config || !this.hass) {
-      console.warn('🔧 Editor: No config or hass available');
       return;
     }
 
@@ -1157,7 +1091,6 @@ export default class MiniGraphCardEditor extends LitElement {
       value = ev.target.value;
     }
 
-    console.log('🔧 Editor: Setting', key, '=', value);
 
     // Handle special cases
     if (key === 'line_color' && typeof value === 'string' && value.includes(',')) {
@@ -1165,12 +1098,10 @@ export default class MiniGraphCardEditor extends LitElement {
     }
 
     this._config = { ...this._config, [key]: value };
-    console.log('🔧 Editor: Updated config:', this._config);
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
   _showChanged(ev, key) {
-    console.log('🔧 Editor: Show option changed for key:', key, ev.target.checked);
     if (!this._config || !this.hass) return;
 
     const value = ev.target.checked;
@@ -1179,29 +1110,23 @@ export default class MiniGraphCardEditor extends LitElement {
       show: { ...this._show, [key]: value },
     };
 
-    console.log('🔧 Editor: Updated show config:', this._config.show);
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
   _addThreshold() {
-    console.log('🔧 Editor: Adding new threshold');
     const thresholds = [...this._color_thresholds, { value: 0, color: '#ff0000' }];
     this._config = { ...this._config, color_thresholds: thresholds };
-    console.log('🔧 Editor: New thresholds:', thresholds);
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
   _removeThreshold(index) {
-    console.log('🔧 Editor: Removing threshold at index:', index);
     const thresholds = [...this._color_thresholds];
     thresholds.splice(index, 1);
     this._config = { ...this._config, color_thresholds: thresholds };
-    console.log('🔧 Editor: Thresholds after removal:', thresholds);
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
   _thresholdChanged(ev, index, field) {
-    console.log('🔧 Editor: Threshold changed at index:', index, 'field:', field, 'value:', ev.target.value);
     const thresholds = [...this._color_thresholds];
     let { value } = ev.target;
 
@@ -1211,22 +1136,18 @@ export default class MiniGraphCardEditor extends LitElement {
 
     thresholds[index] = { ...thresholds[index], [field]: value };
     this._config = { ...this._config, color_thresholds: thresholds };
-    console.log('🔧 Editor: Updated thresholds:', thresholds);
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
   _tapActionChanged(ev, field) {
-    console.log('🔧 Editor: Tap action changed field:', field, 'value:', ev.target.value);
     const { value } = ev.target;
 
     const tapAction = { ...this._tap_action, [field]: value };
     this._config = { ...this._config, tap_action: tapAction };
-    console.log('🔧 Editor: Updated tap action:', tapAction);
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
   _toggleEntityConfig(index) {
-    console.log('🔧 Editor: Toggling entity config for index:', index);
     this._expandedEntities = this._expandedEntities || [];
     const isExpanded = this._expandedEntities.includes(index);
 
@@ -1236,7 +1157,6 @@ export default class MiniGraphCardEditor extends LitElement {
       this._expandedEntities = [...this._expandedEntities, index];
     }
 
-    console.log('🔧 Editor: Expanded entities:', this._expandedEntities);
     this.requestUpdate();
   }
 
@@ -1245,7 +1165,6 @@ export default class MiniGraphCardEditor extends LitElement {
   }
 
   _entityConfigChanged(ev, index, field) {
-    console.log('🔧 Editor: Entity config changed at index:', index, 'field:', field, 'value:', ev.target.value);
     const entities = [...this._entities];
     const entityConfig = typeof entities[index] === 'string'
       ? { entity: entities[index] }
@@ -1261,7 +1180,6 @@ export default class MiniGraphCardEditor extends LitElement {
     entities[index] = entityConfig;
 
     this._config = { ...this._config, entities };
-    console.log('🔧 Editor: Updated entity config:', entityConfig);
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
@@ -1607,6 +1525,4 @@ export default class MiniGraphCardEditor extends LitElement {
   }
 }
 
-console.log('🔧 Mini Graph Card Editor: Defining custom element...');
 customElements.define('mini-graph-card-editor', MiniGraphCardEditor);
-console.log('🔧 Mini Graph Card Editor: Custom element defined successfully!');
