@@ -1077,6 +1077,17 @@ class MiniGraphCard extends LitElement {
   }
 }
 
+// Add getConfigElement method for visual editor
+MiniGraphCard.getConfigElement = function getConfigElement() {
+  return document.createElement('mini-graph-card-editor');
+};
+
+// Add stub config for Lovelace card picker
+MiniGraphCard.getStubConfig = () => ({
+  type: 'custom:mini-graph-card',
+  entity: 'sensor.example',
+});
+
 customElements.define('mini-graph-card', MiniGraphCard);
 
 // Configure the preview in the Lovelace card picker

@@ -14,21 +14,38 @@ const serveopts = {
   },
 };
 
-export default {
-  input: 'src/main.js',
-  output: {
-    file: 'dist/mini-graph-card-bundle.js',
-    format: 'umd',
-    name: 'MiniGraphCard',
-    sourcemap: dev ? true : false,
+export default [
+  // Main card bundle
+  {
+    input: 'src/main.js',
+    output: {
+      file: 'dist/mini-graph-card-bundle.js',
+      format: 'umd',
+      name: 'MiniGraphCard',
+      sourcemap: dev ? true : false,
+    },
+    plugins: [
+      commonjs(),
+      json({
+        include: 'package.json',
+        preferConst: true,
+      }),
+      resolve(),
+      dev && serve(serveopts),
+    ],
   },
-  plugins: [
-    commonjs(),
-    json({
-      include: 'package.json',
-      preferConst: true,
-    }),
-    resolve(),
-    dev && serve(serveopts),
-  ],
-};
+  // Editor bundle
+  {
+    input: 'src/editor.js',
+    output: {
+      file: 'dist/mini-graph-card-editor.js',
+      format: 'umd',
+      name: 'MiniGraphCardEditor',
+      sourcemap: dev ? true : false,
+    },
+    plugins: [
+      commonjs(),
+      resolve(),
+    ],
+  }
+];
