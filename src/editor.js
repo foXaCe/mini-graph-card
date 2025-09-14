@@ -1496,9 +1496,19 @@ export default class MiniGraphCardEditor extends LitElement {
         border-bottom: 1px solid var(--divider-color);
       }
 
+      .entity-config-header button {
+        flex-shrink: 0;
+        min-width: 80px;
+      }
+
       .entity-name {
         font-weight: 500;
         color: var(--primary-text-color);
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-right: 16px;
       }
 
       .entity-config-content {
