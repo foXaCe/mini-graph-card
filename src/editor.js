@@ -384,7 +384,6 @@ export default class MiniGraphCardEditor extends LitElement {
     typeof entity === 'string' ? entity : entity.entity,
     ev => this._entityListChanged(ev, index),
   )}
-                  <button class="btn-remove" @click="${() => this._removeEntity(index)}">${t('Remove')}</button>
                 </div>
               `)}
               <button class="btn-add" @click="${this._addEntity}">${t('Add Entity')}</button>
