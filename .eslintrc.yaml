@@ -12,8 +12,10 @@ rules:
   camelcase: 0
   no-console: 0
   prefer-destructuring: 0
+  quote-props: 0
 globals:
   window: true
   Event: true
   customElements: true
   document: true
+  navigator: true

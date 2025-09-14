@@ -2921,6 +2921,145 @@
     console.warn('🔧 MINI-GRAPH-CARD EDITOR IS LOADING - DEBUG MODE ACTIVE');
     console.trace('🔧 Editor loading trace');
 
+    // French translations
+    const TRANSLATIONS_FR = {
+      // Headers
+      'Mini Graph Card Configuration': 'Configuration Mini Graph Card',
+      'Complete configuration for all options': 'Configuration complète pour toutes les options',
+      'Basic configuration required for the card': 'Configuration de base requise pour la carte',
+      'Name, icon, and visual appearance settings': 'Nom, icône et paramètres d\'apparence visuelle',
+      'Graph type, colors, and visual properties': 'Type de graphique, couleurs et propriétés visuelles',
+      'Data aggregation and time configuration': 'Agrégation des données et configuration temporelle',
+      'Y-axis bounds and scaling options': 'Limites de l\'axe Y et options d\'échelle',
+      'Color configuration and dynamic thresholds': 'Configuration des couleurs et seuils dynamiques',
+      'Advanced options and performance settings': 'Options avancées et paramètres de performance',
+      'Per-entity configuration and customization': 'Configuration et personnalisation par entité',
+
+      // Section titles
+      'Required Settings': 'Paramètres requis',
+      'Display Options': 'Options d\'affichage',
+      'Graph Settings': 'Paramètres du graphique',
+      'Data & Time': 'Données et temps',
+      'Scale & Bounds': 'Échelle et limites',
+      'Colors & Thresholds': 'Couleurs et seuils',
+      'Advanced Options': 'Options avancées',
+      'Entity Configuration': 'Configuration des entités',
+
+      // Form labels
+      'Primary Entity (will be converted to entities list)': 'Entité principale (sera convertie en liste d\'entités)',
+      'Entities List': 'Liste des entités',
+      'Card Name': 'Nom de la carte',
+      'Icon': 'Icône',
+      'Icon Image URL': 'URL de l\'image d\'icône',
+      'Unit': 'Unité',
+      'Font Size (%)': 'Taille de police (%)',
+      'Header Font Size (px)': 'Taille de police de l\'en-tête (px)',
+      'Header Alignment': 'Alignement de l\'en-tête',
+      'Icon Alignment': 'Alignement de l\'icône',
+      'State Alignment': 'Alignement de l\'état',
+      'Decimal Places': 'Nombre de décimales',
+      'Height (px)': 'Hauteur (px)',
+      'Line Width': 'Épaisseur de ligne',
+      'Line Colors (comma-separated)': 'Couleurs de ligne (séparées par des virgules)',
+      'Bar Spacing': 'Espacement des barres',
+      'Enable Animation': 'Activer l\'animation',
+      'Smooth Lines': 'Lignes lissées',
+      'Logarithmic Scale': 'Échelle logarithmique',
+      'Hours to Show': 'Heures à afficher',
+      'Points per Hour': 'Points par heure',
+      'Aggregate Function': 'Fonction d\'agrégation',
+      'Group By': 'Grouper par',
+      'Update Interval (seconds)': 'Intervalle de mise à jour (secondes)',
+      '24-Hour Time Format': 'Format 24 heures',
+      'Lower Bound (use ~N for soft)': 'Limite inférieure (utiliser ~N pour souple)',
+      'Upper Bound (use ~N for soft)': 'Limite supérieure (utiliser ~N pour souple)',
+      'Minimum Range': 'Plage minimale',
+      'Threshold Transition': 'Transition des seuils',
+      'Color Thresholds': 'Seuils de couleur',
+      'Cache Data': 'Cache des données',
+      'Compress Data': 'Compression des données',
+      'Group Entities': 'Grouper les entités',
+
+      // Options
+      'Default': 'Par défaut',
+      'Left': 'Gauche',
+      'Right': 'Droite',
+      'Center': 'Centre',
+      'With State': 'Avec l\'état',
+      'Average': 'Moyenne',
+      'Median': 'Médiane',
+      'Minimum': 'Minimum',
+      'Maximum': 'Maximum',
+      'First': 'Premier',
+      'Last': 'Dernier',
+      'Sum': 'Somme',
+      'Delta': 'Delta',
+      'Difference': 'Différence',
+      'Interval': 'Intervalle',
+      'Date': 'Date',
+      'Hour': 'Heure',
+      'Smooth': 'Lisse',
+      'Hard': 'Dur',
+
+      // Visibility options
+      'Visibility Options': 'Options de visibilité',
+      'Name': 'Nom',
+      'State': 'État',
+      'Graph': 'Graphique',
+      'Fill': 'Remplissage',
+      'Legend': 'Légende',
+      'Extrema': 'Extrema',
+      'Labels': 'Étiquettes',
+      'Secondary Labels': 'Étiquettes secondaires',
+      'Points': 'Points',
+
+      // Buttons
+      'Add Entity': 'Ajouter une entité',
+      'Remove': 'Supprimer',
+      'Add Threshold': 'Ajouter un seuil',
+      'Add State Mapping': 'Ajouter un mappage d\'état',
+
+      // Placeholders
+      'Card title': 'Titre de la carte',
+      '°C, kW, etc.': '°C, kW, etc.',
+      '#ff0000, #00ff00, #0000ff': '#ff0000, #00ff00, #0000ff',
+      '0 or ~0': '0 ou ~0',
+      '100 or ~100': '100 ou ~100',
+      'Value': 'Valeur',
+      'Color': 'Couleur',
+      'Original Value': 'Valeur originale',
+      'Display Label': 'Libellé affiché',
+
+      // Loading and error messages
+      'Loading Home Assistant...': 'Chargement de Home Assistant...',
+      'Please wait while the editor loads.': 'Veuillez patienter pendant le chargement de l\'éditeur.',
+      'Editor Error': 'Erreur de l\'éditeur',
+      'An error occurred while rendering the editor:': 'Une erreur s\'est produite lors du rendu de l\'éditeur :',
+
+      // Debug info
+      'Debug: Config loaded = ': 'Debug : Config chargée = ',
+      ', Entities = ': ', Entités = ',
+
+      // Advanced sections
+      'Primary Y-Axis': 'Axe Y principal',
+      'Thresholds': 'Seuils',
+    };
+
+    // Get browser language
+    const getBrowserLanguage = () => {
+      const lang = navigator.language || navigator.userLanguage || 'en';
+      return lang.toLowerCase().startsWith('fr') ? 'fr' : 'en';
+    };
+
+    // Translation function
+    const t = (key) => {
+      const lang = getBrowserLanguage();
+      if (lang === 'fr' && TRANSLATIONS_FR[key]) {
+        return TRANSLATIONS_FR[key];
+      }
+      return key; // Fallback to original English text
+    };
+
     class MiniGraphCardEditor extends LitElement {
       static get properties() {
         console.log('🔧 Mini Graph Card Editor: Defining properties...');
@@ -3174,8 +3313,8 @@
           console.log('🔧 Mini Graph Card Editor: No hass object, showing loading...');
           return html`
         <div class="loading">
-          <h3>Loading Home Assistant...</h3>
-          <p>Please wait while the editor loads.</p>
+          <h3>${t('Loading Home Assistant...')}</h3>
+          <p>${t('Please wait while the editor loads.')}</p>
         </div>
       `;
         }
@@ -3186,59 +3325,59 @@
           return html`
         <div class="card-config">
           <div class="header">
-            <h2>Mini Graph Card Configuration</h2>
-            <p>Complete configuration for all options</p>
+            <h2>${t('Mini Graph Card Configuration')}</h2>
+            <p>${t('Complete configuration for all options')}</p>
             <div class="debug-info">
-              <small>Debug: Config loaded = ${!!this._config}, Entities = ${this._entities.length}</small>
+              <small>${t('Debug: Config loaded = ')}${!!this._config}${t(', Entities = ')}${this._entities.length}</small>
             </div>
           </div>
 
           <!-- REQUIRED SETTINGS -->
-          ${this.renderSection('required', '🔧 Required Settings', 'Basic configuration required for the card', html`
+          ${this.renderSection('required', `🔧 ${t('Required Settings')}`, t('Basic configuration required for the card'), html`
             ${this._entities.length === 0 ? html`
               <div class="form-group">
-                <label>Primary Entity (will be converted to entities list):</label>
+                <label>${t('Primary Entity (will be converted to entities list)')}:</label>
                 ${this.renderEntityPicker(this._entity, ev => this._primaryEntityChanged(ev))}
               </div>
             ` : ''}
 
             <div class="form-group">
-              <label>Entities List:</label>
+              <label>${t('Entities List')}:</label>
               ${this._entities.map((entity, index) => html`
                 <div class="entity-row">
                   ${this.renderEntityPicker(
     typeof entity === 'string' ? entity : entity.entity,
     ev => this._entityListChanged(ev, index),
   )}
-                  <button class="btn-remove" @click="${() => this._removeEntity(index)}">Remove</button>
+                  <button class="btn-remove" @click="${() => this._removeEntity(index)}">${t('Remove')}</button>
                 </div>
               `)}
-              <button class="btn-add" @click="${this._addEntity}">Add Entity</button>
+              <button class="btn-add" @click="${this._addEntity}">${t('Add Entity')}</button>
             </div>
           `)}
 
           <!-- DISPLAY OPTIONS -->
-          ${this.renderSection('display', '🎨 Display Options', 'Name, icon, and visual appearance settings', html`
+          ${this.renderSection('display', `🎨 ${t('Display Options')}`, t('Name, icon, and visual appearance settings'), html`
             <div class="form-row">
               <div class="form-group">
-                <label>Card Name:</label>
+                <label>${t('Card Name')}:</label>
                 <input
                   type="text"
                   .value="${this._name}"
                   @input="${ev => this._valueChanged(ev, 'name')}"
-                  placeholder="Card title"
+                  placeholder="${t('Card title')}"
                 />
               </div>
 
               <div class="form-group">
-                <label>Icon:</label>
+                <label>${t('Icon')}:</label>
                 ${this.renderIconPicker(this._icon, ev => this._valueChanged(ev, 'icon'))}
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label>Icon Image URL:</label>
+                <label>${t('Icon Image URL')}:</label>
                 <input
                   type="text"
                   .value="${this._icon_image}"
@@ -3248,19 +3387,19 @@
               </div>
 
               <div class="form-group">
-                <label>Unit:</label>
+                <label>${t('Unit')}:</label>
                 <input
                   type="text"
                   .value="${this._unit}"
                   @input="${ev => this._valueChanged(ev, 'unit')}"
-                  placeholder="°C, kW, etc."
+                  placeholder="${t('°C, kW, etc.')}"
                 />
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label>Font Size (%):</label>
+                <label>${t('Font Size (%)')}:</label>
                 <input
                   type="number"
                   min="50"
@@ -3271,7 +3410,7 @@
               </div>
 
               <div class="form-group">
-                <label>Header Font Size (px):</label>
+                <label>${t('Header Font Size (px)')}:</label>
                 <input
                   type="number"
                   min="8"
@@ -3284,38 +3423,38 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label>Header Alignment:</label>
+                <label>${t('Header Alignment')}:</label>
                 <select .value="${this._align_header}" @change="${ev => this._valueChanged(ev, 'align_header')}">
-                  <option value="default">Default</option>
-                  <option value="left">Left</option>
-                  <option value="right">Right</option>
-                  <option value="center">Center</option>
+                  <option value="default">${t('Default')}</option>
+                  <option value="left">${t('Left')}</option>
+                  <option value="right">${t('Right')}</option>
+                  <option value="center">${t('Center')}</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label>Icon Alignment:</label>
+                <label>${t('Icon Alignment')}:</label>
                 <select .value="${this._align_icon}" @change="${ev => this._valueChanged(ev, 'align_icon')}">
-                  <option value="left">Left</option>
-                  <option value="right">Right</option>
-                  <option value="center">Center</option>
-                  <option value="state">With State</option>
+                  <option value="left">${t('Left')}</option>
+                  <option value="right">${t('Right')}</option>
+                  <option value="center">${t('Center')}</option>
+                  <option value="state">${t('With State')}</option>
                 </select>
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label>State Alignment:</label>
+                <label>${t('State Alignment')}:</label>
                 <select .value="${this._align_state}" @change="${ev => this._valueChanged(ev, 'align_state')}">
-                  <option value="left">Left</option>
-                  <option value="right">Right</option>
-                  <option value="center">Center</option>
+                  <option value="left">${t('Left')}</option>
+                  <option value="right">${t('Right')}</option>
+                  <option value="center">${t('Center')}</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label>Decimal Places:</label>
+                <label>${t('Decimal Places')}:</label>
                 <input
                   type="number"
                   min="0"
@@ -3327,20 +3466,20 @@
             </div>
 
             <div class="show-options">
-              <h4>Visibility Options</h4>
+              <h4>${t('Visibility Options')}</h4>
               <div class="checkbox-grid">
                 ${[
-    { key: 'name', label: 'Name' },
-    { key: 'icon', label: 'Icon' },
-    { key: 'state', label: 'State' },
-    { key: 'graph', label: 'Graph' },
-    { key: 'fill', label: 'Fill' },
-    { key: 'points', label: 'Points' },
-    { key: 'legend', label: 'Legend' },
-    { key: 'extrema', label: 'Extrema' },
-    { key: 'average', label: 'Average' },
-    { key: 'labels', label: 'Labels' },
-    { key: 'labels_secondary', label: 'Secondary Labels' },
+    { key: 'name', label: t('Name') },
+    { key: 'icon', label: t('Icon') },
+    { key: 'state', label: t('State') },
+    { key: 'graph', label: t('Graph') },
+    { key: 'fill', label: t('Fill') },
+    { key: 'points', label: t('Points') },
+    { key: 'legend', label: t('Legend') },
+    { key: 'extrema', label: t('Extrema') },
+    { key: 'average', label: t('Average') },
+    { key: 'labels', label: t('Labels') },
+    { key: 'labels_secondary', label: t('Secondary Labels') },
   ].map(option => html`
                   <label class="checkbox-item">
                     <input
@@ -3356,10 +3495,10 @@
           `)}
 
           <!-- GRAPH SETTINGS -->
-          ${this.renderSection('graph', '📊 Graph Settings', 'Graph type, colors, and visual properties', html`
+          ${this.renderSection('graph', `📊 ${t('Graph Settings')}`, t('Graph type, colors, and visual properties'), html`
             <div class="form-row">
               <div class="form-group">
-                <label>Height (px):</label>
+                <label>${t('Height (px)')}:</label>
                 <input
                   type="number"
                   min="50"
@@ -3370,7 +3509,7 @@
               </div>
 
               <div class="form-group">
-                <label>Line Width:</label>
+                <label>${t('Line Width')}:</label>
                 <input
                   type="number"
                   min="1"
@@ -3383,17 +3522,17 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label>Line Colors (comma-separated):</label>
+                <label>${t('Line Colors (comma-separated)')}:</label>
                 <input
                   type="text"
                   .value="${this._line_color}"
                   @input="${ev => this._valueChanged(ev, 'line_color')}"
-                  placeholder="#ff0000, #00ff00, #0000ff"
+                  placeholder="${t('#ff0000, #00ff00, #0000ff')}"
                 />
               </div>
 
               <div class="form-group">
-                <label>Bar Spacing:</label>
+                <label>${t('Bar Spacing')}:</label>
                 <input
                   type="number"
                   min="0"
@@ -3412,7 +3551,7 @@
                     .checked="${this._animate}"
                     @change="${ev => this._valueChanged(ev, 'animate')}"
                   />
-                  Enable Animation
+                  ${t('Enable Animation')}
                 </label>
               </div>
 
@@ -3423,7 +3562,7 @@
                     .checked="${this._smoothing}"
                     @change="${ev => this._valueChanged(ev, 'smoothing')}"
                   />
-                  Smooth Lines
+                  ${t('Smooth Lines')}
                 </label>
               </div>
             </div>
@@ -3436,17 +3575,17 @@
                     .checked="${this._logarithmic}"
                     @change="${ev => this._valueChanged(ev, 'logarithmic')}"
                   />
-                  Logarithmic Scale
+                  ${t('Logarithmic Scale')}
                 </label>
               </div>
             </div>
           `)}
 
           <!-- DATA & TIME -->
-          ${this.renderSection('data', '⏱️ Data & Time', 'Data aggregation and time configuration', html`
+          ${this.renderSection('data', `⏱️ ${t('Data & Time')}`, t('Data aggregation and time configuration'), html`
             <div class="form-row">
               <div class="form-group">
-                <label>Hours to Show:</label>
+                <label>${t('Hours to Show')}:</label>
                 <input
                   type="number"
                   min="1"
@@ -3457,7 +3596,7 @@
               </div>
 
               <div class="form-group">
-                <label>Points per Hour:</label>
+                <label>${t('Points per Hour')}:</label>
                 <input
                   type="number"
                   min="0.1"
@@ -3471,33 +3610,33 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label>Aggregate Function:</label>
+                <label>${t('Aggregate Function')}:</label>
                 <select .value="${this._aggregate_func}" @change="${ev => this._valueChanged(ev, 'aggregate_func')}">
-                  <option value="avg">Average</option>
-                  <option value="median">Median</option>
-                  <option value="min">Minimum</option>
-                  <option value="max">Maximum</option>
-                  <option value="first">First</option>
-                  <option value="last">Last</option>
-                  <option value="sum">Sum</option>
-                  <option value="delta">Delta</option>
-                  <option value="diff">Difference</option>
+                  <option value="avg">${t('Average')}</option>
+                  <option value="median">${t('Median')}</option>
+                  <option value="min">${t('Minimum')}</option>
+                  <option value="max">${t('Maximum')}</option>
+                  <option value="first">${t('First')}</option>
+                  <option value="last">${t('Last')}</option>
+                  <option value="sum">${t('Sum')}</option>
+                  <option value="delta">${t('Delta')}</option>
+                  <option value="diff">${t('Difference')}</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label>Group By:</label>
+                <label>${t('Group By')}:</label>
                 <select .value="${this._group_by}" @change="${ev => this._valueChanged(ev, 'group_by')}">
-                  <option value="interval">Interval</option>
-                  <option value="date">Date</option>
-                  <option value="hour">Hour</option>
+                  <option value="interval">${t('Interval')}</option>
+                  <option value="date">${t('Date')}</option>
+                  <option value="hour">${t('Hour')}</option>
                 </select>
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label>Update Interval (seconds):</label>
+                <label>${t('Update Interval (seconds)')}:</label>
                 <input
                   type="number"
                   min="1"
@@ -3513,39 +3652,39 @@
                     .checked="${this._hour24}"
                     @change="${ev => this._valueChanged(ev, 'hour24')}"
                   />
-                  24-Hour Time Format
+                  ${t('24-Hour Time Format')}
                 </label>
               </div>
             </div>
           `)}
 
           <!-- SCALE & BOUNDS -->
-          ${this.renderSection('bounds', '📏 Scale & Bounds', 'Y-axis bounds and scaling options', html`
-            <h4>Primary Y-Axis</h4>
+          ${this.renderSection('bounds', `📏 ${t('Scale & Bounds')}`, t('Y-axis bounds and scaling options'), html`
+            <h4>${t('Primary Y-Axis')}</h4>
             <div class="form-row">
               <div class="form-group">
-                <label>Lower Bound (use ~N for soft):</label>
+                <label>${t('Lower Bound (use ~N for soft)')}:</label>
                 <input
                   type="text"
                   .value="${this._lower_bound}"
                   @input="${ev => this._valueChanged(ev, 'lower_bound')}"
-                  placeholder="0 or ~0"
+                  placeholder="${t('0 or ~0')}"
                 />
               </div>
 
               <div class="form-group">
-                <label>Upper Bound (use ~N for soft):</label>
+                <label>${t('Upper Bound (use ~N for soft)')}:</label>
                 <input
                   type="text"
                   .value="${this._upper_bound}"
                   @input="${ev => this._valueChanged(ev, 'upper_bound')}"
-                  placeholder="100 or ~100"
+                  placeholder="${t('100 or ~100')}"
                 />
               </div>
             </div>
 
             <div class="form-group">
-              <label>Minimum Range:</label>
+              <label>${t('Minimum Range')}:</label>
               <input
                 type="number"
                 min="0"
@@ -3556,19 +3695,19 @@
           `)}
 
           <!-- COLORS & THRESHOLDS -->
-          ${this.renderSection('colors', '🎨 Colors & Thresholds', 'Color configuration and dynamic thresholds', html`
+          ${this.renderSection('colors', `🎨 ${t('Colors & Thresholds')}`, t('Color configuration and dynamic thresholds'), html`
             <div class="form-group">
-              <label>Threshold Transition:</label>
+              <label>${t('Threshold Transition')}:</label>
               <select .value="${this._color_thresholds_transition}" @change="${ev => this._valueChanged(ev, 'color_thresholds_transition')}">
-                <option value="smooth">Smooth</option>
-                <option value="hard">Hard</option>
+                <option value="smooth">${t('Smooth')}</option>
+                <option value="hard">${t('Hard')}</option>
               </select>
             </div>
 
             <div class="thresholds-section">
               <div class="thresholds-header">
-                <h4>Color Thresholds</h4>
-                <button class="btn-add" @click="${this._addThreshold}">Add Threshold</button>
+                <h4>${t('Color Thresholds')}</h4>
+                <button class="btn-add" @click="${this._addThreshold}">${t('Add Threshold')}</button>
               </div>
 
               ${this._color_thresholds.map((threshold, index) => html`
@@ -3577,7 +3716,7 @@
                     type="number"
                     .value="${threshold.value}"
                     @input="${ev => this._thresholdChanged(ev, index, 'value')}"
-                    placeholder="Value"
+                    placeholder="${t('Value')}"
                   />
                   <input
                     type="color"
@@ -3591,7 +3730,7 @@
           `)}
 
           <!-- ADVANCED OPTIONS -->
-          ${this.renderSection('advanced', '⚙️ Advanced Options', 'Performance, caching, and advanced settings', html`
+          ${this.renderSection('advanced', `⚙️ ${t('Advanced Options')}`, t('Advanced options and performance settings'), html`
             <div class="form-row">
               <div class="form-group">
                 <label class="checkbox-label">
@@ -3600,7 +3739,7 @@
                     .checked="${this._cache}"
                     @change="${ev => this._valueChanged(ev, 'cache')}"
                   />
-                  Enable Caching
+                  ${t('Cache Data')}
                 </label>
               </div>
 
@@ -3611,7 +3750,7 @@
                     .checked="${this._compress}"
                     @change="${ev => this._valueChanged(ev, 'compress')}"
                   />
-                  Enable Compression
+                  ${t('Compress Data')}
                 </label>
               </div>
             </div>
@@ -3623,7 +3762,7 @@
                   .checked="${this._group}"
                   @change="${ev => this._valueChanged(ev, 'group')}"
                 />
-                Group Mode (remove padding/shadow)
+                ${t('Group Entities')}
               </label>
             </div>
 
@@ -3681,7 +3820,7 @@
           `)}
 
           <!-- ENTITY CONFIGURATION -->
-          ${this.renderSection('entities', '🔧 Entity Configuration', 'Individual entity settings and overrides', html`
+          ${this.renderSection('entities', `🔧 ${t('Entity Configuration')}`, t('Per-entity configuration and customization'), html`
             <div class="entities-info">
               Configure individual entity settings. These override global settings for specific entities.
             </div>
@@ -3705,8 +3844,8 @@
           console.error('🔧 Mini Graph Card Editor: Error in render():', error);
           return html`
         <div class="error">
-          <h3>Editor Error</h3>
-          <p>An error occurred while rendering the editor: ${error.message}</p>
+          <h3>${t('Editor Error')}</h3>
+          <p>${t('An error occurred while rendering the editor:')}: ${error.message}</p>
           <pre>${error.stack}</pre>
         </div>
       `;
