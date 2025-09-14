@@ -10,6 +10,8 @@ rules:
   class-methods-use-this: 0
   no-nested-ternary: 0
   camelcase: 0
+  no-console: 0
+  prefer-destructuring: 0
 globals:
   window: true
   Event: true
