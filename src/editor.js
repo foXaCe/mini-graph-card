@@ -124,6 +124,8 @@ const TRANSLATIONS_FR = {
   // Advanced sections
   'Primary Y-Axis': 'Axe Y principal',
   'Thresholds': 'Seuils',
+  'Custom Name': 'Nom personnalisé',
+  'Custom Color': 'Couleur personnalisée',
 };
 
 // Get browser language
@@ -968,7 +970,7 @@ export default class MiniGraphCardEditor extends LitElement {
       <div class="entity-config-content">
         <div class="form-row">
           <div class="form-group">
-            <label>Custom Name:</label>
+            <label>${t('Custom Name')}:</label>
             <input
               type="text"
               .value="${config.name || ''}"
@@ -977,7 +979,7 @@ export default class MiniGraphCardEditor extends LitElement {
           </div>
 
           <div class="form-group">
-            <label>Custom Color:</label>
+            <label>${t('Custom Color')}:</label>
             <input
               type="color"
               .value="${config.color || '#ff0000'}"
