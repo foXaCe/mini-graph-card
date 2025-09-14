@@ -3057,6 +3057,8 @@
       'Entities': 'Entités',
       'Add, configure and manage all your entities': 'Ajoutez, configurez et gérez toutes vos entités',
       'Remove Entity': 'Supprimer l\'entité',
+      'Tap Action': 'Action tactile',
+      'Action Type': 'Type d\'action',
     };
 
     // Get browser language
@@ -3324,26 +3326,28 @@
             <div class="entities-section">
               ${this._entities.map((entity, index) => html`
                 <div class="entity-management-row">
-                  <div class="entity-picker-section">
-                    ${this.renderEntityPicker(
+                  <div class="entity-top-section">
+                    <div class="entity-picker-section">
+                      ${this.renderEntityPicker(
     typeof entity === 'string' ? entity : entity.entity,
     ev => this._entityListChanged(ev, index),
   )}
-                  </div>
-                  <div class="entity-info-section">
-                    ${(() => {
+                    </div>
+                    <div class="entity-info-section">
+                      ${(() => {
     const entityId = typeof entity === 'string' ? entity : entity.entity;
     const entityInfo = this.getEntityInfo(entityId);
     return html`
-                        <div class="entity-display">
-                          <ha-icon .icon="${entityInfo.icon}" class="entity-icon"></ha-icon>
-                          <div class="entity-details">
-                            <div class="entity-friendly-name">${entityInfo.friendlyName}</div>
-                            <div class="entity-id">${entityInfo.entityId}</div>
+                          <div class="entity-display">
+                            <ha-icon .icon="${entityInfo.icon}" class="entity-icon"></ha-icon>
+                            <div class="entity-details">
+                              <div class="entity-friendly-name">${entityInfo.friendlyName}</div>
+                              <div class="entity-id">${entityInfo.entityId}</div>
+                            </div>
                           </div>
-                        </div>
-                      `;
+                        `;
   })()}
+                    </div>
                   </div>
                   <div class="entity-actions">
                     <button class="btn-configure" @click="${() => this._toggleEntityConfig(index)}">
@@ -3773,10 +3777,10 @@
             </div>
 
             <div class="tap-action-section">
-              <h4>Tap Action</h4>
+              <h4>${t('Tap Action')}</h4>
               <div class="form-row">
                 <div class="form-group">
-                  <label>Action Type:</label>
+                  <label>${t('Action Type')}:</label>
                   <select .value="${this._tap_action.action}" @change="${ev => this._tapActionChanged(ev, 'action')}">
                     <option value="more-info">More Info</option>
                     <option value="navigate">Navigate</option>
@@ -4498,18 +4502,16 @@
         font-weight: 500;
         color: var(--primary-text-color);
         font-size: 0.95em;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        word-wrap: break-word;
+        line-height: 1.3;
       }
 
       .entity-id {
         color: var(--secondary-text-color);
         font-size: 0.8em;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        word-wrap: break-word;
         margin-top: 2px;
+        line-height: 1.2;
       }
 
       .entities-section {
@@ -4519,14 +4521,20 @@
       }
 
       .entity-management-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr auto;
-        gap: 16px;
-        align-items: center;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
         padding: 16px;
         border: 1px solid var(--divider-color);
         border-radius: 8px;
         background: var(--card-background-color);
+      }
+
+      .entity-top-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        align-items: center;
       }
 
       .entity-picker-section {
@@ -4556,7 +4564,8 @@
       .entity-actions {
         display: flex;
         gap: 8px;
-        flex-shrink: 0;
+        justify-content: flex-end;
+        flex-wrap: wrap;
       }
 
       .btn-configure {
