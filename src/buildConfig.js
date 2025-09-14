@@ -132,6 +132,15 @@ export default (config) => {
     tap_action: {
       action: 'more-info',
     },
+    // Advanced features
+    chart_type: 'line', // 'line', 'area', 'stacked_area', 'bar', 'candlestick', 'multi_axis'
+    zoom_pan_enabled: false,
+    enable_zoom: true,
+    enable_pan: true,
+    show_zoom_controls: true,
+    micro_interactions: true,
+    intelligent_cache: true,
+    performance_mode: false, // Enable for large datasets
     ...JSON.parse(JSON.stringify(config)),
     show: { ...DEFAULT_SHOW, ...config.show },
   };

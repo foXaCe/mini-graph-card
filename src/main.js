@@ -7,6 +7,11 @@ import Graph from './graph';
 import style from './style';
 import handleClick from './handleClick';
 import buildConfig from './buildConfig';
+// Advanced features - simplified version for compatibility
+import { MicroInteractions } from './microInteractionsSimple';
+// import { AdvancedCharts, ChartTypes } from './advancedCharts';
+// import { ZoomPanController } from './zoomPan';
+// import { getGlobalCache, CacheStrategies } from './intelligentCache';
 import './initialize';
 import { version } from '../package.json';
 import './editor';
@@ -49,6 +54,13 @@ class MiniGraphCard extends LitElement {
     this.stateChanged = false;
     this.initial = true;
     this._md5Config = undefined;
+    // Advanced features - partial activation
+    this.microInteractions = null;
+    this.activeTooltip = null;
+    // this.interactionStates = new Map();
+    // this.advancedCharts = null;
+    // this.zoomPanController = null;
+    // this.cache = null;
   }
 
   static get styles() {
@@ -130,6 +142,25 @@ class MiniGraphCard extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+
+    // Initialize micro-interactions
+    if (!this.microInteractions) {
+      this.microInteractions = new MicroInteractions(this);
+      this.microInteractions.startPerformanceMonitoring();
+    }
+
+    // if (!this.cache) {
+    //   this.cache = getGlobalCache({
+    //     maxMemorySize: 25 * 1024 * 1024, // 25MB for charts
+    //     enableCompression: true,
+    //     enableDiskCache: true,
+    //   });
+    // }
+
+    // if (!this.advancedCharts) {
+    //   this.advancedCharts = new AdvancedCharts(this.config, this.entity);
+    // }
+
     if (this.config.update_interval) {
       window.requestAnimationFrame(() => {
         this.updateOnInterval();
@@ -145,6 +176,13 @@ class MiniGraphCard extends LitElement {
     if (this.interval) {
       clearInterval(this.interval);
     }
+
+    // Cleanup micro-interactions
+    if (this.microInteractions) {
+      this.microInteractions.cleanup();
+      this.microInteractions = null;
+    }
+
     super.disconnectedCallback();
   }
 
@@ -161,6 +199,17 @@ class MiniGraphCard extends LitElement {
 
   firstUpdated() {
     this.initial = false;
+
+    // Zoom/pan controller temporarily disabled for compatibility
+    // if (this.config.zoom_pan_enabled && !this.zoomPanController) {
+    //   setTimeout(() => {
+    //     this.zoomPanController = new ZoomPanController(this, {
+    //       enableZoom: this.config.enable_zoom !== false,
+    //       enablePan: this.config.enable_pan !== false,
+    //       showZoomControls: this.config.show_zoom_controls !== false,
+    //     });
+    //   }, 100); // Delay to ensure SVG is rendered
+    // }
   }
 
   updated(changedProperties) {
@@ -450,6 +499,35 @@ class MiniGraphCard extends LitElement {
 
   renderSvgPoint(point, i) {
     const color = this.gradient[i] ? this.computeColor(point[V], i) : 'inherit';
+
+    const enhancedMouseOver = (event) => {
+      this.setTooltip(i, point[3], point[V]);
+
+      // Enhanced hover effect
+      if (this.microInteractions) {
+        const effects = this.microInteractions.enhanceDataPointHover(
+          event.target,
+          point[V],
+        );
+        effects.showEffect();
+        // Store cleanup function for mouseout
+        const target = event.target;
+        target.cleanup = effects.hideEffect;
+      }
+    };
+
+    const enhancedMouseOut = (event) => {
+      this.tooltip = {};
+      this.activeTooltip = null;
+
+      // Cleanup hover effects
+      const target = event.target;
+      if (target.cleanup) {
+        target.cleanup();
+        target.cleanup = null;
+      }
+    };
+
     return svg`
       <circle
         class='line--point'
@@ -458,8 +536,10 @@ class MiniGraphCard extends LitElement {
         stroke=${color}
         fill=${color}
         cx=${point[X]} cy=${point[Y]} r=${this.config.line_width}
-        @mouseover=${() => this.setTooltip(i, point[3], point[V])}
-        @mouseout=${() => (this.tooltip = {})}
+        @mouseover=${enhancedMouseOver}
+        @mouseout=${enhancedMouseOut}
+        data-entity-index=${i}
+        data-point-value=${point[V]}
       />
     `;
   }
@@ -564,6 +644,13 @@ class MiniGraphCard extends LitElement {
   }
 
   setTooltip(entity, index, value, label = null) {
+    // Enhanced tooltip with micro-interactions
+    if (this.microInteractions && this.activeTooltip !== `${entity}-${index}`) {
+      // Create contextual feedback based on value trend
+      this.microInteractions.createChartFeedback('hover', 'subtle');
+      this.activeTooltip = `${entity}-${index}`;
+    }
+
     const {
       group_by,
       points_per_hour,
@@ -775,6 +862,15 @@ class MiniGraphCard extends LitElement {
   async updateData({ config } = this) {
     this.updating = true;
 
+    // Start loading micro-interactions
+    let loadingInteraction = null;
+    if (this.microInteractions) {
+      const cardElement = this.shadowRoot && this.shadowRoot.querySelector('ha-card');
+      if (cardElement) {
+        loadingInteraction = this.microInteractions.createLoadingPulse(cardElement);
+      }
+    }
+
     const end = this.getEndDate();
     const start = new Date(end);
     start.setMilliseconds(start.getMilliseconds() - getMilli(config.hours_to_show));
@@ -782,8 +878,26 @@ class MiniGraphCard extends LitElement {
     try {
       const promise = this.entity.map((entity, i) => this.updateEntity(entity, i, start, end));
       await Promise.all(promise);
+
+      // Success feedback
+      if (this.microInteractions && loadingInteraction) {
+        loadingInteraction.stop();
+        const cardElement = this.shadowRoot && this.shadowRoot.querySelector('ha-card');
+        if (cardElement) {
+          this.microInteractions.createSuccessConfirmation(cardElement);
+        }
+      }
     } catch (err) {
       log(err);
+
+      // Error feedback
+      if (this.microInteractions && loadingInteraction) {
+        loadingInteraction.stop();
+        const cardElement = this.shadowRoot && this.shadowRoot.querySelector('ha-card');
+        if (cardElement) {
+          this.microInteractions.createErrorShake(cardElement);
+        }
+      }
     }
 
 
@@ -916,12 +1030,35 @@ class MiniGraphCard extends LitElement {
     let start = initStart;
     let skipInitialState = false;
 
-    const history = this.config.cache
-      ? await this.getCache(`${entity.entity_id}_${index}`, this.config.useCompress)
-      : undefined;
-    if (history && history.hours_to_show === this.config.hours_to_show) {
-      stateHistory = history.data;
+    // Cache system - advanced features temporarily disabled
+    let history = null;
+    // if (this.config.cache && this.cache) {
+    //   const cacheKey = this.cache.generateKey(
+    //     entity.entity_id,
+    //     initStart,
+    //     end,
+    //     {
+    //       hours_to_show: this.config.hours_to_show,
+    //       points_per_hour: this.config.points_per_hour,
+    //       index,
+    //     },
+    //   );
+    //   history = await this.cache.get(cacheKey);
+    //   if (history && history.hours_to_show === this.config.hours_to_show) {
+    //     stateHistory = history.data;
+    //     // Start prefetching related data in background
+    //     this.cache.prefetch(entity.entity_id, end);
+    //   }
+    // } else
+    if (this.config.cache) {
+      // Fallback to original cache system
+      history = await this.getCache(`${entity.entity_id}_${index}`, this.config.useCompress);
+      if (history && history.hours_to_show === this.config.hours_to_show) {
+        stateHistory = history.data;
+      }
+    }
 
+    if (stateHistory.length > 0) {
       let currDataIndex = stateHistory.findIndex(item => new Date(item.last_changed) > initStart);
       if (currDataIndex !== -1) {
         if (currDataIndex > 0) {
@@ -981,7 +1118,35 @@ class MiniGraphCard extends LitElement {
       }));
       stateHistory = [...stateHistory, ...newStateHistory];
 
+      // Save to cache - advanced cache temporarily disabled
       if (this.config.cache) {
+        // if (this.cache) {
+        //   // Use intelligent cache system
+        //   const cacheKey = this.cache.generateKey(
+        //     entity.entity_id,
+        //     initStart,
+        //     end,
+        //     {
+        //       hours_to_show: this.config.hours_to_show,
+        //       points_per_hour: this.config.points_per_hour,
+        //       index,
+        //     },
+        //   );
+        //   const cacheData = {
+        //     hours_to_show: this.config.hours_to_show,
+        //     last_fetched: new Date(),
+        //     data: stateHistory,
+        //     version,
+        //     entity_id: entity.entity_id,
+        //     index,
+        //   };
+        //   // Use appropriate caching strategy based on data type
+        //   const strategy = stateHistory.length > 1000
+        //     ? CacheStrategies.HISTORICAL_DATA
+        //     : CacheStrategies.REAL_TIME_DATA;
+        //   await this.cache.set(cacheKey, cacheData, strategy.ttl);
+        // } else {
+        // Use original cache system
         this
           .setCache(`${entity.entity_id}_${index}`, {
             hours_to_show: this.config.hours_to_show,
@@ -993,6 +1158,7 @@ class MiniGraphCard extends LitElement {
             log(err);
             localForage.clear();
           });
+        // }
       }
     }
 
