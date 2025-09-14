@@ -11,6 +11,7 @@ const style = css`
     padding: 16px 0 0 0;
     position: relative;
     overflow: hidden;
+    border-radius: 19px;
   }
   ha-card > div {
     padding: 0px 16px 16px 16px;
@@ -47,8 +48,6 @@ const style = css`
     padding: 0 16px 8px 16px;
   }
   ha-card[group] {
-    box-shadow: none;
-    border: none;
     padding: 0;
   }
   ha-card[group] > div {
