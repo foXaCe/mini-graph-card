@@ -732,7 +732,9 @@ class MiniGraphCard extends LitElement {
 
       if (stateMap) {
         return stateMap.label;
-      } else {
+      } else if (typeof inState === 'string' && Number.isNaN(parseFloat(inState))) {
+        // Only log warning for non-numeric values that are expected to be mapped
+        // Numeric values (like graph bounds) shouldn't trigger state_map warnings
         log(`value [${inState}] not found in state_map`);
       }
     }
