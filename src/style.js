@@ -11,7 +11,14 @@ const style = css`
     padding: 16px 0 0 0;
     position: relative;
     overflow: hidden;
-    border-radius: 19px;
+    border-radius: 12px;
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.1),
+      0 1px 3px rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   ha-card > div {
     padding: 0px 16px 16px 16px;
@@ -26,12 +33,12 @@ const style = css`
   ha-card[points] .line--points,
   ha-card[labels] .graph__labels.--primary {
     opacity: 0;
-    transition: opacity .25s;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     animation: none;
   }
   ha-card[labels-secondary] .graph__labels.--secondary {
     opacity: 0;
-    transition: opacity .25s;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     animation: none;
   }
   ha-card[points]:hover .line--points,
@@ -60,6 +67,20 @@ const style = css`
   }
   ha-card[hover] {
     cursor: pointer;
+  }
+  ha-card:hover {
+    box-shadow:
+      0 8px 25px rgba(0, 0, 0, 0.15),
+      0 4px 10px rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+  ha-card[hover]:hover {
+    box-shadow:
+      0 12px 35px rgba(0, 0, 0, 0.2),
+      0 6px 15px rgba(0, 0, 0, 0.12),
+      0 0 0 1px rgba(255, 255, 255, 0.15);
+    transform: translateY(-4px);
   }
   ha-spinner {
     margin: 4px auto;
@@ -198,6 +219,7 @@ const style = css`
     font-size: 2.4em;
     margin-right: .25rem;
     line-height: 1.2em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .state__uom {
     flex: 1;
@@ -221,7 +243,8 @@ const style = css`
     opacity: .75;
     position: absolute;
     white-space: nowrap;
-    animation: fade .15s cubic-bezier(0.215, 0.61, 0.355, 1);
+    animation: fade 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .states[loc="right"] .state__time {
     left: initial;
@@ -276,9 +299,12 @@ const style = css`
     cursor: pointer;
     fill: var(--primary-background-color, white);
     stroke-width: inherit;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .line--point:hover {
     fill: var(--mcg-hover, inherit) !important;
+    transform: scale(1.15);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
   }
   .bars {
     animation: pop .25s cubic-bezier(0.215, 0.61, 0.355, 1);
@@ -287,11 +313,13 @@ const style = css`
     animation: bars .5s cubic-bezier(0.215, 0.61, 0.355, 1);
   }
   .bar {
-    transition: opacity .25s cubic-bezier(0.215, 0.61, 0.355, 1);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .bar:hover {
-    opacity: .5;
+    opacity: 0.8;
     cursor: pointer;
+    filter: brightness(1.1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+    transform: translateY(-1px);
   }
   ha-card[gradient] .line--point:hover {
     fill: var(--primary-text-color, white);
@@ -334,9 +362,21 @@ const style = css`
   .graph__labels > span {
     cursor: pointer;
     background: var(--primary-background-color, white);
-    border-radius: 1em;
-    padding: .2em .6em;
-    box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.24);
+    border-radius: 0.75em;
+    padding: .3em .8em;
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.08),
+      0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .graph__labels > span:hover {
+    box-shadow:
+      0 4px 8px rgba(0, 0, 0, 0.12),
+      0 2px 4px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+    background: var(--card-background-color, white);
   }
   .graph__legend {
     display: flex;
@@ -350,7 +390,17 @@ const style = css`
     display: flex;
     min-width: 0;
     margin: .4em;
-    align-items: center
+    align-items: center;
+    padding: 0.3em 0.6em;
+    border-radius: 0.5em;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .graph__legend__item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-1px);
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.08),
+      0 1px 2px rgba(0, 0, 0, 0.04);
   }
   .graph__legend__item span {
     opacity: .75;
@@ -392,7 +442,14 @@ const style = css`
     white-space: nowrap;
   }
   @keyframes fade {
-    0% { opacity: 0; }
+    0% {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    100% {
+      opacity: 0.75;
+      transform: translateY(0);
+    }
   }
   @keyframes reveal {
     0% { opacity: 0; }
