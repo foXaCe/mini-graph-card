@@ -126,6 +126,9 @@ const TRANSLATIONS_FR = {
   'Thresholds': 'Seuils',
   'Custom Name': 'Nom personnalisé',
   'Custom Color': 'Couleur personnalisée',
+  'Configure individual entity settings. These override global settings for specific entities.': 'Configurez les paramètres individuels des entités. Ceux-ci remplacent les paramètres globaux pour des entités spécifiques.',
+  'Configure': 'Configurer',
+  'Hide': 'Masquer',
 };
 
 // Get browser language
@@ -149,6 +152,7 @@ export default class MiniGraphCardEditor extends LitElement {
       hass: Object,
       _config: Object,
       _expandedSections: Object,
+      _expandedEntities: Array,
     };
   }
 
@@ -164,6 +168,7 @@ export default class MiniGraphCardEditor extends LitElement {
       advanced: false,
       entities: false,
     };
+    this._expandedEntities = [];
   }
 
   setConfig(config) {
@@ -858,7 +863,7 @@ export default class MiniGraphCardEditor extends LitElement {
           <!-- ENTITY CONFIGURATION -->
           ${this.renderSection('entities', `🔧 ${t('Entity Configuration')}`, t('Per-entity configuration and customization'), html`
             <div class="entities-info">
-              Configure individual entity settings. These override global settings for specific entities.
+              ${t('Configure individual entity settings. These override global settings for specific entities.')}
             </div>
 
             ${this._entities.map((entity, index) => html`
@@ -866,7 +871,7 @@ export default class MiniGraphCardEditor extends LitElement {
                 <div class="entity-config-header">
                   <span class="entity-name">${typeof entity === 'string' ? entity : entity.entity}</span>
                   <button @click="${() => this._toggleEntityConfig(index)}">
-                    ${this._isEntityConfigExpanded(index) ? 'Hide' : 'Configure'}
+                    ${this._isEntityConfigExpanded(index) ? t('Hide') : t('Configure')}
                   </button>
                 </div>
 
