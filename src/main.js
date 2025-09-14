@@ -9,6 +9,7 @@ import handleClick from './handleClick';
 import buildConfig from './buildConfig';
 import './initialize';
 import { version } from '../package.json';
+import './editor';
 
 import {
   ICONS,

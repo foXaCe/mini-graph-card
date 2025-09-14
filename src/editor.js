@@ -2,6 +2,8 @@ import { LitElement, html, css } from 'lit-element';
 import { fireEvent } from 'custom-card-helpers';
 
 console.log('🔧 Mini Graph Card Editor: Starting to load...');
+console.warn('🔧 MINI-GRAPH-CARD EDITOR IS LOADING - DEBUG MODE ACTIVE');
+console.trace('🔧 Editor loading trace');
 
 export default class MiniGraphCardEditor extends LitElement {
   static get properties() {
