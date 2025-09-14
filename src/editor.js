@@ -1372,6 +1372,7 @@ export default class MiniGraphCardEditor extends LitElement {
 
       .form-group {
         margin-bottom: 16px;
+        min-width: 0; /* Prevents overflow in grid */
       }
 
       .form-group label {
@@ -1385,7 +1386,8 @@ export default class MiniGraphCardEditor extends LitElement {
       .form-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 16px;
+        gap: 20px;
+        margin-bottom: 16px;
       }
 
       input[type="text"],
@@ -1393,12 +1395,22 @@ export default class MiniGraphCardEditor extends LitElement {
       input[type="color"],
       select {
         width: 100%;
-        padding: 8px 12px;
+        padding: 10px 14px;
         border: 1px solid var(--divider-color);
-        border-radius: 4px;
+        border-radius: 6px;
         background: var(--card-background-color);
         color: var(--primary-text-color);
         font-size: 14px;
+        box-sizing: border-box;
+        transition: border-color 0.2s ease;
+      }
+
+      input[type="text"]:focus,
+      input[type="number"]:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb, 3, 169, 244), 0.1);
       }
 
       input[type="color"] {
@@ -1489,11 +1501,12 @@ export default class MiniGraphCardEditor extends LitElement {
       .threshold-row {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 16px;
         margin-bottom: 12px;
-        padding: 12px;
+        padding: 14px;
         background: var(--secondary-background-color);
-        border-radius: 4px;
+        border-radius: 6px;
+        border: 1px solid var(--divider-color);
       }
 
       .entity-row > *:first-child,
@@ -1555,6 +1568,12 @@ export default class MiniGraphCardEditor extends LitElement {
         width: 100%;
       }
 
+      @media (max-width: 768px) {
+        .form-row {
+          gap: 16px;
+        }
+      }
+
       @media (max-width: 600px) {
         .card-config {
           padding: 16px;
@@ -1562,6 +1581,7 @@ export default class MiniGraphCardEditor extends LitElement {
 
         .form-row {
           grid-template-columns: 1fr;
+          gap: 12px;
         }
 
         .checkbox-grid {
