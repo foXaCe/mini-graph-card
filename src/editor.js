@@ -129,6 +129,18 @@ const TRANSLATIONS_FR = {
   'Configure individual entity settings. These override global settings for specific entities.': 'Configurez les paramètres individuels des entités. Ceux-ci remplacent les paramètres globaux pour des entités spécifiques.',
   'Configure': 'Configurer',
   'Hide': 'Masquer',
+  'Attribute (instead of state)': 'Attribut (au lieu de l\'état)',
+  'Y-Axis': 'Axe Y',
+  'Primary': 'Principal',
+  'Secondary': 'Secondaire',
+  'Show State': 'Afficher l\'état',
+  'Show in Graph': 'Afficher dans le graphique',
+  'Show Line': 'Afficher la ligne',
+  'Show Fill': 'Afficher le remplissage',
+  'Show Points': 'Afficher les points',
+  'Show in Legend': 'Afficher dans la légende',
+  'Smoothing': 'Lissage',
+  'Fixed Value': 'Valeur fixe',
 };
 
 // Get browser language
@@ -173,6 +185,19 @@ export default class MiniGraphCardEditor extends LitElement {
 
   setConfig(config) {
     this._config = { ...config };
+
+    // Ensure entities array exists and normalize string entities
+    if (this._config.entities) {
+      this._config.entities = this._config.entities.map((entity) => {
+        if (typeof entity === 'string') {
+          return { entity };
+        }
+        return { ...entity };
+      });
+    }
+
+    // Force re-render by updating a reactive property
+    this.requestUpdate();
   }
 
   // Configuration getters
@@ -995,7 +1020,7 @@ export default class MiniGraphCardEditor extends LitElement {
 
         <div class="form-row">
           <div class="form-group">
-            <label>Attribute (instead of state):</label>
+            <label>${t('Attribute (instead of state)')}:</label>
             <input
               type="text"
               .value="${config.attribute || ''}"
@@ -1005,10 +1030,10 @@ export default class MiniGraphCardEditor extends LitElement {
           </div>
 
           <div class="form-group">
-            <label>Y-Axis:</label>
+            <label>${t('Y-Axis')}:</label>
             <select .value="${config.y_axis || 'primary'}" @change="${ev => this._entityConfigChanged(ev, index, 'y_axis')}">
-              <option value="primary">Primary</option>
-              <option value="secondary">Secondary</option>
+              <option value="primary">${t('Primary')}</option>
+              <option value="secondary">${t('Secondary')}</option>
             </select>
           </div>
         </div>
@@ -1030,7 +1055,7 @@ export default class MiniGraphCardEditor extends LitElement {
                 .checked="${config[option.key] !== false}"
                 @change="${ev => this._entityConfigChanged(ev, index, option.key)}"
               />
-              ${option.label}
+              ${t(option.label)}
             </label>
           `)}
         </div>
