@@ -9,9 +9,9 @@ import handleClick from './handleClick';
 import buildConfig from './buildConfig';
 // Advanced features - simplified version for compatibility
 import { MicroInteractions } from './microInteractionsSimple';
-// import { AdvancedCharts, ChartTypes } from './advancedCharts';
-// import { ZoomPanController } from './zoomPan';
-// import { getGlobalCache, CacheStrategies } from './intelligentCache';
+import { getGlobalCache, CacheStrategies } from './intelligentCacheSimple';
+import { AdvancedCharts } from './advancedChartsSimple';
+import { ZoomPanController } from './zoomPanSimple';
 import './initialize';
 import { version } from '../package.json';
 import './editor';
@@ -58,9 +58,9 @@ class MiniGraphCard extends LitElement {
     this.microInteractions = null;
     this.activeTooltip = null;
     // this.interactionStates = new Map();
-    // this.advancedCharts = null;
-    // this.zoomPanController = null;
-    // this.cache = null;
+    this.advancedCharts = null;
+    this.zoomPanController = null;
+    this.cache = null;
   }
 
   static get styles() {
@@ -149,13 +149,18 @@ class MiniGraphCard extends LitElement {
       this.microInteractions.startPerformanceMonitoring();
     }
 
-    // if (!this.cache) {
-    //   this.cache = getGlobalCache({
-    //     maxMemorySize: 25 * 1024 * 1024, // 25MB for charts
-    //     enableCompression: true,
-    //     enableDiskCache: true,
-    //   });
-    // }
+    // Initialize advanced charts
+    if (!this.advancedCharts) {
+      this.advancedCharts = new AdvancedCharts(this.config, this.entity);
+    }
+
+    if (!this.cache) {
+      this.cache = getGlobalCache({
+        maxMemorySize: 25 * 1024 * 1024, // 25MB for charts
+        enableCompression: true,
+        enableDiskCache: true,
+      });
+    }
 
     // if (!this.advancedCharts) {
     //   this.advancedCharts = new AdvancedCharts(this.config, this.entity);
@@ -183,6 +188,18 @@ class MiniGraphCard extends LitElement {
       this.microInteractions = null;
     }
 
+    // Cleanup advanced charts
+    if (this.advancedCharts) {
+      this.advancedCharts.clearCache();
+      this.advancedCharts = null;
+    }
+
+    // Cleanup zoom/pan controller
+    if (this.zoomPanController) {
+      this.zoomPanController.destroy();
+      this.zoomPanController = null;
+    }
+
     super.disconnectedCallback();
   }
 
@@ -200,16 +217,23 @@ class MiniGraphCard extends LitElement {
   firstUpdated() {
     this.initial = false;
 
-    // Zoom/pan controller temporarily disabled for compatibility
-    // if (this.config.zoom_pan_enabled && !this.zoomPanController) {
-    //   setTimeout(() => {
-    //     this.zoomPanController = new ZoomPanController(this, {
-    //       enableZoom: this.config.enable_zoom !== false,
-    //       enablePan: this.config.enable_pan !== false,
-    //       showZoomControls: this.config.show_zoom_controls !== false,
-    //     });
-    //   }, 100); // Delay to ensure SVG is rendered
-    // }
+    // Initialize zoom/pan controller if enabled
+    if (this.config.zoom_pan_enabled && !this.zoomPanController) {
+      setTimeout(() => {
+        const svgElement = this.shadowRoot.querySelector('svg');
+        if (svgElement) {
+          this.zoomPanController = new ZoomPanController({
+            enableZoom: this.config.enable_zoom !== false,
+            enablePan: this.config.enable_pan !== false,
+            minZoom: this.config.min_zoom || 0.1,
+            maxZoom: this.config.max_zoom || 10,
+          });
+          this.zoomPanController.initialize(svgElement, {
+            x: 0, y: 0, width: 500, height: this.config.height,
+          });
+        }
+      }, 100); // Delay to ensure SVG is rendered
+    }
   }
 
   updated(changedProperties) {
@@ -1030,27 +1054,28 @@ class MiniGraphCard extends LitElement {
     let start = initStart;
     let skipInitialState = false;
 
-    // Cache system - advanced features temporarily disabled
+    // Use intelligent cache system
     let history = null;
-    // if (this.config.cache && this.cache) {
-    //   const cacheKey = this.cache.generateKey(
-    //     entity.entity_id,
-    //     initStart,
-    //     end,
-    //     {
-    //       hours_to_show: this.config.hours_to_show,
-    //       points_per_hour: this.config.points_per_hour,
-    //       index,
-    //     },
-    //   );
-    //   history = await this.cache.get(cacheKey);
-    //   if (history && history.hours_to_show === this.config.hours_to_show) {
-    //     stateHistory = history.data;
-    //     // Start prefetching related data in background
-    //     this.cache.prefetch(entity.entity_id, end);
-    //   }
-    // } else
-    if (this.config.cache) {
+    if (this.config.cache && this.cache) {
+      const cacheKey = this.cache.generateKey(
+        entity.entity_id,
+        initStart,
+        end,
+        {
+          hours_to_show: this.config.hours_to_show,
+          points_per_hour: this.config.points_per_hour,
+          index,
+        },
+      );
+
+      history = await this.cache.get(cacheKey);
+      if (history && history.hours_to_show === this.config.hours_to_show) {
+        stateHistory = history.data;
+
+        // Start prefetching related data in background
+        this.cache.prefetch(entity.entity_id);
+      }
+    } else if (this.config.cache) {
       // Fallback to original cache system
       history = await this.getCache(`${entity.entity_id}_${index}`, this.config.useCompress);
       if (history && history.hours_to_show === this.config.hours_to_show) {
@@ -1118,47 +1143,50 @@ class MiniGraphCard extends LitElement {
       }));
       stateHistory = [...stateHistory, ...newStateHistory];
 
-      // Save to cache - advanced cache temporarily disabled
+      // Save to cache
       if (this.config.cache) {
-        // if (this.cache) {
-        //   // Use intelligent cache system
-        //   const cacheKey = this.cache.generateKey(
-        //     entity.entity_id,
-        //     initStart,
-        //     end,
-        //     {
-        //       hours_to_show: this.config.hours_to_show,
-        //       points_per_hour: this.config.points_per_hour,
-        //       index,
-        //     },
-        //   );
-        //   const cacheData = {
-        //     hours_to_show: this.config.hours_to_show,
-        //     last_fetched: new Date(),
-        //     data: stateHistory,
-        //     version,
-        //     entity_id: entity.entity_id,
-        //     index,
-        //   };
-        //   // Use appropriate caching strategy based on data type
-        //   const strategy = stateHistory.length > 1000
-        //     ? CacheStrategies.HISTORICAL_DATA
-        //     : CacheStrategies.REAL_TIME_DATA;
-        //   await this.cache.set(cacheKey, cacheData, strategy.ttl);
-        // } else {
-        // Use original cache system
-        this
-          .setCache(`${entity.entity_id}_${index}`, {
+        if (this.cache) {
+          // Use intelligent cache system
+          const cacheKey = this.cache.generateKey(
+            entity.entity_id,
+            initStart,
+            end,
+            {
+              hours_to_show: this.config.hours_to_show,
+              points_per_hour: this.config.points_per_hour,
+              index,
+            },
+          );
+
+          const cacheData = {
             hours_to_show: this.config.hours_to_show,
             last_fetched: new Date(),
             data: stateHistory,
             version,
-          }, this.config.useCompress)
-          .catch((err) => {
-            log(err);
-            localForage.clear();
-          });
-        // }
+            entity_id: entity.entity_id,
+            index,
+          };
+
+          // Use appropriate caching strategy based on data type
+          const strategy = stateHistory.length > 1000
+            ? CacheStrategies.HISTORICAL_DATA
+            : CacheStrategies.REAL_TIME_DATA;
+
+          await this.cache.set(cacheKey, cacheData, strategy.ttl);
+        } else {
+          // Fallback to original cache system
+          this
+            .setCache(`${entity.entity_id}_${index}`, {
+              hours_to_show: this.config.hours_to_show,
+              last_fetched: new Date(),
+              data: stateHistory,
+              version,
+            }, this.config.useCompress)
+            .catch((err) => {
+              log(err);
+              localForage.clear();
+            });
+        }
       }
     }
 
