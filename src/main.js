@@ -143,10 +143,10 @@ class MiniGraphCard extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
-    // Initialize micro-interactions
+    // Initialize micro-interactions (without auto performance monitoring)
     if (!this.microInteractions) {
       this.microInteractions = new MicroInteractions(this);
-      this.microInteractions.startPerformanceMonitoring();
+      // Performance monitoring disabled to prevent automatic animations
     }
 
     // Initialize advanced charts
@@ -524,32 +524,15 @@ class MiniGraphCard extends LitElement {
   renderSvgPoint(point, i) {
     const color = this.gradient[i] ? this.computeColor(point[V], i) : 'inherit';
 
-    const enhancedMouseOver = (event) => {
+    const enhancedMouseOver = () => {
       this.setTooltip(i, point[3], point[V]);
-
-      // Enhanced hover effect
-      if (this.microInteractions) {
-        const effects = this.microInteractions.enhanceDataPointHover(
-          event.target,
-          point[V],
-        );
-        effects.showEffect();
-        // Store cleanup function for mouseout
-        const target = event.target;
-        target.cleanup = effects.hideEffect;
-      }
+      // Hover effects disabled to prevent automatic animations
     };
 
-    const enhancedMouseOut = (event) => {
+    const enhancedMouseOut = () => {
       this.tooltip = {};
       this.activeTooltip = null;
-
-      // Cleanup hover effects
-      const target = event.target;
-      if (target.cleanup) {
-        target.cleanup();
-        target.cleanup = null;
-      }
+      // Cleanup disabled to prevent automatic animations
     };
 
     return svg`
@@ -668,12 +651,8 @@ class MiniGraphCard extends LitElement {
   }
 
   setTooltip(entity, index, value, label = null) {
-    // Enhanced tooltip with micro-interactions
-    if (this.microInteractions && this.activeTooltip !== `${entity}-${index}`) {
-      // Create contextual feedback based on value trend
-      this.microInteractions.createChartFeedback('hover', 'subtle');
-      this.activeTooltip = `${entity}-${index}`;
-    }
+    // Track active tooltip without automatic animations
+    this.activeTooltip = `${entity}-${index}`;
 
     const {
       group_by,
@@ -885,15 +864,7 @@ class MiniGraphCard extends LitElement {
 
   async updateData({ config } = this) {
     this.updating = true;
-
-    // Start loading micro-interactions
-    let loadingInteraction = null;
-    if (this.microInteractions) {
-      const cardElement = this.shadowRoot && this.shadowRoot.querySelector('ha-card');
-      if (cardElement) {
-        loadingInteraction = this.microInteractions.createLoadingPulse(cardElement);
-      }
-    }
+    // Loading animations disabled to prevent automatic animations
 
     const end = this.getEndDate();
     const start = new Date(end);
@@ -902,26 +873,10 @@ class MiniGraphCard extends LitElement {
     try {
       const promise = this.entity.map((entity, i) => this.updateEntity(entity, i, start, end));
       await Promise.all(promise);
-
-      // Success feedback
-      if (this.microInteractions && loadingInteraction) {
-        loadingInteraction.stop();
-        const cardElement = this.shadowRoot && this.shadowRoot.querySelector('ha-card');
-        if (cardElement) {
-          this.microInteractions.createSuccessConfirmation(cardElement);
-        }
-      }
+      // Success animations disabled to prevent automatic animations
     } catch (err) {
       log(err);
-
-      // Error feedback
-      if (this.microInteractions && loadingInteraction) {
-        loadingInteraction.stop();
-        const cardElement = this.shadowRoot && this.shadowRoot.querySelector('ha-card');
-        if (cardElement) {
-          this.microInteractions.createErrorShake(cardElement);
-        }
-      }
+      // Error animations disabled to prevent automatic animations
     }
 
 
