@@ -35,7 +35,7 @@ import {
 const DISPLAY_TYPE_TRANSLATIONS_FR = {
   'min': 'min',
   'avg': 'moy',
-  'max': 'max'
+  'max': 'max',
 };
 
 // Translation function for display types
