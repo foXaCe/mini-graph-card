@@ -82,6 +82,11 @@ const TRANSLATIONS_FR = {
   'Smooth': 'Lisse',
   'Hard': 'Dur',
 
+  // Display types for info section
+  'min': 'min',
+  'avg': 'moy',
+  'max': 'max',
+
   // Visibility options
   'Visibility Options': 'Options de visibilité',
   'Name': 'Nom',

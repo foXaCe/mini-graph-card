@@ -31,6 +31,22 @@ import {
   log,
 } from './utils';
 
+// French translations for display types
+const DISPLAY_TYPE_TRANSLATIONS_FR = {
+  'min': 'min',
+  'avg': 'moy',
+  'max': 'max'
+};
+
+// Translation function for display types
+const translateDisplayType = (type) => {
+  const lang = navigator.language || navigator.userLanguage || 'en';
+  if (lang.toLowerCase().startsWith('fr') && DISPLAY_TYPE_TRANSLATIONS_FR[type]) {
+    return DISPLAY_TYPE_TRANSLATIONS_FR[type];
+  }
+  return type; // Fallback to original text
+};
+
 class MiniGraphCard extends LitElement {
   constructor() {
     super();
@@ -715,7 +731,7 @@ class MiniGraphCard extends LitElement {
       <div class="info flex">
         ${this.abs.map(entry => html`
           <div class="info__item">
-            <span class="info__item__type">${entry.type}</span>
+            <span class="info__item__type">${translateDisplayType(entry.type)}</span>
             <span class="info__item__value">
               ${this.computeState(entry.state)} ${this.computeUom(0)}
             </span>
