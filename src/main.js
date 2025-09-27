@@ -39,8 +39,8 @@ const DISPLAY_TYPE_TRANSLATIONS_FR = {
 };
 
 // Translation function for display types
-const translateDisplayType = (type) => {
-  const lang = navigator.language || navigator.userLanguage || 'en';
+const translateDisplayType = (type, hassLanguage) => {
+  const lang = hassLanguage || navigator.language || navigator.userLanguage || 'en';
   if (lang.toLowerCase().startsWith('fr') && DISPLAY_TYPE_TRANSLATIONS_FR[type]) {
     return DISPLAY_TYPE_TRANSLATIONS_FR[type];
   }
@@ -731,7 +731,7 @@ class MiniGraphCard extends LitElement {
       <div class="info flex">
         ${this.abs.map(entry => html`
           <div class="info__item">
-            <span class="info__item__type">${translateDisplayType(entry.type)}</span>
+            <span class="info__item__type">${translateDisplayType(entry.type, this._hass.language)}</span>
             <span class="info__item__value">
               ${this.computeState(entry.state)} ${this.computeUom(0)}
             </span>
