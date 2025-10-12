@@ -30,7 +30,7 @@ const style = css`
     padding: 0px 16px 16px 16px;
   }
   ha-card > div:last-child {
-    padding-bottom: 0;
+    padding-bottom: 8px;
   }
   ha-card .graph {
     padding: 0;
@@ -261,7 +261,7 @@ const style = css`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    margin-top: auto;
+    margin-top: 8px;
     width: 100%;
   }
   .graph__container {
