@@ -45,8 +45,8 @@ export class IntelligentCache {
     try {
       // Use IndexedDB via localforage if available
       if (typeof window !== 'undefined' && window.localForage) {
-        const localForageModule = await import('localforage/src/localforage');
-        this.diskCache = localForageModule.default.createInstance({
+        // Use existing localForage from window instead of dynamic import
+        this.diskCache = window.localForage.createInstance({
           name: 'mini-graph-cache',
           version: 1.0,
           size: this.config.maxDiskSize,

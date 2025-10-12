@@ -1241,7 +1241,30 @@ class MiniGraphCard extends LitElement {
   }
 
   getCardSize() {
-    return 3;
+    return this.config.card_size || this.calculateCardSize();
+  }
+
+  calculateCardSize() {
+    let size = 1; // Base size
+
+    // Add size for header (name/icon)
+    if (this.config.show.name || this.config.show.icon) size += 1;
+
+    // Add size for state display
+    if (this.config.show.state) size += 1;
+
+    // Add size based on graph height
+    if (this.config.show.graph) {
+      size += Math.ceil(this.config.height / 50);
+    }
+
+    // Add size for legend
+    if (this.config.show.legend && this.visibleLegends.length > 1) size += 1;
+
+    // Add size for info section (min/max/avg)
+    if (this.abs && this.abs.length > 0) size += 1;
+
+    return size;
   }
 }
 

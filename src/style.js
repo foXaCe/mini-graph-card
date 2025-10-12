@@ -4,6 +4,8 @@ const style = css`
   :host {
     display: flex;
     flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
   }
   ha-card {
     flex-direction: column;
@@ -19,6 +21,10 @@ const style = css`
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
   }
   ha-card > div {
     padding: 0px 16px 16px 16px;
