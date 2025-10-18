@@ -32,6 +32,12 @@ const style = css`
   ha-card > div:last-child {
     padding-bottom: 0;
   }
+  ha-card > div:has(.graph) {
+    padding-bottom: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
   ha-card .graph {
     padding: 0;
     order: 10;
@@ -262,8 +268,7 @@ const style = css`
     display: flex;
     flex-direction: column;
     flex: 1;
-    margin-top: auto;
-    margin-bottom: 0;
+    margin: 0;
     width: 100%;
   }
   .graph__container {
