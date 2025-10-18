@@ -21,7 +21,7 @@ export default class Graph {
     this._history = undefined;
     this.coords = [];
     this.width = width - margin[X] * 2;
-    this.height = height - margin[Y] * 4;
+    this.height = height;
     this.margin = margin;
     this._max = 0;
     this._min = 0;
@@ -103,7 +103,7 @@ export default class Graph {
     const yRatio = ((max - min) / this.height) || 1;
     const coords2 = coords.map((coord) => {
       const val = this._logarithmic ? Math.log10(Math.max(1, coord[V])) : coord[V];
-      const coordY = this.height - ((val - min) / yRatio) + this.margin[Y] * 2;
+      const coordY = this.height - ((val - min) / yRatio);
       return [coord[X], coordY, coord[V]];
     });
 
@@ -185,7 +185,7 @@ export default class Graph {
   }
 
   getFill(path) {
-    const height = this.height + this.margin[Y] * 4;
+    const height = this.height;
     let fill = path;
     fill += ` L ${this.width - this.margin[X] * 2}, ${height}`;
     fill += ` L ${this.coords[0][X]}, ${height} z`;
@@ -198,7 +198,7 @@ export default class Graph {
     return coords.map((coord, i) => ({
       x: (xRatio * i * total) + (xRatio * position) + spacing,
       y: coord[Y],
-      height: this.height - coord[Y] + this.margin[Y] * 4,
+      height: this.height - coord[Y],
       width: xRatio - spacing,
       value: coord[V],
     }));
