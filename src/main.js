@@ -649,12 +649,14 @@ class MiniGraphCard extends LitElement {
 
   renderSvg() {
     const { height } = this.config;
+    const debugFill = this.fill[0] ? this.fill[0].substring(this.fill[0].length - 50) : '';
     return svg`
       <svg width='100%' height=${height !== 0 ? '100%' : 0} viewBox='0 0 500 ${height}'
         @click=${e => e.stopPropagation()} style="background: rgba(255,0,0,0.1);">
         <rect x="0" y="0" width="500" height="${height}" fill="none" stroke="red" stroke-width="2" opacity="1"/>
         <rect x="10" y="${height - 20}" width="50" height="20" fill="blue" opacity="0.5"/>
-        <text x="70" y="${height - 5}" fill="white" font-size="12">Bottom: ${height}</text>
+        <text x="70" y="${height - 5}" fill="white" font-size="10">Bottom: ${height}</text>
+        <text x="200" y="${height - 5}" fill="yellow" font-size="10">Fill: ${debugFill}</text>
         <g>
           <defs>
             ${this.renderSvgGradient(this.gradient)}

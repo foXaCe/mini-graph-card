@@ -187,7 +187,8 @@ export default class Graph {
   getFill(path) {
     const height = this.height;
     let fill = path;
-    fill += ` L ${this.width - this.margin[X] * 2}, ${height}`;
+    const lastX = this.coords[this.coords.length - 1][X];
+    fill += ` L ${lastX}, ${height}`;
     fill += ` L ${this.coords[0][X]}, ${height} z`;
     return fill;
   }
