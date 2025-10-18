@@ -660,6 +660,7 @@ class MiniGraphCard extends LitElement {
         <line x1="0" y1="${height}" x2="500" y2="${height}" stroke="green" stroke-width="3"/>
         <rect x="10" y="${height - 20}" width="50" height="20" fill="blue" opacity="0.5"/>
         <text x="70" y="${height - 5}" fill="white" font-size="14" font-weight="bold">${debugInfo} Fill:${fillDebug}</text>
+        <path d="${this.fill[0]}" fill="none" stroke="yellow" stroke-width="2" opacity="0.7"/>
         <g>
           <defs>
             ${this.renderSvgGradient(this.gradient)}
