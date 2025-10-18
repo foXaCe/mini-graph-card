@@ -490,7 +490,7 @@ class MiniGraphCard extends LitElement {
 
   renderSvgFill(fill, i) {
     if (!fill) return;
-    const fade = this.config.show.fill === 'fade';
+    // const fade = this.config.show.fill === 'fade';
     const init = this.length[i] || this.config.entities[i].show_line === false;
     return svg`
       <defs>
@@ -508,7 +508,7 @@ class MiniGraphCard extends LitElement {
           .id=${i} anim=${this.config.animate} ?init=${init}
           style="animation-delay: ${this.config.animate ? `${i * 0.5}s` : '0s'}"
           fill='white'
-          mask=${fade ? `url(#fill-grad-mask-${this.id}-${i})` : ''}
+          mask=""
           d=${this.fill[i]}
         />
       </mask>`;
