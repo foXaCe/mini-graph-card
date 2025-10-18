@@ -30,11 +30,10 @@ const style = css`
     padding: 0px 16px 16px 16px;
   }
   ha-card > div:last-child {
-    padding-bottom: 8px;
+    padding-bottom: 0;
   }
   ha-card .graph {
-    padding: 0 !important;
-    padding-bottom: 0 !important;
+    padding: 0;
     order: 10;
   }
   ha-card[points] .line--points,
@@ -258,25 +257,32 @@ const style = css`
     right: 0;
   }
   .graph {
-    align-self: flex-end;
+    align-self: stretch;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    margin-top: 8px;
+    flex: 1;
+    margin-top: auto;
+    margin-bottom: 0;
     width: 100%;
   }
   .graph__container {
     display: flex;
     flex-direction: row;
     position: relative;
+    flex: 1;
   }
   .graph__container__svg {
     cursor: default;
     flex: 1;
+    display: flex;
+    flex-direction: column;
   }
   svg {
     overflow: hidden;
     display: block;
+    flex: 1;
+    height: 100%;
   }
   path {
     stroke-linecap: round;
