@@ -651,7 +651,8 @@ class MiniGraphCard extends LitElement {
     const { height } = this.config;
     return svg`
       <svg width='100%' height=${height !== 0 ? '100%' : 0} viewBox='0 0 500 ${height}'
-        @click=${e => e.stopPropagation()}>
+        @click=${e => e.stopPropagation()} style="background: rgba(255,0,0,0.1);">
+        <rect x="0" y="0" width="500" height="${height}" fill="none" stroke="red" stroke-width="1" opacity="0.3"/>
         <g>
           <defs>
             ${this.renderSvgGradient(this.gradient)}
