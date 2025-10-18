@@ -33,7 +33,8 @@ const style = css`
     padding-bottom: 8px;
   }
   ha-card .graph {
-    padding: 0;
+    padding: 0 !important;
+    padding-bottom: 0 !important;
     order: 10;
   }
   ha-card[points] .line--points,
