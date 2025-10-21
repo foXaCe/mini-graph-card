@@ -285,15 +285,19 @@ const style = css`
     min-height: 0;
     overflow: hidden;
     height: 100%;
+    position: relative;
   }
   .graph__container {
     display: flex;
     flex-direction: row;
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     flex: 1;
     min-height: 0;
     overflow: hidden;
-    height: 100%;
   }
   .graph__container__svg {
     cursor: default;
@@ -302,14 +306,20 @@ const style = css`
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
-    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
   svg {
     overflow: visible;
     display: block;
-    flex: 1;
     width: 100%;
     height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
     /* Ensure no extra baseline space from inline SVG rendering */
     vertical-align: top;
   }
