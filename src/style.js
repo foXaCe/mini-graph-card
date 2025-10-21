@@ -45,6 +45,7 @@ const style = css`
     overflow: hidden;
     padding: 0 16px;
     margin: 0;
+    height: 100%;
   }
   ha-card .graph {
     padding: 0;
@@ -283,6 +284,7 @@ const style = css`
     width: 100%;
     min-height: 0;
     overflow: hidden;
+    height: 100%;
   }
   .graph__container {
     display: flex;
@@ -291,6 +293,7 @@ const style = css`
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    height: 100%;
   }
   .graph__container__svg {
     cursor: default;
@@ -299,6 +302,7 @@ const style = css`
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
+    height: 100%;
   }
   svg {
     overflow: visible;
