@@ -10,7 +10,7 @@ const style = css`
   ha-card {
     flex-direction: column;
     flex: 1;
-    padding: 16px 0 0 0;
+    padding: 0;
     position: relative;
     overflow: hidden;
     border-radius: 12px;
@@ -25,23 +25,30 @@ const style = css`
     height: 100%;
     min-height: 0;
     box-sizing: border-box;
+    gap: 0;
   }
   ha-card > div {
-    padding: 0px 16px 16px 16px;
+    padding: 0 16px;
+    margin: 0;
   }
-  ha-card > div:last-child {
-    padding-bottom: 0;
+  ha-card > div:first-child {
+    padding-top: 16px;
+  }
+  ha-card > div:not(:has(.graph)) {
+    padding-bottom: 16px;
   }
   ha-card > div:has(.graph) {
-    padding-bottom: 8px;
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
+    padding: 0 16px;
+    margin: 0;
   }
   ha-card .graph {
     padding: 0;
+    margin: 0;
     order: 10;
   }
   ha-card[points] .line--points,
@@ -411,8 +418,8 @@ const style = css`
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
-    padding-top: 16px;
-    padding-bottom: 8px;
+    padding: 16px 0 0 0;
+    margin: 0;
     flex-wrap: wrap;
     flex-shrink: 0;
   }
