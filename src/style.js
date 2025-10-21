@@ -306,13 +306,10 @@ const style = css`
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    /* relative so the child svg absolute positioning doesn't leak */
+    position: relative;
   }
-  svg {
+  .graph__container__svg > svg {
     overflow: visible;
     display: block;
     width: 100%;
