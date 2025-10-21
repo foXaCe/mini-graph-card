@@ -423,7 +423,7 @@ class MiniGraphCard extends LitElement {
     ))
     || this.config.show.loading_indicator === false;
     return this.config.show.graph ? html`
-      <div class="graph" style="height: ${this.config.height}px;">
+      <div class="graph">
         ${ready ? html`
             <div class="graph__container">
               ${this.renderLabels()}

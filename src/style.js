@@ -12,7 +12,7 @@ const style = css`
     flex: 1;
     padding: 16px 0 0 0;
     position: relative;
-    overflow: visible;
+    overflow: hidden;
     border-radius: 12px;
     box-shadow:
       0 2px 8px rgba(0, 0, 0, 0.1),
@@ -34,9 +34,11 @@ const style = css`
   }
   ha-card > div:has(.graph) {
     padding-bottom: 8px;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
+    min-height: 0;
+    overflow: hidden;
   }
   ha-card .graph {
     padding: 0;
@@ -104,6 +106,7 @@ const style = css`
   }
   .header {
     justify-content: space-between;
+    flex-shrink: 0;
   }
   .header[loc="center"] {
     justify-content: space-around;
@@ -149,6 +152,7 @@ const style = css`
     font-weight: 300;
     justify-content: space-between;
     flex-wrap: nowrap;
+    flex-shrink: 0;
   }
   .states .icon {
     align-self: center;
@@ -271,6 +275,7 @@ const style = css`
     margin: 0;
     width: 100%;
     min-height: 0;
+    overflow: hidden;
   }
   .graph__container {
     display: flex;
@@ -278,6 +283,7 @@ const style = css`
     position: relative;
     flex: 1;
     min-height: 0;
+    overflow: hidden;
   }
   .graph__container__svg {
     cursor: default;
@@ -285,13 +291,14 @@ const style = css`
     display: flex;
     flex-direction: column;
     min-height: 0;
+    overflow: hidden;
   }
   svg {
-    overflow: hidden;
+    overflow: visible;
     display: block;
     flex: 1;
+    width: 100%;
     height: 100%;
-    max-height: 100%;
   }
   path {
     stroke-linecap: round;
@@ -407,6 +414,7 @@ const style = css`
     padding-top: 16px;
     padding-bottom: 8px;
     flex-wrap: wrap;
+    flex-shrink: 0;
   }
   .graph__legend__item {
     cursor: pointer;
@@ -436,6 +444,7 @@ const style = css`
   .info {
     justify-content: space-between;
     align-items: middle;
+    flex-shrink: 0;
   }
   .info__item {
     display: flex;
