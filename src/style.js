@@ -33,7 +33,7 @@ const style = css`
     padding-bottom: 0;
   }
   ha-card > div:has(.graph) {
-    padding-bottom: 0;
+    padding-bottom: 8px;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -270,24 +270,28 @@ const style = css`
     flex: 1;
     margin: 0;
     width: 100%;
+    min-height: 0;
   }
   .graph__container {
     display: flex;
     flex-direction: row;
     position: relative;
     flex: 1;
+    min-height: 0;
   }
   .graph__container__svg {
     cursor: default;
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-height: 0;
   }
   svg {
     overflow: hidden;
     display: block;
     flex: 1;
     height: 100%;
+    max-height: 100%;
   }
   path {
     stroke-linecap: round;
@@ -401,6 +405,7 @@ const style = css`
     flex-direction: row;
     justify-content: space-evenly;
     padding-top: 16px;
+    padding-bottom: 8px;
     flex-wrap: wrap;
   }
   .graph__legend__item {
