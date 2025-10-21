@@ -22,7 +22,7 @@ const style = css`
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
-    height: 100%;
+    height: auto; /* let HA grid define height */
     min-height: 0;
     box-sizing: border-box;
     gap: 0;

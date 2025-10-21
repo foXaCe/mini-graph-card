@@ -1241,6 +1241,16 @@ class MiniGraphCard extends LitElement {
   }
 
   getCardSize() {
+    // Prefer measuring the rendered height to match HA's new layout behavior
+    try {
+      const card = this.shadowRoot && this.shadowRoot.querySelector('ha-card');
+      if (card && card.getBoundingClientRect) {
+        const measured = Math.ceil(card.getBoundingClientRect().height / 50);
+        if (Number.isFinite(measured) && measured > 0) return measured;
+      }
+    } catch (e) {
+      // noop – fall back to calculated size below
+    }
     return this.config.card_size || this.calculateCardSize();
   }
 
