@@ -310,6 +310,8 @@ const style = css`
     flex: 1;
     width: 100%;
     height: 100%;
+    /* Ensure no extra baseline space from inline SVG rendering */
+    vertical-align: top;
   }
   path {
     stroke-linecap: round;
