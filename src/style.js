@@ -34,9 +34,9 @@ const style = css`
   }
   ha-card > div:has(.graph) {
     padding-bottom: 8px;
-    flex: 1;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
   }
   ha-card .graph {
     padding: 0;
