@@ -47,13 +47,13 @@
     "@types/spark-md5": "^3.0.2",
     "babel-plugin-iife-wrap": "^1.1.0",
     "babel-preset-minify": "^0.5.0",
-    "eslint": "^5.3.0",
-    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint": "^10.0.2",
+    "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.17.2",
     "rollup": "^2.33.1",
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-serve": "^1.1.0",
-    "semantic-release": "^17.3.3"
+    "semantic-release": "^25.0.3"
   },
   "scripts": {
     "build": "npm run lint && npm run rollup && npm run babel",
