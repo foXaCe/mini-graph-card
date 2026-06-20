@@ -2,7 +2,7 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.MiniGraphCardEditor = factory());
-}(this, (function () { 'use strict';
+})(this, (function () { 'use strict';
 
     /**
      * @license
@@ -1200,7 +1200,7 @@
      *     container. Render options must *not* change between renders to the same
      *     container, as those changes will not effect previously rendered DOM.
      */
-    const render = (result, container, options) => {
+    const render$1 = (result, container, options) => {
         let part = parts.get(container);
         if (part === undefined) {
             removeNodes(container, container.firstChild);
@@ -1505,7 +1505,7 @@
      * non-shorthand names (for example `border` and `border-width`) is not
      * supported.
      */
-    const render$1 = (result, container, options) => {
+    const render = (result, container, options) => {
         if (!options || typeof options !== 'object' || !options.scopeName) {
             throw new Error('The `scopeName` option is required.');
         }
@@ -1519,7 +1519,7 @@
         // On first scope render, render into a fragment; this cannot be a single
         // fragment that is reused since nested renders can occur synchronously.
         const renderContainer = firstScopeRender ? document.createDocumentFragment() : container;
-        render(result, renderContainer, Object.assign({ templateFactory: shadyTemplateFactory(scopeName) }, options));
+        render$1(result, renderContainer, Object.assign({ templateFactory: shadyTemplateFactory(scopeName) }, options));
         // When performing first scope render,
         // (1) We've rendered into a fragment so that there's a chance to
         // `prepareTemplateStyles` before sub-elements hit the DOM
@@ -2530,7 +2530,7 @@
      *
      * @nocollapse
      */
-    LitElement.render = render$1;
+    LitElement.render = render;
 
     var token = /d{1,4}|M{1,4}|YY(?:YY)?|S{1,3}|Do|ZZ|Z|([HhMsDm])\1?|[aA]|"[^"]*"|'[^']*'/g;
     var twoDigitsOptional = "[1-9]\\d?";
@@ -2915,9 +2915,9 @@
         setGlobalDateMasks: setGlobalDateMasks
     };
 
-    var a=function(){try{(new Date).toLocaleDateString("i");}catch(e){return "RangeError"===e.name}return !1}()?function(e,t){return e.toLocaleDateString(t,{year:"numeric",month:"long",day:"numeric"})}:function(t){return fecha.format(t,"mediumDate")},r=function(){try{(new Date).toLocaleString("i");}catch(e){return "RangeError"===e.name}return !1}()?function(e,t){return e.toLocaleString(t,{year:"numeric",month:"long",day:"numeric",hour:"numeric",minute:"2-digit"})}:function(t){return fecha.format(t,"haDateTime")},n=function(){try{(new Date).toLocaleTimeString("i");}catch(e){return "RangeError"===e.name}return !1}()?function(e,t){return e.toLocaleTimeString(t,{hour:"numeric",minute:"2-digit"})}:function(t){return fecha.format(t,"shortTime")};var C=function(e,t,a,r){r=r||{},a=null==a?{}:a;var n=new Event(t,{bubbles:void 0===r.bubbles||r.bubbles,cancelable:Boolean(r.cancelable),composed:void 0===r.composed||r.composed});return n.detail=a,e.dispatchEvent(n),n};
+    (function(){try{(new Date).toLocaleDateString("i");}catch(e){return "RangeError"===e.name}return !1})()?function(e,t){return e.toLocaleDateString(t,{year:"numeric",month:"long",day:"numeric"})}:function(t){return fecha.format(t,"mediumDate")};(function(){try{(new Date).toLocaleString("i");}catch(e){return "RangeError"===e.name}return !1})()?function(e,t){return e.toLocaleString(t,{year:"numeric",month:"long",day:"numeric",hour:"numeric",minute:"2-digit"})}:function(t){return fecha.format(t,"haDateTime")};(function(){try{(new Date).toLocaleTimeString("i");}catch(e){return "RangeError"===e.name}return !1})()?function(e,t){return e.toLocaleTimeString(t,{hour:"numeric",minute:"2-digit"})}:function(t){return fecha.format(t,"shortTime")};var C=function(e,t,a,r){r=r||{},a=null==a?{}:a;var n=new Event(t,{bubbles:void 0===r.bubbles||r.bubbles,cancelable:Boolean(r.cancelable),composed:void 0===r.composed||r.composed});return n.detail=a,e.dispatchEvent(n),n};
 
-    const editor = {
+    const editor$1 = {
     	messages: {
     		loading_home_assistant: "Loading Home Assistant...",
     		please_wait_while_the_editor_loads: "Please wait while the editor loads.",
@@ -3057,7 +3057,7 @@
     		fixed_value: "Fixed Value"
     	}
     };
-    const card = {
+    const card$1 = {
     	error: {
     		entity_not_available: "Entity not available:"
     	},
@@ -3078,11 +3078,11 @@
     	}
     };
     var en = {
-    	editor: editor,
-    	card: card
+    	editor: editor$1,
+    	card: card$1
     };
 
-    const editor$1 = {
+    const editor = {
     	messages: {
     		loading_home_assistant: "Chargement de Home Assistant...",
     		please_wait_while_the_editor_loads: "Veuillez patienter pendant le chargement de l'éditeur.",
@@ -3222,7 +3222,7 @@
     		fixed_value: "Valeur fixe"
     	}
     };
-    const card$1 = {
+    const card = {
     	error: {
     		entity_not_available: "Entité non disponible :"
     	},
@@ -3243,8 +3243,8 @@
     	}
     };
     var fr = {
-    	editor: editor$1,
-    	card: card$1
+    	editor: editor,
+    	card: card
     };
 
     // Conventional i18n for mini-graph-card, shared by the card and its visual editor.
@@ -4889,4 +4889,4 @@
 
     return MiniGraphCardEditor;
 
-})));
+}));
