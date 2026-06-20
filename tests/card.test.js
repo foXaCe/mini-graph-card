@@ -27,6 +27,34 @@ describe('mini-graph-card — registration & static API', () => {
     expect(entry).toBeTruthy();
     expect(entry.name).toBeTypeOf('string');
   });
+
+  describe('getEntitySuggestion (card-picker entity suggestion)', () => {
+    const entry = () => window.customCards.find(c => c.type === 'mini-graph-card');
+    const hass = {
+      states: {
+        'sensor.temp': { attributes: { unit_of_measurement: '°C' } },
+        'sensor.energy': { attributes: { state_class: 'total_increasing' } },
+        'sensor.text': { attributes: {} },
+        'counter.coffee': { attributes: {} },
+      },
+    };
+
+    it('suggests the card for a numeric sensor (unit or state_class)', () => {
+      const s = entry().getEntitySuggestion(hass, 'sensor.temp');
+      expect(s.config).toEqual({ type: 'custom:mini-graph-card', entities: [{ entity: 'sensor.temp' }] });
+      expect(entry().getEntitySuggestion(hass, 'sensor.energy')).toBeTruthy();
+    });
+
+    it('suggests the card for inherently-numeric domains', () => {
+      expect(entry().getEntitySuggestion(hass, 'counter.coffee')).toBeTruthy();
+    });
+
+    it('returns null for non-numeric or non-graphable entities', () => {
+      expect(entry().getEntitySuggestion(hass, 'sensor.text')).toBeNull();
+      expect(entry().getEntitySuggestion(hass, 'light.kitchen')).toBeNull();
+      expect(entry().getEntitySuggestion(hass, 'sensor.missing')).toBeNull();
+    });
+  });
 });
 
 describe('mini-graph-card — setConfig', () => {

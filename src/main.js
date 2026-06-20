@@ -819,6 +819,20 @@ MiniGraphCard.getStubConfig = () => ({
 
 customElements.define('mini-graph-card', MiniGraphCard);
 
+// Entities the card can graph out of the box: the inherently-numeric domains,
+// plus sensors that expose a unit or a state_class (i.e. numeric sensors).
+const NUMERIC_DOMAINS = ['counter', 'input_number', 'number'];
+
+const isNumericEntity = (hass, entityId) => {
+  const domain = entityId.split('.')[0];
+  if (NUMERIC_DOMAINS.includes(domain)) return true;
+  if (domain !== 'sensor') return false;
+
+  const stateObj = hass.states[entityId];
+  if (!stateObj) return false;
+  return !!stateObj.attributes.unit_of_measurement || !!stateObj.attributes.state_class;
+};
+
 // Configure the preview in the Lovelace card picker.
 // No hass at module-load time, so the picker name/description resolve via the
 // browser language (navigator) — this is by design, not a fallback bug.
@@ -828,4 +842,9 @@ window.customCards.push({
   name: localize('card.picker.name'),
   preview: false,
   description: localize('card.picker.description'),
+  // Offer the card as a suggestion when a numeric entity is added to a
+  // dashboard (Home Assistant 2026.6+ card-picker entity suggestion).
+  getEntitySuggestion: (hass, entityId) => (isNumericEntity(hass, entityId)
+    ? { config: { type: 'custom:mini-graph-card', entities: [{ entity: entityId }] } }
+    : null),
 });
