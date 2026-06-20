@@ -15,7 +15,7 @@
   ],
   "main": "src/main.js",
   "module": "src/main.js",
-  "repository": "git@github.com:kalkih/mini-graph-card.git",
+  "repository": "git@github.com:foXaCe/mini-graph-card.git",
   "author": "Karl Kihlström <mrkihlstrom@gmail.com>",
   "license": "MIT",
   "dependencies": {
