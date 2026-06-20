@@ -11,13 +11,13 @@ const getMax = (arr, val) => arr.reduce((max, p) => (
   Number(p[val]) > Number(max[val]) ? p : max
 ), arr[0]);
 const getTime = (date, extra, locale = 'en-US') => date.toLocaleString(locale, { hour: 'numeric', minute: 'numeric', ...extra });
-const getMilli = hours => hours * 60 ** 2 * 10 ** 3;
+const getMilli = (hours) => hours * 60 ** 2 * 10 ** 3;
 
-const compress = data => lzStringCompress(JSON.stringify(data));
+const compress = (data) => lzStringCompress(JSON.stringify(data));
 
-const decompress = data => (typeof data === 'string' ? JSON.parse(lzStringDecompress(data)) : data);
+const decompress = (data) => (typeof data === 'string' ? JSON.parse(lzStringDecompress(data)) : data);
 
-const getFirstDefinedItem = (...collection) => collection.find(item => typeof item !== 'undefined');
+const getFirstDefinedItem = (...collection) => collection.find((item) => typeof item !== 'undefined');
 
 // eslint-disable-next-line max-len
 const compareArray = (a, b) => a.length === b.length && a.every((value, index) => value === b[index]);

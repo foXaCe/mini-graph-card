@@ -89,7 +89,7 @@ function renderSvgPoints(card, points, i) {
       fill=${color}
       stroke=${color}
       stroke-width=${card.config.line_width / 2}>
-      ${points.map(point => renderSvgPoint(card, point, i))}
+      ${points.map((point) => renderSvgPoint(card, point, i))}
     </g>`;
 }
 
@@ -99,7 +99,7 @@ function renderSvgGradient(card, gradients) {
     if (!gradient) return undefined;
     return svg`
       <linearGradient id=${`grad-${card.id}-${i}`} gradientTransform="rotate(90)">
-        ${gradient.map(stop => svg`
+        ${gradient.map((stop) => svg`
           <stop stop-color=${stop.color} offset=${`${stop.offset}%`} />
         `)}
       </linearGradient>`;
@@ -163,7 +163,7 @@ export default function renderSvg(card) {
   const { height } = card.config;
   return svg`
     <svg width='100%' height='100%' viewBox='0 0 500 ${height}' preserveAspectRatio='none'
-      @click=${e => e.stopPropagation()}>
+      @click=${(e) => e.stopPropagation()}>
       <g>
         <defs>
           ${renderSvgGradient(card, card.gradient)}

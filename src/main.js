@@ -110,7 +110,7 @@ class MiniGraphCard extends LitElement {
     if (!this.Graph || entitiesChanged) {
       if (this._hass) this.hass = this._hass;
       this.Graph = this.config.entities.map(
-        entity => new Graph(
+        (entity) => new Graph(
           500,
           this.config.height,
           [this.config.show.fill ? 0 : this.config.line_width, this.config.line_width],
@@ -151,7 +151,7 @@ class MiniGraphCard extends LitElement {
   }
 
   shouldUpdate(changedProps) {
-    if (UPDATE_PROPS.some(prop => changedProps.has(prop))) {
+    if (UPDATE_PROPS.some((prop) => changedProps.has(prop))) {
       // Guard against a configured entity that is entirely absent from hass
       // (entity[0] undefined): compute the colour from the value we have, so
       // render() can reach renderWarnings() instead of throwing here.
@@ -197,7 +197,7 @@ class MiniGraphCard extends LitElement {
         ?gradient=${config.color_thresholds.length > 0}
         ?hover=${config.tap_action.action !== 'none'}
         style="font-size: ${config.font_size}px;"
-        @click=${e => this.handlePopup(e, config.tap_action.entity || this.entity[0])}
+        @click=${(e) => this.handlePopup(e, config.tap_action.entity || this.entity[0])}
       >
         ${this.renderHeader()} ${this.renderStates()} ${this.renderGraph()} ${this.renderInfo()}
       </ha-card>
@@ -216,7 +216,6 @@ class MiniGraphCard extends LitElement {
       </hui-warning>
     `;
   }
-
 
   renderHeader() {
     const {
@@ -302,7 +301,7 @@ class MiniGraphCard extends LitElement {
       return html`
         <div
           class="state ${!isPrimary && 'state--small'}"
-          @click=${e => this.handlePopup(e, this.entity[id])}
+          @click=${(e) => this.handlePopup(e, this.entity[id])}
           style=${entityConfig.state_adaptive_color ? `color: ${this.computeColor(value, entity)}` : ''}>
           ${entityConfig.show_indicator ? this.renderIndicator(value, entity) : ''}
           <span class="state__value ellipsis">
@@ -382,7 +381,7 @@ class MiniGraphCard extends LitElement {
           const legend = this.computeLegend(entity.index);
           return html`
             <div class="graph__legend__item"
-              @click=${e => this.handlePopup(e, this.entity[entity.index])}
+              @click=${(e) => this.handlePopup(e, this.entity[entity.index])}
               @mouseenter=${() => this.setTooltip(entity.index, -1, this.getEntityState(entity.index), localize('card.labels.current', this._hass))}
               @mouseleave=${() => (this.tooltip = {})}>
               ${this.renderIndicator(this.getEntityState(entity.index), entity.index)}
@@ -463,7 +462,7 @@ class MiniGraphCard extends LitElement {
   renderInfo() {
     return this.abs.length > 0 ? html`
       <div class="info flex">
-        ${this.abs.map(entry => html`
+        ${this.abs.map((entry) => html`
           <div class="info__item">
             <span class="info__item__type">${localize(`card.display_type.${entry.type}`, this._hass)}</span>
             <span class="info__item__value">
@@ -484,28 +483,28 @@ class MiniGraphCard extends LitElement {
   }
 
   get visibleEntities() {
-    return this.config.entities.filter(entity => entity.show_graph !== false);
+    return this.config.entities.filter((entity) => entity.show_graph !== false);
   }
 
   get primaryYaxisEntities() {
-    return this.visibleEntities.filter(entity => entity.y_axis === undefined
+    return this.visibleEntities.filter((entity) => entity.y_axis === undefined
       || entity.y_axis === 'primary');
   }
 
   get secondaryYaxisEntities() {
-    return this.visibleEntities.filter(entity => entity.y_axis === 'secondary');
+    return this.visibleEntities.filter((entity) => entity.y_axis === 'secondary');
   }
 
   get visibleLegends() {
-    return this.visibleEntities.filter(entity => entity.show_legend !== false);
+    return this.visibleEntities.filter((entity) => entity.show_legend !== false);
   }
 
   get primaryYaxisSeries() {
-    return this.primaryYaxisEntities.map(entity => this.Graph[entity.index]);
+    return this.primaryYaxisEntities.map((entity) => this.Graph[entity.index]);
   }
 
   get secondaryYaxisSeries() {
-    return this.secondaryYaxisEntities.map(entity => this.Graph[entity.index]);
+    return this.secondaryYaxisEntities.map((entity) => this.Graph[entity.index]);
   }
 
   computeColor(inState, i) {
@@ -577,7 +576,8 @@ class MiniGraphCard extends LitElement {
           }
           if (config.color_thresholds.length > 0 && !config.entities[i].color)
             this.gradient[i] = this.Graph[i].computeGradient(
-              config.color_thresholds, this.config.logarithmic,
+              config.color_thresholds,
+              this.config.logarithmic,
             );
         }
       });
@@ -610,7 +610,7 @@ class MiniGraphCard extends LitElement {
       || !this.updateQueue.includes(`${entity.entity_id}-${index}`)
       || this.config.entities[index].show_graph === false
     ) return;
-    this.updateQueue = this.updateQueue.filter(entry => entry !== `${entity.entity_id}-${index}`);
+    this.updateQueue = this.updateQueue.filter((entry) => entry !== `${entity.entity_id}-${index}`);
 
     let stateHistory = [];
     let start = initStart;
@@ -625,7 +625,7 @@ class MiniGraphCard extends LitElement {
     }
 
     if (stateHistory.length > 0) {
-      let currDataIndex = stateHistory.findIndex(item => new Date(item.last_changed) > initStart);
+      let currDataIndex = stateHistory.findIndex((item) => new Date(item.last_changed) > initStart);
       if (currDataIndex !== -1) {
         if (currDataIndex > 0) {
           // include previous item
@@ -678,8 +678,8 @@ class MiniGraphCard extends LitElement {
         });
       }
 
-      newStateHistory = newStateHistory[0].filter(item => !Number.isNaN(parseFloat(item.state)));
-      newStateHistory = newStateHistory.map(item => ({
+      newStateHistory = newStateHistory[0].filter((item) => !Number.isNaN(parseFloat(item.state)));
+      newStateHistory = newStateHistory.map((item) => ({
         last_changed: this.config.entities[index].attribute ? item.last_updated : item.last_changed,
         state: item.state,
       }));
@@ -733,7 +733,7 @@ class MiniGraphCard extends LitElement {
   }
 
   _convertState(res) {
-    const resultIndex = this.config.state_map.findIndex(s => s.value === res.state);
+    const resultIndex = this.config.state_map.findIndex((s) => s.value === res.state);
     if (resultIndex === -1) {
       return;
     }

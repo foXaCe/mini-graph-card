@@ -13,10 +13,10 @@ export function color(config, inState, i) {
 
   let intColor;
   if (color_thresholds.length > 0) {
-    const { color: found } = color_thresholds.find(ele => ele.value < numericState)
+    const { color: found } = color_thresholds.find((ele) => ele.value < numericState)
       || color_thresholds.slice(-1)[0];
     intColor = found;
-    const index = color_thresholds.findIndex(ele => ele.value < numericState);
+    const index = color_thresholds.findIndex((ele) => ele.value < numericState);
     const c1 = color_thresholds[index];
     const c2 = color_thresholds[index - 1];
     if (c2) {
@@ -73,7 +73,7 @@ export function state(config, inState, language) {
   if (config.state_map.length > 0) {
     const stateMap = Number.isInteger(inState)
       ? config.state_map[inState]
-      : config.state_map.find(s => s.value === inState);
+      : config.state_map.find((s) => s.value === inState);
 
     if (stateMap) {
       return stateMap.label;
@@ -100,6 +100,7 @@ export function state(config, inState, language) {
   const x = 10 ** dec;
   return numberFormat(
     (Math.round(value * valueFactor * x) / x).toFixed(dec),
-    language, dec,
+    language,
+    dec,
   );
 }

@@ -59,8 +59,8 @@ export default class Graph {
     histGroups.length = requiredNumOfPoints;
 
     this.coords = this._calcPoints(histGroups);
-    this.min = Math.min(...this.coords.map(item => Number(item[V])));
-    this.max = Math.max(...this.coords.map(item => Number(item[V])));
+    this.min = Math.min(...this.coords.map((item) => Number(item[V])));
+    this.max = Math.max(...this.coords.map((item) => Number(item[V])));
   }
 
   _reducer(res, item) {
@@ -129,7 +129,6 @@ export default class Graph {
       return coords.map((point, i) => [point[X], point[Y], point[V], i]);
     }
   }
-
 
   getPath() {
     let { coords } = this;
@@ -224,11 +223,11 @@ export default class Graph {
   }
 
   _maximum(items) {
-    return Math.max(...items.map(item => item.state));
+    return Math.max(...items.map((item) => item.state));
   }
 
   _minimum(items) {
-    return Math.min(...items.map(item => item.state));
+    return Math.min(...items.map((item) => item.state));
   }
 
   _first(items) {

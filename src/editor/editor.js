@@ -8,7 +8,7 @@ import { getEntityInfo } from './helpers';
 // time (see render()) so every t('...') call resolves to the user's
 // Home Assistant language via the shared localize module.
 let editorHass = null;
-const t = key => localize(key, editorHass);
+const t = (key) => localize(key, editorHass);
 
 export default class MiniGraphCardEditor extends LitElement {
   static get properties() {
@@ -148,7 +148,7 @@ export default class MiniGraphCardEditor extends LitElement {
       ${this._entities.length === 0 ? html`
         <div class="form-group">
           <label>${t('editor.labels.primary_entity_will_be_converted_to_entities_list')}:</label>
-          ${this.renderEntityPicker(this._entity, ev => this._primaryEntityChanged(ev))}
+          ${this.renderEntityPicker(this._entity, (ev) => this._primaryEntityChanged(ev))}
         </div>
       ` : ''}
 
@@ -159,7 +159,7 @@ export default class MiniGraphCardEditor extends LitElement {
               <div class="entity-picker-section">
                 ${this.renderEntityPicker(
     typeof entity === 'string' ? entity : entity.entity,
-    ev => this._entityListChanged(ev, index),
+    (ev) => this._entityListChanged(ev, index),
   )}
               </div>
               <div class="entity-info-section">
@@ -204,14 +204,14 @@ export default class MiniGraphCardEditor extends LitElement {
           <input
             type="text"
             .value="${this._name}"
-            @input="${ev => this._valueChanged(ev, 'name')}"
+            @input="${(ev) => this._valueChanged(ev, 'name')}"
             placeholder="${t('editor.placeholders.card_title')}"
           />
         </div>
 
         <div class="form-group">
           <label>${t('editor.labels.icon')}:</label>
-          ${this.renderIconPicker(this._icon, ev => this._valueChanged(ev, 'icon'))}
+          ${this.renderIconPicker(this._icon, (ev) => this._valueChanged(ev, 'icon'))}
         </div>
       </div>
 
@@ -221,7 +221,7 @@ export default class MiniGraphCardEditor extends LitElement {
           <input
             type="text"
             .value="${this._icon_image}"
-            @input="${ev => this._valueChanged(ev, 'icon_image')}"
+            @input="${(ev) => this._valueChanged(ev, 'icon_image')}"
             placeholder="https://example.com/image.png"
           />
         </div>
@@ -231,7 +231,7 @@ export default class MiniGraphCardEditor extends LitElement {
           <input
             type="text"
             .value="${this._unit}"
-            @input="${ev => this._valueChanged(ev, 'unit')}"
+            @input="${(ev) => this._valueChanged(ev, 'unit')}"
             placeholder="${t('editor.placeholders.unit_example')}"
           />
         </div>
@@ -245,7 +245,7 @@ export default class MiniGraphCardEditor extends LitElement {
             min="50"
             max="200"
             .value="${this._font_size}"
-            @input="${ev => this._valueChanged(ev, 'font_size')}"
+            @input="${(ev) => this._valueChanged(ev, 'font_size')}"
           />
         </div>
 
@@ -256,7 +256,7 @@ export default class MiniGraphCardEditor extends LitElement {
             min="8"
             max="32"
             .value="${this._font_size_header}"
-            @input="${ev => this._valueChanged(ev, 'font_size_header')}"
+            @input="${(ev) => this._valueChanged(ev, 'font_size_header')}"
           />
         </div>
       </div>
@@ -264,7 +264,7 @@ export default class MiniGraphCardEditor extends LitElement {
       <div class="form-row">
         <div class="form-group">
           <label>${t('editor.labels.header_alignment')}:</label>
-          <select .value="${this._align_header}" @change="${ev => this._valueChanged(ev, 'align_header')}">
+          <select .value="${this._align_header}" @change="${(ev) => this._valueChanged(ev, 'align_header')}">
             <option value="default">${t('editor.options.default')}</option>
             <option value="left">${t('editor.options.left')}</option>
             <option value="right">${t('editor.options.right')}</option>
@@ -274,7 +274,7 @@ export default class MiniGraphCardEditor extends LitElement {
 
         <div class="form-group">
           <label>${t('editor.labels.icon_alignment')}:</label>
-          <select .value="${this._align_icon}" @change="${ev => this._valueChanged(ev, 'align_icon')}">
+          <select .value="${this._align_icon}" @change="${(ev) => this._valueChanged(ev, 'align_icon')}">
             <option value="left">${t('editor.options.left')}</option>
             <option value="right">${t('editor.options.right')}</option>
             <option value="center">${t('editor.options.center')}</option>
@@ -286,7 +286,7 @@ export default class MiniGraphCardEditor extends LitElement {
       <div class="form-row">
         <div class="form-group">
           <label>${t('editor.labels.state_alignment')}:</label>
-          <select .value="${this._align_state}" @change="${ev => this._valueChanged(ev, 'align_state')}">
+          <select .value="${this._align_state}" @change="${(ev) => this._valueChanged(ev, 'align_state')}">
             <option value="left">${t('editor.options.left')}</option>
             <option value="right">${t('editor.options.right')}</option>
             <option value="center">${t('editor.options.center')}</option>
@@ -300,7 +300,7 @@ export default class MiniGraphCardEditor extends LitElement {
             min="0"
             max="10"
             .value="${this._decimals}"
-            @input="${ev => this._valueChanged(ev, 'decimals')}"
+            @input="${(ev) => this._valueChanged(ev, 'decimals')}"
           />
         </div>
       </div>
@@ -320,12 +320,12 @@ export default class MiniGraphCardEditor extends LitElement {
     { key: 'average', label: t('editor.visibility.average') },
     { key: 'labels', label: t('editor.visibility.labels') },
     { key: 'labels_secondary', label: t('editor.visibility.secondary_labels') },
-  ].map(option => html`
+  ].map((option) => html`
             <label class="checkbox-item">
               <input
                 type="checkbox"
                 .checked="${this._show[option.key] !== false}"
-                @change="${ev => this._showChanged(ev, option.key)}"
+                @change="${(ev) => this._showChanged(ev, option.key)}"
               />
               ${option.label}
             </label>
@@ -345,7 +345,7 @@ export default class MiniGraphCardEditor extends LitElement {
             min="50"
             max="500"
             .value="${this._height}"
-            @input="${ev => this._valueChanged(ev, 'height')}"
+            @input="${(ev) => this._valueChanged(ev, 'height')}"
           />
         </div>
 
@@ -356,7 +356,7 @@ export default class MiniGraphCardEditor extends LitElement {
             min="1"
             max="20"
             .value="${this._line_width}"
-            @input="${ev => this._valueChanged(ev, 'line_width')}"
+            @input="${(ev) => this._valueChanged(ev, 'line_width')}"
           />
         </div>
       </div>
@@ -367,7 +367,7 @@ export default class MiniGraphCardEditor extends LitElement {
           <input
             type="text"
             .value="${this._line_color}"
-            @input="${ev => this._valueChanged(ev, 'line_color')}"
+            @input="${(ev) => this._valueChanged(ev, 'line_color')}"
             placeholder="#ff0000, #00ff00, #0000ff"
           />
         </div>
@@ -379,7 +379,7 @@ export default class MiniGraphCardEditor extends LitElement {
             min="0"
             max="20"
             .value="${this._bar_spacing}"
-            @input="${ev => this._valueChanged(ev, 'bar_spacing')}"
+            @input="${(ev) => this._valueChanged(ev, 'bar_spacing')}"
           />
         </div>
       </div>
@@ -390,7 +390,7 @@ export default class MiniGraphCardEditor extends LitElement {
             <input
               type="checkbox"
               .checked="${this._animate}"
-              @change="${ev => this._valueChanged(ev, 'animate')}"
+              @change="${(ev) => this._valueChanged(ev, 'animate')}"
             />
             ${t('editor.labels.enable_animation')}
           </label>
@@ -401,7 +401,7 @@ export default class MiniGraphCardEditor extends LitElement {
             <input
               type="checkbox"
               .checked="${this._smoothing}"
-              @change="${ev => this._valueChanged(ev, 'smoothing')}"
+              @change="${(ev) => this._valueChanged(ev, 'smoothing')}"
             />
             ${t('editor.labels.smooth_lines')}
           </label>
@@ -414,7 +414,7 @@ export default class MiniGraphCardEditor extends LitElement {
             <input
               type="checkbox"
               .checked="${this._logarithmic}"
-              @change="${ev => this._valueChanged(ev, 'logarithmic')}"
+              @change="${(ev) => this._valueChanged(ev, 'logarithmic')}"
             />
             ${t('editor.labels.logarithmic_scale')}
           </label>
@@ -433,7 +433,7 @@ export default class MiniGraphCardEditor extends LitElement {
             min="1"
             max="168"
             .value="${this._hours_to_show}"
-            @input="${ev => this._valueChanged(ev, 'hours_to_show')}"
+            @input="${(ev) => this._valueChanged(ev, 'hours_to_show')}"
           />
         </div>
 
@@ -445,7 +445,7 @@ export default class MiniGraphCardEditor extends LitElement {
             max="60"
             step="0.1"
             .value="${this._points_per_hour}"
-            @input="${ev => this._valueChanged(ev, 'points_per_hour')}"
+            @input="${(ev) => this._valueChanged(ev, 'points_per_hour')}"
           />
         </div>
       </div>
@@ -453,7 +453,7 @@ export default class MiniGraphCardEditor extends LitElement {
       <div class="form-row">
         <div class="form-group">
           <label>${t('editor.labels.aggregate_function')}:</label>
-          <select .value="${this._aggregate_func}" @change="${ev => this._valueChanged(ev, 'aggregate_func')}">
+          <select .value="${this._aggregate_func}" @change="${(ev) => this._valueChanged(ev, 'aggregate_func')}">
             <option value="avg">${t('editor.options.average')}</option>
             <option value="median">${t('editor.options.median')}</option>
             <option value="min">${t('editor.options.minimum')}</option>
@@ -468,7 +468,7 @@ export default class MiniGraphCardEditor extends LitElement {
 
         <div class="form-group">
           <label>${t('editor.labels.group_by')}:</label>
-          <select .value="${this._group_by}" @change="${ev => this._valueChanged(ev, 'group_by')}">
+          <select .value="${this._group_by}" @change="${(ev) => this._valueChanged(ev, 'group_by')}">
             <option value="interval">${t('editor.options.interval')}</option>
             <option value="date">${t('editor.options.date')}</option>
             <option value="hour">${t('editor.options.hour')}</option>
@@ -483,7 +483,7 @@ export default class MiniGraphCardEditor extends LitElement {
             type="number"
             min="1"
             .value="${this._update_interval}"
-            @input="${ev => this._valueChanged(ev, 'update_interval')}"
+            @input="${(ev) => this._valueChanged(ev, 'update_interval')}"
           />
         </div>
 
@@ -492,7 +492,7 @@ export default class MiniGraphCardEditor extends LitElement {
             <input
               type="checkbox"
               .checked="${this._hour24}"
-              @change="${ev => this._valueChanged(ev, 'hour24')}"
+              @change="${(ev) => this._valueChanged(ev, 'hour24')}"
             />
             ${t('editor.labels.time_format_24h')}
           </label>
@@ -510,7 +510,7 @@ export default class MiniGraphCardEditor extends LitElement {
           <input
             type="text"
             .value="${this._lower_bound}"
-            @input="${ev => this._valueChanged(ev, 'lower_bound')}"
+            @input="${(ev) => this._valueChanged(ev, 'lower_bound')}"
             placeholder="${t('editor.placeholders.lower_bound_example')}"
           />
         </div>
@@ -520,7 +520,7 @@ export default class MiniGraphCardEditor extends LitElement {
           <input
             type="text"
             .value="${this._upper_bound}"
-            @input="${ev => this._valueChanged(ev, 'upper_bound')}"
+            @input="${(ev) => this._valueChanged(ev, 'upper_bound')}"
             placeholder="${t('editor.placeholders.upper_bound_example')}"
           />
         </div>
@@ -532,7 +532,7 @@ export default class MiniGraphCardEditor extends LitElement {
           type="number"
           min="0"
           .value="${this._min_bound_range}"
-          @input="${ev => this._valueChanged(ev, 'min_bound_range')}"
+          @input="${(ev) => this._valueChanged(ev, 'min_bound_range')}"
         />
       </div>
     `;
@@ -542,7 +542,7 @@ export default class MiniGraphCardEditor extends LitElement {
     return html`
       <div class="form-group">
         <label>${t('editor.labels.threshold_transition')}:</label>
-        <select .value="${this._color_thresholds_transition}" @change="${ev => this._valueChanged(ev, 'color_thresholds_transition')}">
+        <select .value="${this._color_thresholds_transition}" @change="${(ev) => this._valueChanged(ev, 'color_thresholds_transition')}">
           <option value="smooth">${t('editor.options.smooth')}</option>
           <option value="hard">${t('editor.options.hard')}</option>
         </select>
@@ -559,13 +559,13 @@ export default class MiniGraphCardEditor extends LitElement {
             <input
               type="number"
               .value="${threshold.value}"
-              @input="${ev => this._thresholdChanged(ev, index, 'value')}"
+              @input="${(ev) => this._thresholdChanged(ev, index, 'value')}"
               placeholder="${t('editor.placeholders.value')}"
             />
             <input
               type="color"
               .value="${threshold.color}"
-              @input="${ev => this._thresholdChanged(ev, index, 'color')}"
+              @input="${(ev) => this._thresholdChanged(ev, index, 'color')}"
             />
             <button class="btn-remove" @click="${() => this._removeThreshold(index)}">${t('editor.buttons.remove')}</button>
           </div>
@@ -582,7 +582,7 @@ export default class MiniGraphCardEditor extends LitElement {
             <input
               type="checkbox"
               .checked="${this._cache}"
-              @change="${ev => this._valueChanged(ev, 'cache')}"
+              @change="${(ev) => this._valueChanged(ev, 'cache')}"
             />
             ${t('editor.labels.cache_data')}
           </label>
@@ -593,7 +593,7 @@ export default class MiniGraphCardEditor extends LitElement {
             <input
               type="checkbox"
               .checked="${this._compress}"
-              @change="${ev => this._valueChanged(ev, 'compress')}"
+              @change="${(ev) => this._valueChanged(ev, 'compress')}"
             />
             ${t('editor.labels.compress_data')}
           </label>
@@ -605,7 +605,7 @@ export default class MiniGraphCardEditor extends LitElement {
           <input
             type="checkbox"
             .checked="${this._group}"
-            @change="${ev => this._valueChanged(ev, 'group')}"
+            @change="${(ev) => this._valueChanged(ev, 'group')}"
           />
           ${t('editor.labels.group_entities')}
         </label>
@@ -616,7 +616,7 @@ export default class MiniGraphCardEditor extends LitElement {
         <div class="form-row">
           <div class="form-group">
             <label>${t('editor.tap_action.action_type')}:</label>
-            <select .value="${this._tap_action.action}" @change="${ev => this._tapActionChanged(ev, 'action')}">
+            <select .value="${this._tap_action.action}" @change="${(ev) => this._tapActionChanged(ev, 'action')}">
               <option value="more-info">${t('editor.tap_action.more_info')}</option>
               <option value="navigate">${t('editor.tap_action.navigate')}</option>
               <option value="call-service">${t('editor.tap_action.call_service')}</option>
@@ -631,7 +631,7 @@ export default class MiniGraphCardEditor extends LitElement {
               <input
                 type="text"
                 .value="${this._tap_action.navigation_path || ''}"
-                @input="${ev => this._tapActionChanged(ev, 'navigation_path')}"
+                @input="${(ev) => this._tapActionChanged(ev, 'navigation_path')}"
                 placeholder="/lovelace/dashboard"
               />
             </div>
@@ -643,7 +643,7 @@ export default class MiniGraphCardEditor extends LitElement {
               <input
                 type="text"
                 .value="${this._tap_action.url || ''}"
-                @input="${ev => this._tapActionChanged(ev, 'url')}"
+                @input="${(ev) => this._tapActionChanged(ev, 'url')}"
                 placeholder="https://example.com"
               />
             </div>
@@ -655,7 +655,7 @@ export default class MiniGraphCardEditor extends LitElement {
               <input
                 type="text"
                 .value="${this._tap_action.service || ''}"
-                @input="${ev => this._tapActionChanged(ev, 'service')}"
+                @input="${(ev) => this._tapActionChanged(ev, 'service')}"
                 placeholder="light.toggle"
               />
             </div>
@@ -708,7 +708,7 @@ export default class MiniGraphCardEditor extends LitElement {
         list="entity-list"
       />
       <datalist id="entity-list">
-        ${Object.keys((this.hass && this.hass.states) || {}).map(entity => html`
+        ${Object.keys((this.hass && this.hass.states) || {}).map((entity) => html`
           <option value="${entity}"></option>
         `)}
       </datalist>
@@ -752,7 +752,7 @@ export default class MiniGraphCardEditor extends LitElement {
             <input
               type="text"
               .value="${config.name || ''}"
-              @input="${ev => this._entityConfigChanged(ev, index, 'name')}"
+              @input="${(ev) => this._entityConfigChanged(ev, index, 'name')}"
             />
           </div>
 
@@ -761,7 +761,7 @@ export default class MiniGraphCardEditor extends LitElement {
             <input
               type="color"
               .value="${config.color || '#ff0000'}"
-              @input="${ev => this._entityConfigChanged(ev, index, 'color')}"
+              @input="${(ev) => this._entityConfigChanged(ev, index, 'color')}"
             />
           </div>
         </div>
@@ -772,14 +772,14 @@ export default class MiniGraphCardEditor extends LitElement {
             <input
               type="text"
               .value="${config.attribute || ''}"
-              @input="${ev => this._entityConfigChanged(ev, index, 'attribute')}"
+              @input="${(ev) => this._entityConfigChanged(ev, index, 'attribute')}"
               placeholder="temperature"
             />
           </div>
 
           <div class="form-group">
             <label>${t('editor.entity.y_axis')}:</label>
-            <select .value="${config.y_axis || 'primary'}" @change="${ev => this._entityConfigChanged(ev, index, 'y_axis')}">
+            <select .value="${config.y_axis || 'primary'}" @change="${(ev) => this._entityConfigChanged(ev, index, 'y_axis')}">
               <option value="primary">${t('editor.options.primary')}</option>
               <option value="secondary">${t('editor.options.secondary')}</option>
             </select>
@@ -796,12 +796,12 @@ export default class MiniGraphCardEditor extends LitElement {
     { key: 'show_legend', label: 'editor.entity.show_in_legend' },
     { key: 'smoothing', label: 'editor.entity.smoothing' },
     { key: 'fixed_value', label: 'editor.entity.fixed_value' },
-  ].map(option => html`
+  ].map((option) => html`
             <label class="checkbox-item">
               <input
                 type="checkbox"
                 .checked="${config[option.key] !== false}"
-                @change="${ev => this._entityConfigChanged(ev, index, option.key)}"
+                @change="${(ev) => this._entityConfigChanged(ev, index, option.key)}"
               />
               ${t(option.label)}
             </label>
@@ -875,10 +875,9 @@ export default class MiniGraphCardEditor extends LitElement {
       value = ev.target.value;
     }
 
-
     // Handle special cases
     if (key === 'line_color' && typeof value === 'string' && value.includes(',')) {
-      value = value.split(',').map(c => c.trim());
+      value = value.split(',').map((c) => c.trim());
     }
 
     this._config = { ...this._config, [key]: value };
@@ -936,7 +935,7 @@ export default class MiniGraphCardEditor extends LitElement {
     const isExpanded = this._expandedEntities.includes(index);
 
     if (isExpanded) {
-      this._expandedEntities = this._expandedEntities.filter(i => i !== index);
+      this._expandedEntities = this._expandedEntities.filter((i) => i !== index);
     } else {
       this._expandedEntities = [...this._expandedEntities, index];
     }

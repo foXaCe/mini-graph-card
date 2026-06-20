@@ -9,14 +9,14 @@ export function getBoundary(type, series, configVal, fallback) {
 
   if (configVal === undefined) {
     // dynamic boundary depending on values
-    return Math[type](...series.map(ele => ele[type])) || fallback;
+    return Math[type](...series.map((ele) => ele[type])) || fallback;
   }
   if (configVal[0] !== '~') {
     // fixed boundary
     return configVal;
   }
   // soft boundary (respecting out of range values)
-  return Math[type](Number(configVal.substr(1)), ...series.map(ele => ele[type]));
+  return Math[type](Number(configVal.substr(1)), ...series.map((ele) => ele[type]));
 }
 
 export function getBoundaries(series, min, max, fallback, minRange) {
