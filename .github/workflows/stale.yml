@@ -1,0 +1,39 @@
+name: Stale
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-issue-stale: 60
+          days-before-issue-close: 14
+          days-before-pr-stale: 30
+          days-before-pr-close: 14
+          stale-issue-label: stale
+          stale-pr-label: stale
+          exempt-issue-labels: "pinned,security,help wanted,[Status] Maybe Later"
+          exempt-pr-labels: "pinned,security,help wanted,[Status] Maybe Later"
+          exempt-all-milestones: true
+          exempt-all-assignees: true
+          stale-issue-message: >
+            This issue has been automatically marked as stale because it has not had
+            recent activity. It will be closed if no further activity occurs. Thank you
+            for your contributions. If this is still an active issue, please let us know!
+          stale-pr-message: >
+            This pull request has been automatically marked as stale because it has not had
+            recent activity. It will be closed if no further activity occurs. Thank you
+            for your contributions.
+          close-issue-message: >
+            This issue was closed because it has been stale with no further activity.
+          close-pr-message: >
+            This pull request was closed because it has been stale with no further activity.

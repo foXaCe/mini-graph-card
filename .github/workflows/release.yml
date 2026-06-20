@@ -4,12 +4,11 @@ on:
   push:
     branches:
       - main
-      - dev
 
 jobs:
   release-bundle:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
+    if: github.ref == 'refs/heads/main'
 
     outputs:
       new_release_published: ${{ steps.semantic.outputs.new_release_published }}
