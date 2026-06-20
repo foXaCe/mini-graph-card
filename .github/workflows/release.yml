@@ -32,6 +32,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Release
-        run: npx semantic-release
+        # semantic-release and its non-bundled plugins are fetched on demand
+        # here instead of being pinned in devDependencies, so their transitive
+        # tree (notably the bundled npm CLI) stays out of package-lock.json and
+        # off Dependabot's radar. commit-analyzer / release-notes-generator /
+        # npm / github ship inside semantic-release core.
+        run: >-
+          npx
+          -p semantic-release@^24
+          -p @semantic-release/changelog@^6
+          -p @semantic-release/exec@^7
+          -p @semantic-release/git@^10
+          semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
