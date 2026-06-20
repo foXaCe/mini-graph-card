@@ -1,0 +1,5 @@
+#!/bin/sh
+# Pre-commit hook: run the same lint as CI so a commit never breaks the pipeline.
+# Enabled via `git config core.hooksPath .githooks` (run `npm run hooks` once per clone).
+# Bypass a single commit with: git commit --no-verify
+npm run lint
