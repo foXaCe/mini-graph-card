@@ -14,7 +14,7 @@ if [ -z "${BRANCH}" ]; then
   exit 1;
 fi
 
-if [ ! "${BRANCH}" = "refs/heads/master" ]; then
+if [ ! "${BRANCH}" = "refs/heads/main" ]; then
   echo "Branch is ${BRANCH}; README.md not updated."
   exit 0;
 fi

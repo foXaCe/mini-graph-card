@@ -25,7 +25,7 @@ module.exports = {
   ],
   preset: 'angular',
   branches: [
-    { name: 'master' },
+    { name: 'main' },
     { name: 'dev', prerelease: true },
   ],
 };

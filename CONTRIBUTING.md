@@ -91,5 +91,5 @@ PRs including new features should be approved in the same way as refactoring cod
 ## New releases
 
 Releases are published using a GitHub action.
-It must be triggered manually and it can be run on the `dev` branch for pre-releases or on the `master` branch for official releases.
+It must be triggered manually and it can be run on the `dev` branch for pre-releases or on the `main` branch for official releases.
 We create frequent pre-releases (if there are changes) to ship improvements in a timely manner.
