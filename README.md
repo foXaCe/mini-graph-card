@@ -13,11 +13,11 @@ This card is available in [HACS](https://hacs.xyz/) (Home Assistant Community St
 
 <small>*HACS is a third party community store and is not included in Home Assistant out of the box.*</small>
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=kalkih&repository=mini-graph-card)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=foXaCe&repository=mini-graph-card)
 
 ### Manual install
 
-1. Download and copy `mini-graph-card-bundle.js` from the [latest release](https://github.com/kalkih/mini-graph-card/releases/latest) into your `config/www` directory.
+1. Download and copy `mini-graph-card-bundle.js` from the [latest release](https://github.com/foXaCe/mini-graph-card/releases/latest) into your `config/www` directory.
 
 2. Add the resource reference as decribed below.
 
@@ -57,7 +57,7 @@ Else, if you prefer the graphical editor, use the menu to add the resource:
 
 1. Find your `mini-graph-card-bundle.js` file in `config/www` or wherever you ended up storing it.
 
-2. Replace the local file with the latest one attached in the [latest release](https://github.com/kalkih/mini-graph-card/releases/latest).
+2. Replace the local file with the latest one attached in the [latest release](https://github.com/foXaCe/mini-graph-card/releases/latest).
 
 3. Add the new version number to the end of the cards reference url in your `ui-lovelace.yaml` like below:
 
@@ -583,7 +583,7 @@ entities:
 1. Clone this repository into your `config/www` folder using git:
 
 ```console
-$ git clone https://github.com/kalkih/mini-graph-card.git
+$ git clone https://github.com/foXaCe/mini-graph-card.git
 ```
 
 2. Add a reference to the card in your `ui-lovelace.yaml`:

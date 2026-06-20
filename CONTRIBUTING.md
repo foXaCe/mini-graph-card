@@ -12,7 +12,7 @@ In this document, you will find information on
 
 ## Issues
 
-If you encounter any issues or have feature requests, please submit them via [GitHub Issues](https://github.com/kalkih/mini-graph-card/issues).
+If you encounter any issues or have feature requests, please submit them via [GitHub Issues](https://github.com/foXaCe/mini-graph-card/issues).
 Before submitting a new issue, please check to see if a similar one has already been reported.
 If you find an existing issue that describes the problem you're experiencing, please add a comment to the existing issue rather than creating a new one.
 
