@@ -1,0 +1,66 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)",
+    "group:allNonMajor",
+    ":dependencyDashboard",
+    ":enableVulnerabilityAlertsWithLabel(security)",
+    ":timezone(Europe/Paris)",
+    "schedule:weekly"
+  ],
+  "labels": ["dependencies"],
+  "assignees": ["foXaCe"],
+  "rangeStrategy": "bump",
+  "rebaseWhen": "behind-base-branch",
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "📦 Renovate Dependency Dashboard",
+  "dependencyDashboardLabels": ["dependencies", "dashboard"],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "automerge": true,
+  "automergeStrategy": "squash",
+  "automergeType": "pr",
+  "pruneStaleBranches": true,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"],
+    "automerge": true
+  },
+  "packageRules": [
+    {
+      "description": "Low-risk updates (patch / pin / digest) — auto-merge once CI is green",
+      "matchUpdateTypes": ["patch", "pin", "digest"],
+      "labels": ["dependencies", "auto-merge"]
+    },
+    {
+      "description": "GitHub Actions — own label, auto-merge once CI is green",
+      "matchManagers": ["github-actions"],
+      "labels": ["dependencies", "github_actions"]
+    },
+    {
+      "description": "Build/lint toolchain: skip MAJOR bumps entirely (they break the build/lint). Minor & patch still flow and auto-merge.",
+      "matchPackageNames": [
+        "eslint",
+        "eslint-config-airbnb-base",
+        "eslint-plugin-import",
+        "rollup",
+        "/^@babel\\//",
+        "/^@rollup\\//",
+        "/^rollup-plugin/",
+        "/^babel-/"
+      ],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "Major updates (non-toolchain): individual PR, still auto-merged when the full CI (lint + build + tests) passes",
+      "matchUpdateTypes": ["major"],
+      "labels": ["dependencies", "major"]
+    }
+  ],
+  "ignorePaths": ["**/node_modules/**", "**/dist/**", "**/coverage/**"]
+}
