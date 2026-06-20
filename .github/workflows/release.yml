@@ -1,9 +1,12 @@
 name: Release
 
+# Manual only: a release is published solely when YOU run this workflow
+# (Actions tab → Release → "Run workflow", or `gh workflow run Release`).
+# Pushes to main — including Renovate auto-merges — never auto-publish.
+# semantic-release still computes the version/changelog from the commits
+# accumulated since the last release.
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   release-bundle:
