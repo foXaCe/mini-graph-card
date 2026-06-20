@@ -20,32 +20,32 @@
   "author": "Karl Kihlström <mrkihlstrom@gmail.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": ">=20.20.2"
   },
   "dependencies": {
     "@kalkih/lz-string": "^1.4.5",
     "custom-card-helpers": "^1.9.0",
     "d3-interpolate": "^3.0.1",
-    "lit": "^3.2.1",
+    "lit": "^3.3.3",
     "localforage": "^1.10.0",
     "spark-md5": "^3.0.2"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-commonjs": "^28.0.9",
     "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-node-resolve": "^15.3.1",
     "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^12.1.1",
+    "@rollup/plugin-typescript": "^12.3.0",
     "@types/d3-interpolate": "^3.0.4",
     "@types/spark-md5": "^3.0.5",
     "@vitest/coverage-v8": "^4.1.9",
-    "eslint": "^9.15.0",
-    "globals": "^15.12.0",
+    "eslint": "^9.39.4",
+    "globals": "^15.15.0",
     "jsdom": "^25.0.1",
-    "rollup": "^4.27.4",
+    "rollup": "^4.62.0",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.16.0",
+    "typescript-eslint": "^8.61.1",
     "vitest": "^4.1.9"
   },
   "overrides": {
