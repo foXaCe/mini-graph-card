@@ -1,3 +1,19 @@
+# [0.23.0](https://github.com/foXaCe/mini-graph-card/compare/v0.22.9...v0.23.0) (2026-06-20)
+
+
+### Bug Fixes
+
+* **build:** drop babel-plugin-iife-wrap to clear babel-traverse 6 CVE ([0487c4c](https://github.com/foXaCe/mini-graph-card/commit/0487c4c09d23fdb8d3103263c840fd6dc4aab324))
+* **ci:** point repository at the fork for semantic-release ([7f860e8](https://github.com/foXaCe/mini-graph-card/commit/7f860e84667cddb19baee0484fa725aa81d6bf1d))
+* **ci:** repair npm ci lockfile and add pre-commit lint hook ([e0b0de7](https://github.com/foXaCe/mini-graph-card/commit/e0b0de7da27196d031eeb0af6a9afb05f9caac23))
+* **graph:** sort median by numeric state and guard sparse history ([b91e14a](https://github.com/foXaCe/mini-graph-card/commit/b91e14aaef98e5bd33106af14ed040f0fd21874d))
+
+
+### Features
+
+* **i18n:** rework localization into JSON files with hierarchical keys ([fb48474](https://github.com/foXaCe/mini-graph-card/commit/fb4847427bcb8515570064ce7506432ba28cdb32))
+* **picker:** suggest the card for numeric entities ([966d729](https://github.com/foXaCe/mini-graph-card/commit/966d7294118c1eb77c56989f970d0ef00c5c76c6)), closes [#1365](https://github.com/foXaCe/mini-graph-card/issues/1365)
+
 # [0.13.0](https://github.com/kalkih/mini-graph-card/compare/v0.12.1...v0.13.0) (2025-05-29)
 
 
