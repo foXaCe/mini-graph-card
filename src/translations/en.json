@@ -1,0 +1,162 @@
+{
+  "editor": {
+    "messages": {
+      "loading_home_assistant": "Loading Home Assistant...",
+      "please_wait_while_the_editor_loads": "Please wait while the editor loads.",
+      "editor_error": "Editor Error",
+      "an_error_occurred_while_rendering_the_editor": "An error occurred while rendering the editor:"
+    },
+    "headers": {
+      "mini_graph_card_configuration": "Mini Graph Card Configuration",
+      "complete_configuration_for_all_options": "Complete configuration for all options"
+    },
+    "sections": {
+      "entities": "Entities",
+      "add_configure_and_manage_all_your_entities": "Add, configure and manage all your entities",
+      "display_options": "Display Options",
+      "name_icon_and_visual_appearance_settings": "Name, icon, and visual appearance settings",
+      "graph_settings": "Graph Settings",
+      "graph_type_colors_and_visual_properties": "Graph type, colors, and visual properties",
+      "data_time": "Data & Time",
+      "data_aggregation_and_time_configuration": "Data aggregation and time configuration",
+      "scale_bounds": "Scale & Bounds",
+      "y_axis_bounds_and_scaling_options": "Y-axis bounds and scaling options",
+      "colors_thresholds": "Colors & Thresholds",
+      "color_configuration_and_dynamic_thresholds": "Color configuration and dynamic thresholds",
+      "advanced_options": "Advanced Options",
+      "advanced_options_and_performance_settings": "Advanced options and performance settings"
+    },
+    "labels": {
+      "primary_entity_will_be_converted_to_entities_list": "Primary Entity (will be converted to entities list)",
+      "card_name": "Card Name",
+      "icon": "Icon",
+      "icon_image_url": "Icon Image URL",
+      "unit": "Unit",
+      "font_size": "Font Size (%)",
+      "header_font_size_px": "Header Font Size (px)",
+      "header_alignment": "Header Alignment",
+      "icon_alignment": "Icon Alignment",
+      "state_alignment": "State Alignment",
+      "decimal_places": "Decimal Places",
+      "height_px": "Height (px)",
+      "line_width": "Line Width",
+      "line_colors_comma_separated": "Line Colors (comma-separated)",
+      "bar_spacing": "Bar Spacing",
+      "enable_animation": "Enable Animation",
+      "smooth_lines": "Smooth Lines",
+      "logarithmic_scale": "Logarithmic Scale",
+      "hours_to_show": "Hours to Show",
+      "points_per_hour": "Points per Hour",
+      "aggregate_function": "Aggregate Function",
+      "group_by": "Group By",
+      "update_interval_seconds": "Update Interval (seconds)",
+      "primary_y_axis": "Primary Y-Axis",
+      "lower_bound_use_n_for_soft": "Lower Bound (use ~N for soft)",
+      "upper_bound_use_n_for_soft": "Upper Bound (use ~N for soft)",
+      "minimum_range": "Minimum Range",
+      "threshold_transition": "Threshold Transition",
+      "color_thresholds": "Color Thresholds",
+      "cache_data": "Cache Data",
+      "compress_data": "Compress Data",
+      "group_entities": "Group Entities",
+      "time_format_24h": "24-Hour Time Format"
+    },
+    "buttons": {
+      "hide": "Hide",
+      "configure": "Configure",
+      "remove_entity": "Remove Entity",
+      "add_entity": "Add Entity",
+      "add_threshold": "Add Threshold",
+      "remove": "Remove"
+    },
+    "placeholders": {
+      "card_title": "Card title",
+      "value": "Value",
+      "unit_example": "°C, kW, etc.",
+      "lower_bound_example": "0 or ~0",
+      "upper_bound_example": "100 or ~100"
+    },
+    "options": {
+      "default": "Default",
+      "left": "Left",
+      "right": "Right",
+      "center": "Center",
+      "with_state": "With State",
+      "median": "Median",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "first": "First",
+      "last": "Last",
+      "sum": "Sum",
+      "delta": "Delta",
+      "difference": "Difference",
+      "interval": "Interval",
+      "date": "Date",
+      "hour": "Hour",
+      "smooth": "Smooth",
+      "hard": "Hard",
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "average": "Average"
+    },
+    "visibility": {
+      "visibility_options": "Visibility Options",
+      "name": "Name",
+      "state": "State",
+      "graph": "Graph",
+      "fill": "Fill",
+      "points": "Points",
+      "legend": "Legend",
+      "extrema": "Extrema",
+      "average": "Average",
+      "labels": "Labels",
+      "secondary_labels": "Secondary Labels"
+    },
+    "tap_action": {
+      "tap_action": "Tap Action",
+      "action_type": "Action Type",
+      "more_info": "More Info",
+      "navigate": "Navigate",
+      "call_service": "Call Service",
+      "open_url": "Open URL",
+      "no_action": "No Action",
+      "navigation_path": "Navigation Path",
+      "url": "URL",
+      "service": "Service"
+    },
+    "entity": {
+      "custom_name": "Custom Name",
+      "custom_color": "Custom Color",
+      "attribute_instead_of_state": "Attribute (instead of state)",
+      "y_axis": "Y-Axis",
+      "show_state": "Show State",
+      "show_in_graph": "Show in Graph",
+      "show_line": "Show Line",
+      "show_fill": "Show Fill",
+      "show_points": "Show Points",
+      "show_in_legend": "Show in Legend",
+      "smoothing": "Smoothing",
+      "fixed_value": "Fixed Value"
+    }
+  },
+  "card": {
+    "error": {
+      "entity_not_available": "Entity not available:"
+    },
+    "a11y": {
+      "loading": "Loading"
+    },
+    "labels": {
+      "current": "Current"
+    },
+    "display_type": {
+      "min": "min",
+      "avg": "avg",
+      "max": "max"
+    },
+    "picker": {
+      "name": "Mini Graph Card",
+      "description": "The Mini Graph card is a minimalistic and customizable graph card"
+    }
+  }
+}

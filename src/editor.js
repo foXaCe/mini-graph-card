@@ -1,170 +1,12 @@
 import { LitElement, html, css } from 'lit-element';
 import { fireEvent } from 'custom-card-helpers';
+import { localize } from './localize';
 
-
-// French translations
-const TRANSLATIONS_FR = {
-  // Headers
-  'Mini Graph Card Configuration': 'Configuration Mini Graph Card',
-  'Complete configuration for all options': 'Configuration complète pour toutes les options',
-  'Basic configuration required for the card': 'Configuration de base requise pour la carte',
-  'Name, icon, and visual appearance settings': 'Nom, icône et paramètres d\'apparence visuelle',
-  'Graph type, colors, and visual properties': 'Type de graphique, couleurs et propriétés visuelles',
-  'Data aggregation and time configuration': 'Agrégation des données et configuration temporelle',
-  'Y-axis bounds and scaling options': 'Limites de l\'axe Y et options d\'échelle',
-  'Color configuration and dynamic thresholds': 'Configuration des couleurs et seuils dynamiques',
-  'Advanced options and performance settings': 'Options avancées et paramètres de performance',
-  'Per-entity configuration and customization': 'Configuration et personnalisation par entité',
-
-  // Section titles
-  'Required Settings': 'Paramètres requis',
-  'Display Options': 'Options d\'affichage',
-  'Graph Settings': 'Paramètres du graphique',
-  'Data & Time': 'Données et temps',
-  'Scale & Bounds': 'Échelle et limites',
-  'Colors & Thresholds': 'Couleurs et seuils',
-  'Advanced Options': 'Options avancées',
-  'Entity Configuration': 'Configuration des entités',
-
-  // Form labels
-  'Primary Entity (will be converted to entities list)': 'Entité principale (sera convertie en liste d\'entités)',
-  'Entities List': 'Liste des entités',
-  'Card Name': 'Nom de la carte',
-  'Icon': 'Icône',
-  'Icon Image URL': 'URL de l\'image d\'icône',
-  'Unit': 'Unité',
-  'Font Size (%)': 'Taille de police (%)',
-  'Header Font Size (px)': 'Taille de police de l\'en-tête (px)',
-  'Header Alignment': 'Alignement de l\'en-tête',
-  'Icon Alignment': 'Alignement de l\'icône',
-  'State Alignment': 'Alignement de l\'état',
-  'Decimal Places': 'Nombre de décimales',
-  'Height (px)': 'Hauteur (px)',
-  'Line Width': 'Épaisseur de ligne',
-  'Line Colors (comma-separated)': 'Couleurs de ligne (séparées par des virgules)',
-  'Bar Spacing': 'Espacement des barres',
-  'Enable Animation': 'Activer l\'animation',
-  'Smooth Lines': 'Lignes lissées',
-  'Logarithmic Scale': 'Échelle logarithmique',
-  'Hours to Show': 'Heures à afficher',
-  'Points per Hour': 'Points par heure',
-  'Aggregate Function': 'Fonction d\'agrégation',
-  'Group By': 'Grouper par',
-  'Update Interval (seconds)': 'Intervalle de mise à jour (secondes)',
-  '24-Hour Time Format': 'Format 24 heures',
-  'Lower Bound (use ~N for soft)': 'Limite inférieure (utiliser ~N pour souple)',
-  'Upper Bound (use ~N for soft)': 'Limite supérieure (utiliser ~N pour souple)',
-  'Minimum Range': 'Plage minimale',
-  'Threshold Transition': 'Transition des seuils',
-  'Color Thresholds': 'Seuils de couleur',
-  'Cache Data': 'Cache des données',
-  'Compress Data': 'Compression des données',
-  'Group Entities': 'Grouper les entités',
-
-  // Options
-  'Default': 'Par défaut',
-  'Left': 'Gauche',
-  'Right': 'Droite',
-  'Center': 'Centre',
-  'With State': 'Avec l\'état',
-  'Average': 'Moyenne',
-  'Median': 'Médiane',
-  'Minimum': 'Minimum',
-  'Maximum': 'Maximum',
-  'First': 'Premier',
-  'Last': 'Dernier',
-  'Sum': 'Somme',
-  'Delta': 'Delta',
-  'Difference': 'Différence',
-  'Interval': 'Intervalle',
-  'Date': 'Date',
-  'Hour': 'Heure',
-  'Smooth': 'Lisse',
-  'Hard': 'Dur',
-
-  // Display types for info section
-  'min': 'min',
-  'avg': 'moy',
-  'max': 'max',
-
-  // Visibility options
-  'Visibility Options': 'Options de visibilité',
-  'Name': 'Nom',
-  'State': 'État',
-  'Graph': 'Graphique',
-  'Fill': 'Remplissage',
-  'Legend': 'Légende',
-  'Extrema': 'Extrema',
-  'Labels': 'Étiquettes',
-  'Secondary Labels': 'Étiquettes secondaires',
-  'Points': 'Points',
-
-  // Buttons
-  'Add Entity': 'Ajouter une entité',
-  'Remove': 'Supprimer',
-  'Add Threshold': 'Ajouter un seuil',
-  'Add State Mapping': 'Ajouter un mappage d\'état',
-
-  // Placeholders
-  'Card title': 'Titre de la carte',
-  '°C, kW, etc.': '°C, kW, etc.',
-  '#ff0000, #00ff00, #0000ff': '#ff0000, #00ff00, #0000ff',
-  '0 or ~0': '0 ou ~0',
-  '100 or ~100': '100 ou ~100',
-  'Value': 'Valeur',
-  'Color': 'Couleur',
-  'Original Value': 'Valeur originale',
-  'Display Label': 'Libellé affiché',
-
-  // Loading and error messages
-  'Loading Home Assistant...': 'Chargement de Home Assistant...',
-  'Please wait while the editor loads.': 'Veuillez patienter pendant le chargement de l\'éditeur.',
-  'Editor Error': 'Erreur de l\'éditeur',
-  'An error occurred while rendering the editor:': 'Une erreur s\'est produite lors du rendu de l\'éditeur :',
-
-  // Debug info
-
-  // Advanced sections
-  'Primary Y-Axis': 'Axe Y principal',
-  'Thresholds': 'Seuils',
-  'Custom Name': 'Nom personnalisé',
-  'Custom Color': 'Couleur personnalisée',
-  'Configure individual entity settings. These override global settings for specific entities.': 'Configurez les paramètres individuels des entités. Ceux-ci remplacent les paramètres globaux pour des entités spécifiques.',
-  'Configure': 'Configurer',
-  'Hide': 'Masquer',
-  'Attribute (instead of state)': 'Attribut (au lieu de l\'état)',
-  'Y-Axis': 'Axe Y',
-  'Primary': 'Principal',
-  'Secondary': 'Secondaire',
-  'Show State': 'Afficher l\'état',
-  'Show in Graph': 'Afficher dans le graphique',
-  'Show Line': 'Afficher la ligne',
-  'Show Fill': 'Afficher le remplissage',
-  'Show Points': 'Afficher les points',
-  'Show in Legend': 'Afficher dans la légende',
-  'Smoothing': 'Lissage',
-  'Fixed Value': 'Valeur fixe',
-  'Entities': 'Entités',
-  'Add, configure and manage all your entities': 'Ajoutez, configurez et gérez toutes vos entités',
-  'Remove Entity': 'Supprimer l\'entité',
-  'Tap Action': 'Action tactile',
-  'Action Type': 'Type d\'action',
-};
-
-// Get browser language
-const getBrowserLanguage = () => {
-  const lang = navigator.language || navigator.userLanguage || 'en';
-  return lang.toLowerCase().startsWith('fr') ? 'fr' : 'en';
-};
-
-// Translation function
-const t = (key) => {
-  const lang = getBrowserLanguage();
-  if (lang === 'fr' && TRANSLATIONS_FR[key]) {
-    return TRANSLATIONS_FR[key];
-  }
-  return key; // Fallback to original English text
-};
+// Editor-scoped translation helper. The active hass is captured at render
+// time (see render()) so every t('...') call resolves to the user's
+// Home Assistant language via the shared localize module.
+let editorHass = null;
+const t = key => localize(key, editorHass);
 
 export default class MiniGraphCardEditor extends LitElement {
   static get properties() {
@@ -387,11 +229,12 @@ export default class MiniGraphCardEditor extends LitElement {
   }
 
   render() {
+    editorHass = this.hass;
     if (!this.hass) {
       return html`
         <div class="loading">
-          <h3>${t('Loading Home Assistant...')}</h3>
-          <p>${t('Please wait while the editor loads.')}</p>
+          <h3>${t('editor.messages.loading_home_assistant')}</h3>
+          <p>${t('editor.messages.please_wait_while_the_editor_loads')}</p>
         </div>
       `;
     }
@@ -400,15 +243,15 @@ export default class MiniGraphCardEditor extends LitElement {
       return html`
         <div class="card-config">
           <div class="header">
-            <h2>${t('Mini Graph Card Configuration')}</h2>
-            <p>${t('Complete configuration for all options')}</p>
+            <h2>${t('editor.headers.mini_graph_card_configuration')}</h2>
+            <p>${t('editor.headers.complete_configuration_for_all_options')}</p>
           </div>
 
           <!-- ENTITIES MANAGEMENT -->
-          ${this.renderSection('entities', `🏠 ${t('Entities')}`, t('Add, configure and manage all your entities'), html`
+          ${this.renderSection('entities', `🏠 ${t('editor.sections.entities')}`, t('editor.sections.add_configure_and_manage_all_your_entities'), html`
             ${this._entities.length === 0 ? html`
               <div class="form-group">
-                <label>${t('Primary Entity (will be converted to entities list)')}:</label>
+                <label>${t('editor.labels.primary_entity_will_be_converted_to_entities_list')}:</label>
                 ${this.renderEntityPicker(this._entity, ev => this._primaryEntityChanged(ev))}
               </div>
             ` : ''}
@@ -441,9 +284,9 @@ export default class MiniGraphCardEditor extends LitElement {
                   </div>
                   <div class="entity-actions">
                     <button class="btn-configure" @click="${() => this._toggleEntityConfig(index)}">
-                      ${this._isEntityConfigExpanded(index) ? t('Hide') : t('Configure')}
+                      ${this._isEntityConfigExpanded(index) ? t('editor.buttons.hide') : t('editor.buttons.configure')}
                     </button>
-                    <button class="btn-remove" @click="${() => this._removeEntity(index)}" title="${t('Remove Entity')}">×</button>
+                    <button class="btn-remove" @click="${() => this._removeEntity(index)}" title="${t('editor.buttons.remove_entity')}">×</button>
                   </div>
                 </div>
                 ${this._isEntityConfigExpanded(index) ? html`
@@ -452,32 +295,32 @@ export default class MiniGraphCardEditor extends LitElement {
                   </div>
                 ` : ''}
               `)}
-              <button class="btn-add" @click="${this._addEntity}">${t('Add Entity')}</button>
+              <button class="btn-add" @click="${this._addEntity}">${t('editor.buttons.add_entity')}</button>
             </div>
           `)}
 
           <!-- DISPLAY OPTIONS -->
-          ${this.renderSection('display', `🎨 ${t('Display Options')}`, t('Name, icon, and visual appearance settings'), html`
+          ${this.renderSection('display', `🎨 ${t('editor.sections.display_options')}`, t('editor.sections.name_icon_and_visual_appearance_settings'), html`
             <div class="form-row">
               <div class="form-group">
-                <label>${t('Card Name')}:</label>
+                <label>${t('editor.labels.card_name')}:</label>
                 <input
                   type="text"
                   .value="${this._name}"
                   @input="${ev => this._valueChanged(ev, 'name')}"
-                  placeholder="${t('Card title')}"
+                  placeholder="${t('editor.placeholders.card_title')}"
                 />
               </div>
 
               <div class="form-group">
-                <label>${t('Icon')}:</label>
+                <label>${t('editor.labels.icon')}:</label>
                 ${this.renderIconPicker(this._icon, ev => this._valueChanged(ev, 'icon'))}
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label>${t('Icon Image URL')}:</label>
+                <label>${t('editor.labels.icon_image_url')}:</label>
                 <input
                   type="text"
                   .value="${this._icon_image}"
@@ -487,19 +330,19 @@ export default class MiniGraphCardEditor extends LitElement {
               </div>
 
               <div class="form-group">
-                <label>${t('Unit')}:</label>
+                <label>${t('editor.labels.unit')}:</label>
                 <input
                   type="text"
                   .value="${this._unit}"
                   @input="${ev => this._valueChanged(ev, 'unit')}"
-                  placeholder="${t('°C, kW, etc.')}"
+                  placeholder="${t('editor.placeholders.unit_example')}"
                 />
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label>${t('Font Size (%)')}:</label>
+                <label>${t('editor.labels.font_size')}:</label>
                 <input
                   type="number"
                   min="50"
@@ -510,7 +353,7 @@ export default class MiniGraphCardEditor extends LitElement {
               </div>
 
               <div class="form-group">
-                <label>${t('Header Font Size (px)')}:</label>
+                <label>${t('editor.labels.header_font_size_px')}:</label>
                 <input
                   type="number"
                   min="8"
@@ -523,38 +366,38 @@ export default class MiniGraphCardEditor extends LitElement {
 
             <div class="form-row">
               <div class="form-group">
-                <label>${t('Header Alignment')}:</label>
+                <label>${t('editor.labels.header_alignment')}:</label>
                 <select .value="${this._align_header}" @change="${ev => this._valueChanged(ev, 'align_header')}">
-                  <option value="default">${t('Default')}</option>
-                  <option value="left">${t('Left')}</option>
-                  <option value="right">${t('Right')}</option>
-                  <option value="center">${t('Center')}</option>
+                  <option value="default">${t('editor.options.default')}</option>
+                  <option value="left">${t('editor.options.left')}</option>
+                  <option value="right">${t('editor.options.right')}</option>
+                  <option value="center">${t('editor.options.center')}</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label>${t('Icon Alignment')}:</label>
+                <label>${t('editor.labels.icon_alignment')}:</label>
                 <select .value="${this._align_icon}" @change="${ev => this._valueChanged(ev, 'align_icon')}">
-                  <option value="left">${t('Left')}</option>
-                  <option value="right">${t('Right')}</option>
-                  <option value="center">${t('Center')}</option>
-                  <option value="state">${t('With State')}</option>
+                  <option value="left">${t('editor.options.left')}</option>
+                  <option value="right">${t('editor.options.right')}</option>
+                  <option value="center">${t('editor.options.center')}</option>
+                  <option value="state">${t('editor.options.with_state')}</option>
                 </select>
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label>${t('State Alignment')}:</label>
+                <label>${t('editor.labels.state_alignment')}:</label>
                 <select .value="${this._align_state}" @change="${ev => this._valueChanged(ev, 'align_state')}">
-                  <option value="left">${t('Left')}</option>
-                  <option value="right">${t('Right')}</option>
-                  <option value="center">${t('Center')}</option>
+                  <option value="left">${t('editor.options.left')}</option>
+                  <option value="right">${t('editor.options.right')}</option>
+                  <option value="center">${t('editor.options.center')}</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label>${t('Decimal Places')}:</label>
+                <label>${t('editor.labels.decimal_places')}:</label>
                 <input
                   type="number"
                   min="0"
@@ -566,20 +409,20 @@ export default class MiniGraphCardEditor extends LitElement {
             </div>
 
             <div class="show-options">
-              <h4>${t('Visibility Options')}</h4>
+              <h4>${t('editor.visibility.visibility_options')}</h4>
               <div class="checkbox-grid">
                 ${[
-    { key: 'name', label: t('Name') },
-    { key: 'icon', label: t('Icon') },
-    { key: 'state', label: t('State') },
-    { key: 'graph', label: t('Graph') },
-    { key: 'fill', label: t('Fill') },
-    { key: 'points', label: t('Points') },
-    { key: 'legend', label: t('Legend') },
-    { key: 'extrema', label: t('Extrema') },
-    { key: 'average', label: t('Average') },
-    { key: 'labels', label: t('Labels') },
-    { key: 'labels_secondary', label: t('Secondary Labels') },
+    { key: 'name', label: t('editor.visibility.name') },
+    { key: 'icon', label: t('editor.labels.icon') },
+    { key: 'state', label: t('editor.visibility.state') },
+    { key: 'graph', label: t('editor.visibility.graph') },
+    { key: 'fill', label: t('editor.visibility.fill') },
+    { key: 'points', label: t('editor.visibility.points') },
+    { key: 'legend', label: t('editor.visibility.legend') },
+    { key: 'extrema', label: t('editor.visibility.extrema') },
+    { key: 'average', label: t('editor.visibility.average') },
+    { key: 'labels', label: t('editor.visibility.labels') },
+    { key: 'labels_secondary', label: t('editor.visibility.secondary_labels') },
   ].map(option => html`
                   <label class="checkbox-item">
                     <input
@@ -595,10 +438,10 @@ export default class MiniGraphCardEditor extends LitElement {
           `)}
 
           <!-- GRAPH SETTINGS -->
-          ${this.renderSection('graph', `📊 ${t('Graph Settings')}`, t('Graph type, colors, and visual properties'), html`
+          ${this.renderSection('graph', `📊 ${t('editor.sections.graph_settings')}`, t('editor.sections.graph_type_colors_and_visual_properties'), html`
             <div class="form-row">
               <div class="form-group">
-                <label>${t('Height (px)')}:</label>
+                <label>${t('editor.labels.height_px')}:</label>
                 <input
                   type="number"
                   min="50"
@@ -609,7 +452,7 @@ export default class MiniGraphCardEditor extends LitElement {
               </div>
 
               <div class="form-group">
-                <label>${t('Line Width')}:</label>
+                <label>${t('editor.labels.line_width')}:</label>
                 <input
                   type="number"
                   min="1"
@@ -622,17 +465,17 @@ export default class MiniGraphCardEditor extends LitElement {
 
             <div class="form-row">
               <div class="form-group">
-                <label>${t('Line Colors (comma-separated)')}:</label>
+                <label>${t('editor.labels.line_colors_comma_separated')}:</label>
                 <input
                   type="text"
                   .value="${this._line_color}"
                   @input="${ev => this._valueChanged(ev, 'line_color')}"
-                  placeholder="${t('#ff0000, #00ff00, #0000ff')}"
+                  placeholder="#ff0000, #00ff00, #0000ff"
                 />
               </div>
 
               <div class="form-group">
-                <label>${t('Bar Spacing')}:</label>
+                <label>${t('editor.labels.bar_spacing')}:</label>
                 <input
                   type="number"
                   min="0"
@@ -651,7 +494,7 @@ export default class MiniGraphCardEditor extends LitElement {
                     .checked="${this._animate}"
                     @change="${ev => this._valueChanged(ev, 'animate')}"
                   />
-                  ${t('Enable Animation')}
+                  ${t('editor.labels.enable_animation')}
                 </label>
               </div>
 
@@ -662,7 +505,7 @@ export default class MiniGraphCardEditor extends LitElement {
                     .checked="${this._smoothing}"
                     @change="${ev => this._valueChanged(ev, 'smoothing')}"
                   />
-                  ${t('Smooth Lines')}
+                  ${t('editor.labels.smooth_lines')}
                 </label>
               </div>
             </div>
@@ -675,17 +518,17 @@ export default class MiniGraphCardEditor extends LitElement {
                     .checked="${this._logarithmic}"
                     @change="${ev => this._valueChanged(ev, 'logarithmic')}"
                   />
-                  ${t('Logarithmic Scale')}
+                  ${t('editor.labels.logarithmic_scale')}
                 </label>
               </div>
             </div>
           `)}
 
           <!-- DATA & TIME -->
-          ${this.renderSection('data', `⏱️ ${t('Data & Time')}`, t('Data aggregation and time configuration'), html`
+          ${this.renderSection('data', `⏱️ ${t('editor.sections.data_time')}`, t('editor.sections.data_aggregation_and_time_configuration'), html`
             <div class="form-row">
               <div class="form-group">
-                <label>${t('Hours to Show')}:</label>
+                <label>${t('editor.labels.hours_to_show')}:</label>
                 <input
                   type="number"
                   min="1"
@@ -696,7 +539,7 @@ export default class MiniGraphCardEditor extends LitElement {
               </div>
 
               <div class="form-group">
-                <label>${t('Points per Hour')}:</label>
+                <label>${t('editor.labels.points_per_hour')}:</label>
                 <input
                   type="number"
                   min="0.1"
@@ -710,33 +553,33 @@ export default class MiniGraphCardEditor extends LitElement {
 
             <div class="form-row">
               <div class="form-group">
-                <label>${t('Aggregate Function')}:</label>
+                <label>${t('editor.labels.aggregate_function')}:</label>
                 <select .value="${this._aggregate_func}" @change="${ev => this._valueChanged(ev, 'aggregate_func')}">
-                  <option value="avg">${t('Average')}</option>
-                  <option value="median">${t('Median')}</option>
-                  <option value="min">${t('Minimum')}</option>
-                  <option value="max">${t('Maximum')}</option>
-                  <option value="first">${t('First')}</option>
-                  <option value="last">${t('Last')}</option>
-                  <option value="sum">${t('Sum')}</option>
-                  <option value="delta">${t('Delta')}</option>
-                  <option value="diff">${t('Difference')}</option>
+                  <option value="avg">${t('editor.options.average')}</option>
+                  <option value="median">${t('editor.options.median')}</option>
+                  <option value="min">${t('editor.options.minimum')}</option>
+                  <option value="max">${t('editor.options.maximum')}</option>
+                  <option value="first">${t('editor.options.first')}</option>
+                  <option value="last">${t('editor.options.last')}</option>
+                  <option value="sum">${t('editor.options.sum')}</option>
+                  <option value="delta">${t('editor.options.delta')}</option>
+                  <option value="diff">${t('editor.options.difference')}</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label>${t('Group By')}:</label>
+                <label>${t('editor.labels.group_by')}:</label>
                 <select .value="${this._group_by}" @change="${ev => this._valueChanged(ev, 'group_by')}">
-                  <option value="interval">${t('Interval')}</option>
-                  <option value="date">${t('Date')}</option>
-                  <option value="hour">${t('Hour')}</option>
+                  <option value="interval">${t('editor.options.interval')}</option>
+                  <option value="date">${t('editor.options.date')}</option>
+                  <option value="hour">${t('editor.options.hour')}</option>
                 </select>
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label>${t('Update Interval (seconds)')}:</label>
+                <label>${t('editor.labels.update_interval_seconds')}:</label>
                 <input
                   type="number"
                   min="1"
@@ -752,39 +595,39 @@ export default class MiniGraphCardEditor extends LitElement {
                     .checked="${this._hour24}"
                     @change="${ev => this._valueChanged(ev, 'hour24')}"
                   />
-                  ${t('24-Hour Time Format')}
+                  ${t('editor.labels.time_format_24h')}
                 </label>
               </div>
             </div>
           `)}
 
           <!-- SCALE & BOUNDS -->
-          ${this.renderSection('bounds', `📏 ${t('Scale & Bounds')}`, t('Y-axis bounds and scaling options'), html`
-            <h4>${t('Primary Y-Axis')}</h4>
+          ${this.renderSection('bounds', `📏 ${t('editor.sections.scale_bounds')}`, t('editor.sections.y_axis_bounds_and_scaling_options'), html`
+            <h4>${t('editor.labels.primary_y_axis')}</h4>
             <div class="form-row">
               <div class="form-group">
-                <label>${t('Lower Bound (use ~N for soft)')}:</label>
+                <label>${t('editor.labels.lower_bound_use_n_for_soft')}:</label>
                 <input
                   type="text"
                   .value="${this._lower_bound}"
                   @input="${ev => this._valueChanged(ev, 'lower_bound')}"
-                  placeholder="${t('0 or ~0')}"
+                  placeholder="${t('editor.placeholders.lower_bound_example')}"
                 />
               </div>
 
               <div class="form-group">
-                <label>${t('Upper Bound (use ~N for soft)')}:</label>
+                <label>${t('editor.labels.upper_bound_use_n_for_soft')}:</label>
                 <input
                   type="text"
                   .value="${this._upper_bound}"
                   @input="${ev => this._valueChanged(ev, 'upper_bound')}"
-                  placeholder="${t('100 or ~100')}"
+                  placeholder="${t('editor.placeholders.upper_bound_example')}"
                 />
               </div>
             </div>
 
             <div class="form-group">
-              <label>${t('Minimum Range')}:</label>
+              <label>${t('editor.labels.minimum_range')}:</label>
               <input
                 type="number"
                 min="0"
@@ -795,19 +638,19 @@ export default class MiniGraphCardEditor extends LitElement {
           `)}
 
           <!-- COLORS & THRESHOLDS -->
-          ${this.renderSection('colors', `🎨 ${t('Colors & Thresholds')}`, t('Color configuration and dynamic thresholds'), html`
+          ${this.renderSection('colors', `🎨 ${t('editor.sections.colors_thresholds')}`, t('editor.sections.color_configuration_and_dynamic_thresholds'), html`
             <div class="form-group">
-              <label>${t('Threshold Transition')}:</label>
+              <label>${t('editor.labels.threshold_transition')}:</label>
               <select .value="${this._color_thresholds_transition}" @change="${ev => this._valueChanged(ev, 'color_thresholds_transition')}">
-                <option value="smooth">${t('Smooth')}</option>
-                <option value="hard">${t('Hard')}</option>
+                <option value="smooth">${t('editor.options.smooth')}</option>
+                <option value="hard">${t('editor.options.hard')}</option>
               </select>
             </div>
 
             <div class="thresholds-section">
               <div class="thresholds-header">
-                <h4>${t('Color Thresholds')}</h4>
-                <button class="btn-add" @click="${this._addThreshold}">${t('Add Threshold')}</button>
+                <h4>${t('editor.labels.color_thresholds')}</h4>
+                <button class="btn-add" @click="${this._addThreshold}">${t('editor.buttons.add_threshold')}</button>
               </div>
 
               ${this._color_thresholds.map((threshold, index) => html`
@@ -816,21 +659,21 @@ export default class MiniGraphCardEditor extends LitElement {
                     type="number"
                     .value="${threshold.value}"
                     @input="${ev => this._thresholdChanged(ev, index, 'value')}"
-                    placeholder="${t('Value')}"
+                    placeholder="${t('editor.placeholders.value')}"
                   />
                   <input
                     type="color"
                     .value="${threshold.color}"
                     @input="${ev => this._thresholdChanged(ev, index, 'color')}"
                   />
-                  <button class="btn-remove" @click="${() => this._removeThreshold(index)}">Remove</button>
+                  <button class="btn-remove" @click="${() => this._removeThreshold(index)}">${t('editor.buttons.remove')}</button>
                 </div>
               `)}
             </div>
           `)}
 
           <!-- ADVANCED OPTIONS -->
-          ${this.renderSection('advanced', `⚙️ ${t('Advanced Options')}`, t('Advanced options and performance settings'), html`
+          ${this.renderSection('advanced', `⚙️ ${t('editor.sections.advanced_options')}`, t('editor.sections.advanced_options_and_performance_settings'), html`
             <div class="form-row">
               <div class="form-group">
                 <label class="checkbox-label">
@@ -839,7 +682,7 @@ export default class MiniGraphCardEditor extends LitElement {
                     .checked="${this._cache}"
                     @change="${ev => this._valueChanged(ev, 'cache')}"
                   />
-                  ${t('Cache Data')}
+                  ${t('editor.labels.cache_data')}
                 </label>
               </div>
 
@@ -850,7 +693,7 @@ export default class MiniGraphCardEditor extends LitElement {
                     .checked="${this._compress}"
                     @change="${ev => this._valueChanged(ev, 'compress')}"
                   />
-                  ${t('Compress Data')}
+                  ${t('editor.labels.compress_data')}
                 </label>
               </div>
             </div>
@@ -862,27 +705,27 @@ export default class MiniGraphCardEditor extends LitElement {
                   .checked="${this._group}"
                   @change="${ev => this._valueChanged(ev, 'group')}"
                 />
-                ${t('Group Entities')}
+                ${t('editor.labels.group_entities')}
               </label>
             </div>
 
             <div class="tap-action-section">
-              <h4>${t('Tap Action')}</h4>
+              <h4>${t('editor.tap_action.tap_action')}</h4>
               <div class="form-row">
                 <div class="form-group">
-                  <label>${t('Action Type')}:</label>
+                  <label>${t('editor.tap_action.action_type')}:</label>
                   <select .value="${this._tap_action.action}" @change="${ev => this._tapActionChanged(ev, 'action')}">
-                    <option value="more-info">More Info</option>
-                    <option value="navigate">Navigate</option>
-                    <option value="call-service">Call Service</option>
-                    <option value="url">Open URL</option>
-                    <option value="none">No Action</option>
+                    <option value="more-info">${t('editor.tap_action.more_info')}</option>
+                    <option value="navigate">${t('editor.tap_action.navigate')}</option>
+                    <option value="call-service">${t('editor.tap_action.call_service')}</option>
+                    <option value="url">${t('editor.tap_action.open_url')}</option>
+                    <option value="none">${t('editor.tap_action.no_action')}</option>
                   </select>
                 </div>
 
                 ${this._tap_action.action === 'navigate' ? html`
                   <div class="form-group">
-                    <label>Navigation Path:</label>
+                    <label>${t('editor.tap_action.navigation_path')}:</label>
                     <input
                       type="text"
                       .value="${this._tap_action.navigation_path || ''}"
@@ -894,7 +737,7 @@ export default class MiniGraphCardEditor extends LitElement {
 
                 ${this._tap_action.action === 'url' ? html`
                   <div class="form-group">
-                    <label>URL:</label>
+                    <label>${t('editor.tap_action.url')}:</label>
                     <input
                       type="text"
                       .value="${this._tap_action.url || ''}"
@@ -906,7 +749,7 @@ export default class MiniGraphCardEditor extends LitElement {
 
                 ${this._tap_action.action === 'call-service' ? html`
                   <div class="form-group">
-                    <label>Service:</label>
+                    <label>${t('editor.tap_action.service')}:</label>
                     <input
                       type="text"
                       .value="${this._tap_action.service || ''}"
@@ -924,8 +767,8 @@ export default class MiniGraphCardEditor extends LitElement {
     } catch (error) {
       return html`
         <div class="error">
-          <h3>${t('Editor Error')}</h3>
-          <p>${t('An error occurred while rendering the editor:')}: ${error.message}</p>
+          <h3>${t('editor.messages.editor_error')}</h3>
+          <p>${t('editor.messages.an_error_occurred_while_rendering_the_editor')}: ${error.message}</p>
           <pre>${error.stack}</pre>
         </div>
       `;
@@ -1015,7 +858,7 @@ export default class MiniGraphCardEditor extends LitElement {
       <div class="entity-config-content">
         <div class="form-row">
           <div class="form-group">
-            <label>${t('Custom Name')}:</label>
+            <label>${t('editor.entity.custom_name')}:</label>
             <input
               type="text"
               .value="${config.name || ''}"
@@ -1024,7 +867,7 @@ export default class MiniGraphCardEditor extends LitElement {
           </div>
 
           <div class="form-group">
-            <label>${t('Custom Color')}:</label>
+            <label>${t('editor.entity.custom_color')}:</label>
             <input
               type="color"
               .value="${config.color || '#ff0000'}"
@@ -1035,7 +878,7 @@ export default class MiniGraphCardEditor extends LitElement {
 
         <div class="form-row">
           <div class="form-group">
-            <label>${t('Attribute (instead of state)')}:</label>
+            <label>${t('editor.entity.attribute_instead_of_state')}:</label>
             <input
               type="text"
               .value="${config.attribute || ''}"
@@ -1045,24 +888,24 @@ export default class MiniGraphCardEditor extends LitElement {
           </div>
 
           <div class="form-group">
-            <label>${t('Y-Axis')}:</label>
+            <label>${t('editor.entity.y_axis')}:</label>
             <select .value="${config.y_axis || 'primary'}" @change="${ev => this._entityConfigChanged(ev, index, 'y_axis')}">
-              <option value="primary">${t('Primary')}</option>
-              <option value="secondary">${t('Secondary')}</option>
+              <option value="primary">${t('editor.options.primary')}</option>
+              <option value="secondary">${t('editor.options.secondary')}</option>
             </select>
           </div>
         </div>
 
         <div class="entity-switches">
           ${[
-    { key: 'show_state', label: 'Show State' },
-    { key: 'show_graph', label: 'Show in Graph' },
-    { key: 'show_line', label: 'Show Line' },
-    { key: 'show_fill', label: 'Show Fill' },
-    { key: 'show_points', label: 'Show Points' },
-    { key: 'show_legend', label: 'Show in Legend' },
-    { key: 'smoothing', label: 'Smoothing' },
-    { key: 'fixed_value', label: 'Fixed Value' },
+    { key: 'show_state', label: 'editor.entity.show_state' },
+    { key: 'show_graph', label: 'editor.entity.show_in_graph' },
+    { key: 'show_line', label: 'editor.entity.show_line' },
+    { key: 'show_fill', label: 'editor.entity.show_fill' },
+    { key: 'show_points', label: 'editor.entity.show_points' },
+    { key: 'show_legend', label: 'editor.entity.show_in_legend' },
+    { key: 'smoothing', label: 'editor.entity.smoothing' },
+    { key: 'fixed_value', label: 'editor.entity.fixed_value' },
   ].map(option => html`
             <label class="checkbox-item">
               <input

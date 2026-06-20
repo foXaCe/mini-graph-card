@@ -7,6 +7,7 @@ import Graph from './graph';
 import style from './style';
 import handleClick from './handleClick';
 import buildConfig from './buildConfig';
+import { localize } from './localize';
 // Advanced features - simplified version for compatibility
 import { MicroInteractions } from './microInteractionsSimple';
 import { getGlobalCache, CacheStrategies } from './intelligentCacheSimple';
@@ -30,22 +31,6 @@ import {
   compareArray,
   log,
 } from './utils';
-
-// French translations for display types
-const DISPLAY_TYPE_TRANSLATIONS_FR = {
-  'min': 'min',
-  'avg': 'moy',
-  'max': 'max',
-};
-
-// Translation function for display types
-const translateDisplayType = (type, hassLanguage) => {
-  const lang = hassLanguage || navigator.language || navigator.userLanguage || 'en';
-  if (lang.toLowerCase().startsWith('fr') && DISPLAY_TYPE_TRANSLATIONS_FR[type]) {
-    return DISPLAY_TYPE_TRANSLATIONS_FR[type];
-  }
-  return type; // Fallback to original text
-};
 
 class MiniGraphCard extends LitElement {
   constructor() {
@@ -295,7 +280,7 @@ class MiniGraphCard extends LitElement {
         <div>mini-graph-card</div>
         ${this.config.entities.map((_, index) => (!this.entity[index] ? html`
           <div>
-            Entity not available: ${this.config.entities[index].entity}
+            ${localize('card.error.entity_not_available', this._hass)} ${this.config.entities[index].entity}
           </div>
         ` : html``))}
       </hui-warning>
@@ -433,7 +418,7 @@ class MiniGraphCard extends LitElement {
               </div>
             </div>
             ${this.renderLegend()}
-        ` : html`<ha-spinner aria-label="Loading" size="small"></ha-spinner>`}
+        ` : html`<ha-spinner aria-label="${localize('card.a11y.loading', this._hass)}" size="small"></ha-spinner>`}
       </div>` : '';
   }
 
@@ -468,7 +453,7 @@ class MiniGraphCard extends LitElement {
           return html`
             <div class="graph__legend__item"
               @click=${e => this.handlePopup(e, this.entity[entity.index])}
-              @mouseenter=${() => this.setTooltip(entity.index, -1, this.getEntityState(entity.index), 'Current')}
+              @mouseenter=${() => this.setTooltip(entity.index, -1, this.getEntityState(entity.index), localize('card.labels.current', this._hass))}
               @mouseleave=${() => (this.tooltip = {})}>
               ${this.renderIndicator(this.getEntityState(entity.index), entity.index)}
               <span class="ellipsis">${legend}</span>
@@ -731,7 +716,7 @@ class MiniGraphCard extends LitElement {
       <div class="info flex">
         ${this.abs.map(entry => html`
           <div class="info__item">
-            <span class="info__item__type">${translateDisplayType(entry.type, this._hass.language)}</span>
+            <span class="info__item__type">${localize(`card.display_type.${entry.type}`, this._hass)}</span>
             <span class="info__item__value">
               ${this.computeState(entry.state)} ${this.computeUom(0)}
             </span>
@@ -1291,11 +1276,13 @@ MiniGraphCard.getStubConfig = () => ({
 
 customElements.define('mini-graph-card', MiniGraphCard);
 
-// Configure the preview in the Lovelace card picker
+// Configure the preview in the Lovelace card picker.
+// No hass at module-load time, so the picker name/description resolve via the
+// browser language (navigator) — this is by design, not a fallback bug.
 window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'mini-graph-card',
-  name: 'Mini Graph Card',
+  name: localize('card.picker.name'),
   preview: false,
-  description: 'The Mini Graph card is a minimalistic and customizable graph card',
+  description: localize('card.picker.description'),
 });

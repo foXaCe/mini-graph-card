@@ -27,7 +27,7 @@ export default [
     plugins: [
       commonjs(),
       json({
-        include: 'package.json',
+        include: ['package.json', 'src/translations/*.json'],
         preferConst: true,
       }),
       resolve(),
@@ -45,6 +45,10 @@ export default [
     },
     plugins: [
       commonjs(),
+      json({
+        include: ['package.json', 'src/translations/*.json'],
+        preferConst: true,
+      }),
       resolve(),
     ],
   }
