@@ -1,32 +1,27 @@
 import { LitElement, html, svg } from 'lit-element';
 import localForage from 'localforage/src/localforage';
-import { stateIcon } from 'custom-card-helpers';
 import SparkMD5 from 'spark-md5';
-import { interpolateRgb } from 'd3-interpolate';
 import Graph from './graph';
 import style from './style';
 import handleClick from './handleClick';
 import buildConfig from './buildConfig';
 import { localize } from './localize';
-// Advanced features - simplified version for compatibility
-import { MicroInteractions } from './microInteractionsSimple';
-import { getGlobalCache, CacheStrategies } from './intelligentCacheSimple';
-import { AdvancedCharts } from './advancedChartsSimple';
-import { ZoomPanController } from './zoomPanSimple';
+import * as compute from './compute';
+import { getBoundaries } from './boundaries';
+import { fetchRecent, getCache, setCache } from './dataSource';
+import renderSvg from './renderSvg';
 import './initialize';
 import { version } from '../package.json';
-import './editor';
+import './editor/editor';
 
 import {
-  ICONS,
   UPDATE_PROPS,
-  X, Y, V,
+  V,
   ONE_HOUR,
 } from './const';
 import {
   getMin, getAvg, getMax,
   getTime, getMilli,
-  compress, decompress,
   getFirstDefinedItem,
   compareArray,
   log,
@@ -55,13 +50,6 @@ class MiniGraphCard extends LitElement {
     this.stateChanged = false;
     this.initial = true;
     this._md5Config = undefined;
-    // Advanced features - partial activation
-    this.microInteractions = null;
-    this.activeTooltip = null;
-    // this.interactionStates = new Map();
-    this.advancedCharts = null;
-    this.zoomPanController = null;
-    this.cache = null;
   }
 
   static get styles() {
@@ -144,29 +132,6 @@ class MiniGraphCard extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
-    // Initialize micro-interactions (without auto performance monitoring)
-    if (!this.microInteractions) {
-      this.microInteractions = new MicroInteractions(this);
-      // Performance monitoring disabled to prevent automatic animations
-    }
-
-    // Initialize advanced charts
-    if (!this.advancedCharts) {
-      this.advancedCharts = new AdvancedCharts(this.config, this.entity);
-    }
-
-    if (!this.cache) {
-      this.cache = getGlobalCache({
-        maxMemorySize: 25 * 1024 * 1024, // 25MB for charts
-        enableCompression: true,
-        enableDiskCache: true,
-      });
-    }
-
-    // if (!this.advancedCharts) {
-    //   this.advancedCharts = new AdvancedCharts(this.config, this.entity);
-    // }
-
     if (this.config.update_interval) {
       window.requestAnimationFrame(() => {
         this.updateOnInterval();
@@ -182,59 +147,24 @@ class MiniGraphCard extends LitElement {
     if (this.interval) {
       clearInterval(this.interval);
     }
-
-    // Cleanup micro-interactions
-    if (this.microInteractions) {
-      this.microInteractions.cleanup();
-      this.microInteractions = null;
-    }
-
-    // Cleanup advanced charts
-    if (this.advancedCharts) {
-      this.advancedCharts.clearCache();
-      this.advancedCharts = null;
-    }
-
-    // Cleanup zoom/pan controller
-    if (this.zoomPanController) {
-      this.zoomPanController.destroy();
-      this.zoomPanController = null;
-    }
-
     super.disconnectedCallback();
   }
 
   shouldUpdate(changedProps) {
     if (UPDATE_PROPS.some(prop => changedProps.has(prop))) {
-      this.color = this.computeColor(
-        this.tooltip.value !== undefined
-          ? this.tooltip.value : this.getEntityState(0),
-        this.tooltip.entity || 0,
-      );
+      // Guard against a configured entity that is entirely absent from hass
+      // (entity[0] undefined): compute the colour from the value we have, so
+      // render() can reach renderWarnings() instead of throwing here.
+      const stateValue = this.tooltip.value !== undefined
+        ? this.tooltip.value
+        : (this.entity[0] !== undefined ? this.getEntityState(0) : undefined);
+      this.color = this.computeColor(stateValue, this.tooltip.entity || 0);
       return true;
     }
   }
 
   firstUpdated() {
     this.initial = false;
-
-    // Initialize zoom/pan controller if enabled
-    if (this.config.zoom_pan_enabled && !this.zoomPanController) {
-      setTimeout(() => {
-        const svgElement = this.shadowRoot.querySelector('svg');
-        if (svgElement) {
-          this.zoomPanController = new ZoomPanController({
-            enableZoom: this.config.enable_zoom !== false,
-            enablePan: this.config.enable_pan !== false,
-            minZoom: this.config.min_zoom || 0.1,
-            maxZoom: this.config.max_zoom || 10,
-          });
-          this.zoomPanController.initialize(svgElement, {
-            x: 0, y: 0, width: 500, height: this.config.height,
-          });
-        }
-      }, 100); // Delay to ensure SVG is rendered
-    }
   }
 
   updated(changedProperties) {
@@ -338,7 +268,7 @@ class MiniGraphCard extends LitElement {
       return html`
         <div class="states flex" loc=${this.config.align_state}>
           ${this.renderState(0)}
-          <div class="states--secondary">${this.config.entities.map((entityConfig, i) => i > 0 && this.renderState(i) || '')}</div>
+          <div class="states--secondary">${this.config.entities.map((_, i) => i > 0 && this.renderState(i) || '')}</div>
           ${this.config.align_icon === 'state' ? this.renderIcon() : ''}
         </div>
       `;
@@ -414,7 +344,7 @@ class MiniGraphCard extends LitElement {
               ${this.renderLabels()}
               ${this.renderLabelsSecondary()}
               <div class="graph__container__svg">
-                ${this.renderSvg()}
+                ${renderSvg(this)}
               </div>
             </div>
             ${this.renderLegend()}
@@ -473,188 +403,7 @@ class MiniGraphCard extends LitElement {
     `;
   }
 
-  renderSvgFill(fill, i) {
-    if (!fill) return;
-    // const fade = this.config.show.fill === 'fade';
-    const init = this.length[i] || this.config.entities[i].show_line === false;
-    return svg`
-      <defs>
-        <linearGradient id=${`fill-grad-${this.id}-${i}`} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop stop-color='white' offset='0%' stop-opacity='1'/>
-          <stop stop-color='white' offset='100%' stop-opacity='.15'/>
-        </linearGradient>
-        <mask id=${`fill-grad-mask-${this.id}-${i}`}>
-          <rect width="100%" height="100%" fill=${`url(#fill-grad-${this.id}-${i})`} />
-        </mask>
-      </defs>
-      <mask id=${`fill-${this.id}-${i}`}>
-        <path class='fill'
-          type=${this.config.show.fill}
-          .id=${i} anim=${this.config.animate} ?init=${init}
-          style="animation-delay: ${this.config.animate ? `${i * 0.5}s` : '0s'}"
-          fill='white'
-          mask=""
-          d=${this.fill[i]}
-        />
-      </mask>`;
-  }
-
-  renderSvgLine(line, i) {
-    if (!line) return;
-
-    const path = svg`
-      <path
-        class='line'
-        .id=${i}
-        anim=${this.config.animate} ?init=${this.length[i]}
-        style="animation-delay: ${this.config.animate ? `${i * 0.5}s` : '0s'}"
-        fill='none'
-        stroke-dasharray=${this.length[i] || 'none'} stroke-dashoffset=${this.length[i] || 'none'}
-        stroke=${'white'}
-        stroke-width=${this.config.line_width}
-        d=${this.line[i]}
-      />`;
-
-    return svg`
-      <mask id=${`line-${this.id}-${i}`}>
-        ${path}
-      </mask>
-    `;
-  }
-
-  renderSvgPoint(point, i) {
-    const color = this.gradient[i] ? this.computeColor(point[V], i) : 'inherit';
-
-    const enhancedMouseOver = () => {
-      this.setTooltip(i, point[3], point[V]);
-      // Hover effects disabled to prevent automatic animations
-    };
-
-    const enhancedMouseOut = () => {
-      this.tooltip = {};
-      this.activeTooltip = null;
-      // Cleanup disabled to prevent automatic animations
-    };
-
-    return svg`
-      <circle
-        class='line--point'
-        ?inactive=${this.tooltip.index !== point[3]}
-        style=${`--mcg-hover: ${color};`}
-        stroke=${color}
-        fill=${color}
-        cx=${point[X]} cy=${point[Y]} r=${this.config.line_width}
-        @mouseover=${enhancedMouseOver}
-        @mouseout=${enhancedMouseOut}
-        data-entity-index=${i}
-        data-point-value=${point[V]}
-      />
-    `;
-  }
-
-  renderSvgPoints(points, i) {
-    if (!points) return;
-    const color = this.computeColor(this.entity[i].state, i);
-    return svg`
-      <g class='line--points'
-        ?tooltip=${this.tooltip.entity === i}
-        ?inactive=${this.tooltip.entity !== undefined && this.tooltip.entity !== i}
-        ?init=${this.length[i]}
-        anim=${this.config.animate && this.config.show.points !== 'hover'}
-        style="animation-delay: ${this.config.animate ? `${i * 0.5 + 0.5}s` : '0s'}"
-        fill=${color}
-        stroke=${color}
-        stroke-width=${this.config.line_width / 2}>
-        ${points.map(point => this.renderSvgPoint(point, i))}
-      </g>`;
-  }
-
-  renderSvgGradient(gradients) {
-    if (!gradients) return;
-    const items = gradients.map((gradient, i) => {
-      if (!gradient) return;
-      return svg`
-        <linearGradient id=${`grad-${this.id}-${i}`} gradientTransform="rotate(90)">
-          ${gradient.map(stop => svg`
-            <stop stop-color=${stop.color} offset=${`${stop.offset}%`} />
-          `)}
-        </linearGradient>`;
-    });
-    return svg`${items}`;
-  }
-
-  renderSvgLineRect(line, i) {
-    if (!line) return;
-    const fill = this.gradient[i]
-      ? `url(#grad-${this.id}-${i})`
-      : this.computeColor(this.entity[i].state, i);
-    return svg`
-      <rect class='line--rect'
-        ?inactive=${this.tooltip.entity !== undefined && this.tooltip.entity !== i}
-        id=${`rect-${this.id}-${i}`}
-        fill=${fill} height="100%" width="100%"
-        mask=${`url(#line-${this.id}-${i})`}
-      />`;
-  }
-
-  renderSvgFillRect(fill, i) {
-    if (!fill) return;
-    const svgFill = this.gradient[i]
-      ? `url(#grad-${this.id}-${i})`
-      : this.computeColor(this.entity[i].state, i);
-    return svg`
-      <rect class='fill--rect'
-        ?inactive=${this.tooltip.entity !== undefined && this.tooltip.entity !== i}
-        id=${`fill-rect-${this.id}-${i}`}
-        fill=${svgFill} height="100%" width="100%"
-        mask=${`url(#fill-${this.id}-${i})`}
-      />`;
-  }
-
-  renderSvgBars(bars, index) {
-    if (!bars) return;
-    const items = bars.map((bar, i) => {
-      const animation = this.config.animate
-        ? svg`
-          <animate attributeName='y' from=${this.config.height} to=${bar.y} dur='1s' fill='remove'
-            calcMode='spline' keyTimes='0; 1' keySplines='0.215 0.61 0.355 1'>
-          </animate>`
-        : '';
-      const color = this.computeColor(bar.value, index);
-      return svg`
-        <rect class='bar' x=${bar.x} y=${bar.y}
-          height=${bar.height} width=${bar.width} fill=${color}
-          @mouseover=${() => this.setTooltip(index, i, bar.value)}
-          @mouseout=${() => (this.tooltip = {})}>
-          ${animation}
-        </rect>`;
-    });
-    return svg`<g class='bars' ?anim=${this.config.animate}>${items}</g>`;
-  }
-
-  renderSvg() {
-    const { height } = this.config;
-    return svg`
-      <svg width='100%' height='100%' viewBox='0 0 500 ${height}' preserveAspectRatio='none'
-        @click=${e => e.stopPropagation()}>
-        <g>
-          <defs>
-            ${this.renderSvgGradient(this.gradient)}
-          </defs>
-          ${this.fill.map((fill, i) => this.renderSvgFill(fill, i))}
-          ${this.fill.map((fill, i) => this.renderSvgFillRect(fill, i))}
-          ${this.line.map((line, i) => this.renderSvgLine(line, i))}
-          ${this.line.map((line, i) => this.renderSvgLineRect(line, i))}
-          ${this.bar.map((bars, i) => this.renderSvgBars(bars, i))}
-        </g>
-        ${this.points.map((points, i) => this.renderSvgPoints(points, i))}
-      </svg>`;
-  }
-
   setTooltip(entity, index, value, label = null) {
-    // Track active tooltip without automatic animations
-    this.activeTooltip = `${entity}-${index}`;
-
     const {
       group_by,
       points_per_hour,
@@ -760,100 +509,23 @@ class MiniGraphCard extends LitElement {
   }
 
   computeColor(inState, i) {
-    const { color_thresholds, line_color } = this.config;
-    const state = Number(inState) || 0;
-
-    let intColor;
-    if (color_thresholds.length > 0) {
-      const { color } = color_thresholds.find(ele => ele.value < state)
-        || color_thresholds.slice(-1)[0];
-      intColor = color;
-      const index = color_thresholds.findIndex(ele => ele.value < state);
-      const c1 = color_thresholds[index];
-      const c2 = color_thresholds[index - 1];
-      if (c2) {
-        const factor = (c2.value - state) / (c2.value - c1.value);
-        intColor = interpolateRgb(c2.color, c1.color)(factor);
-      } else {
-        intColor = index
-          ? color_thresholds[color_thresholds.length - 1].color
-          : color_thresholds[0].color;
-      }
-    }
-
-    return this.config.entities[i].color || intColor || line_color[i] || line_color[0];
+    return compute.color(this.config, inState, i);
   }
 
   computeName(index) {
-    return this.config.entities[index].name
-      || this.entity[index].attributes.friendly_name
-      || this.entity[index].entity_id;
+    return compute.name(this.config, this.entity[index], index);
   }
 
   computeIcon(entity) {
-    return (
-      this.config.icon
-      || entity.attributes.icon
-      || stateIcon(entity)
-      || ICONS.temperature
-    );
+    return compute.icon(this.config, entity);
   }
 
   computeUom(index) {
-    return (
-      this.config.entities[index].unit !== undefined
-        ? this.config.entities[index].unit
-        : (
-          this.config.unit !== undefined
-            ? this.config.unit
-            : (
-              !this.config.entities[index].attribute
-                ? (this.entity[index].attributes.unit_of_measurement || '')
-                : ''
-            )
-        )
-    );
+    return compute.uom(this.config, this.entity[index], index);
   }
 
   computeState(inState) {
-    if (this.config.state_map.length > 0) {
-      const stateMap = Number.isInteger(inState)
-        ? this.config.state_map[inState]
-        : this.config.state_map.find(state => state.value === inState);
-
-      if (stateMap) {
-        return stateMap.label;
-      } else if (typeof inState === 'string' && Number.isNaN(parseFloat(inState))) {
-        // Only log warning for non-numeric values that are expected to be mapped
-        // Numeric values (like graph bounds) shouldn't trigger state_map warnings
-        log(`value [${inState}] not found in state_map`);
-      }
-    }
-
-    let state;
-    if (typeof inState === 'string') {
-      state = parseFloat(inState.replace(/,/g, '.'));
-    } else {
-      state = Number(inState);
-    }
-    const dec = this.config.decimals;
-    const value_factor = 10 ** this.config.value_factor;
-
-    if (dec === undefined || Number.isNaN(dec) || Number.isNaN(state)) {
-      return this.numberFormat(Math.round(state * value_factor * 100) / 100, this._hass.language);
-    }
-
-    const x = 10 ** dec;
-    return this.numberFormat(
-      (Math.round(state * value_factor * x) / x).toFixed(dec),
-      this._hass.language, dec,
-    );
-  }
-
-  numberFormat(num, language, dec) {
-    if (!Number.isNaN(Number(num)) && Intl)
-      return new Intl.NumberFormat(language, { minimumFractionDigits: dec }).format(Number(num));
-    return num.toString();
+    return compute.state(this.config, inState, this._hass.language);
   }
 
   updateOnInterval() {
@@ -865,7 +537,6 @@ class MiniGraphCard extends LitElement {
 
   async updateData({ config } = this) {
     this.updating = true;
-    // Loading animations disabled to prevent automatic animations
 
     const end = this.getEndDate();
     const start = new Date(end);
@@ -874,12 +545,9 @@ class MiniGraphCard extends LitElement {
     try {
       const promise = this.entity.map((entity, i) => this.updateEntity(entity, i, start, end));
       await Promise.all(promise);
-      // Success animations disabled to prevent automatic animations
     } catch (err) {
       log(err);
-      // Error animations disabled to prevent automatic animations
     }
-
 
     if (config.show.graph) {
       this.entity.forEach((entity, i) => {
@@ -919,59 +587,8 @@ class MiniGraphCard extends LitElement {
     this.setNextUpdate();
   }
 
-  getBoundary(type, series, configVal, fallback) {
-    if (!(type in Math)) {
-      throw new Error(`The type "${type}" is not present on the Math object`);
-    }
-
-    if (configVal === undefined) {
-      // dynamic boundary depending on values
-      return Math[type](...series.map(ele => ele[type])) || fallback;
-    }
-    if (configVal[0] !== '~') {
-      // fixed boundary
-      return configVal;
-    }
-    // soft boundary (respecting out of range values)
-    return Math[type](Number(configVal.substr(1)), ...series.map(ele => ele[type]));
-  }
-
-  getBoundaries(series, min, max, fallback, minRange) {
-    let boundary = [
-      this.getBoundary('min', series, min, fallback[0]),
-      this.getBoundary('max', series, max, fallback[1]),
-    ];
-
-    if (minRange) {
-      const currentRange = Math.abs(boundary[0] - boundary[1]);
-      const diff = parseFloat(minRange) - currentRange;
-
-      // Doesn't matter if minBoundRange is NaN because this will be false if so
-      if (diff > 0) {
-        const weights = [
-          min !== undefined && min[0] !== '~' || max === undefined ? 0 : 1,
-          max !== undefined && max[0] !== '~' || min === undefined ? 0 : 1,
-        ];
-        const sum = weights[0] + weights[1];
-        if (sum > 0) {
-          boundary = [
-            boundary[0] - diff * weights[0] / sum,
-            boundary[1] + diff * weights[1] / sum,
-          ];
-        } else {
-          boundary = [
-            boundary[0] - diff / 2,
-            boundary[1] + diff / 2,
-          ];
-        }
-      }
-    }
-
-    return boundary;
-  }
-
   updateBounds({ config } = this) {
-    this.bound = this.getBoundaries(
+    this.bound = getBoundaries(
       this.primaryYaxisSeries,
       config.lower_bound,
       config.upper_bound,
@@ -979,24 +596,13 @@ class MiniGraphCard extends LitElement {
       config.min_bound_range,
     );
 
-    this.boundSecondary = this.getBoundaries(
+    this.boundSecondary = getBoundaries(
       this.secondaryYaxisSeries,
       config.lower_bound_secondary,
       config.upper_bound_secondary,
       this.boundSecondary,
       config.min_bound_range_secondary,
     );
-  }
-
-  async getCache(key, compressed) {
-    const data = await localForage.getItem(`${key}_${this._md5Config}${(compressed ? '' : '_raw')}`);
-    return data ? (compressed ? decompress(data) : data) : null;
-  }
-
-  async setCache(key, data, compressed) {
-    return compressed
-      ? localForage.setItem(`${key}_${this._md5Config}`, compress(data))
-      : localForage.setItem(`${key}_${this._md5Config}_raw`, data);
   }
 
   async updateEntity(entity, index, initStart, end) {
@@ -1010,30 +616,9 @@ class MiniGraphCard extends LitElement {
     let start = initStart;
     let skipInitialState = false;
 
-    // Use intelligent cache system
     let history = null;
-    if (this.config.cache && this.cache) {
-      const cacheKey = this.cache.generateKey(
-        entity.entity_id,
-        initStart,
-        end,
-        {
-          hours_to_show: this.config.hours_to_show,
-          points_per_hour: this.config.points_per_hour,
-          index,
-        },
-      );
-
-      history = await this.cache.get(cacheKey);
-      if (history && history.hours_to_show === this.config.hours_to_show) {
-        stateHistory = history.data;
-
-        // Start prefetching related data in background
-        this.cache.prefetch(entity.entity_id);
-      }
-    } else if (this.config.cache) {
-      // Fallback to original cache system
-      history = await this.getCache(`${entity.entity_id}_${index}`, this.config.useCompress);
+    if (this.config.cache) {
+      history = await getCache(this._md5Config, `${entity.entity_id}_${index}`, this.config.compress);
       if (history && history.hours_to_show === this.config.hours_to_show) {
         stateHistory = history.data;
       }
@@ -1063,7 +648,8 @@ class MiniGraphCard extends LitElement {
       }
     }
 
-    let newStateHistory = await this.fetchRecent(
+    let newStateHistory = await fetchRecent(
+      this._hass,
       entity.entity_id,
       start,
       end,
@@ -1101,48 +687,16 @@ class MiniGraphCard extends LitElement {
 
       // Save to cache
       if (this.config.cache) {
-        if (this.cache) {
-          // Use intelligent cache system
-          const cacheKey = this.cache.generateKey(
-            entity.entity_id,
-            initStart,
-            end,
-            {
-              hours_to_show: this.config.hours_to_show,
-              points_per_hour: this.config.points_per_hour,
-              index,
-            },
-          );
-
-          const cacheData = {
-            hours_to_show: this.config.hours_to_show,
-            last_fetched: new Date(),
-            data: stateHistory,
-            version,
-            entity_id: entity.entity_id,
-            index,
-          };
-
-          // Use appropriate caching strategy based on data type
-          const strategy = stateHistory.length > 1000
-            ? CacheStrategies.HISTORICAL_DATA
-            : CacheStrategies.REAL_TIME_DATA;
-
-          await this.cache.set(cacheKey, cacheData, strategy.ttl);
-        } else {
-          // Fallback to original cache system
-          this
-            .setCache(`${entity.entity_id}_${index}`, {
-              hours_to_show: this.config.hours_to_show,
-              last_fetched: new Date(),
-              data: stateHistory,
-              version,
-            }, this.config.useCompress)
-            .catch((err) => {
-              log(err);
-              localForage.clear();
-            });
-        }
+        setCache(this._md5Config, `${entity.entity_id}_${index}`, {
+          hours_to_show: this.config.hours_to_show,
+          last_fetched: new Date(),
+          data: stateHistory,
+          version,
+        }, this.config.compress)
+          .catch((err) => {
+            log(err);
+            localForage.clear();
+          });
       }
     }
 
@@ -1158,17 +712,6 @@ class MiniGraphCard extends LitElement {
     } else {
       this.Graph[index].history = stateHistory;
     }
-  }
-
-  async fetchRecent(entityId, start, end, skipInitialState, withAttributes) {
-    let url = 'history/period';
-    if (start) url += `/${start.toISOString()}`;
-    url += `?filter_entity_id=${entityId}`;
-    if (end) url += `&end_time=${end.toISOString()}`;
-    if (skipInitialState) url += '&skip_initial_state';
-    if (!withAttributes) url += '&minimal_response&no_attributes';
-    if (withAttributes) url += '&significant_changes_only=0';
-    return this._hass.callApi('GET', url);
   }
 
   updateExtrema(history) {

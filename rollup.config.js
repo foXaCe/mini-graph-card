@@ -14,8 +14,9 @@ const serveopts = {
   },
 };
 
+// Single bundle: src/main.js already imports the visual editor
+// (./editor/editor), so the card and its editor ship together in one file.
 export default [
-  // Main card bundle
   {
     input: 'src/main.js',
     output: {
@@ -34,22 +35,4 @@ export default [
       dev && serve(serveopts),
     ],
   },
-  // Editor bundle
-  {
-    input: 'src/editor.js',
-    output: {
-      file: 'dist/mini-graph-card-editor.js',
-      format: 'umd',
-      name: 'MiniGraphCardEditor',
-      sourcemap: dev ? true : false,
-    },
-    plugins: [
-      commonjs(),
-      json({
-        include: ['package.json', 'src/translations/*.json'],
-        preferConst: true,
-      }),
-      resolve(),
-    ],
-  }
 ];
