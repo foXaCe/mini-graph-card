@@ -1,6 +1,12 @@
 # Pre-commit configuration for mini-graph-card (Lovelace card).
 # Install once per clone:  pre-commit install   (or: prek install / npm run hooks)
 # The eslint hook mirrors the CI lint job so a commit never breaks the pipeline.
+
+# pre-commit.ci (the hosted service) has no Node/npm env, so it cannot run the
+# local eslint hook — skip it there. The dedicated CI lint job already covers it.
+ci:
+  skip: [eslint]
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
