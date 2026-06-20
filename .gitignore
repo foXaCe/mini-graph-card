@@ -1,3 +1,21 @@
+# Dependencies
 /node_modules/
+
+# Test & coverage output
 /coverage/
+.eslintcache
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Editors / IDE (note: .vscode/ is intentionally tracked for shared debug config)
+.idea/
+*.swp
+*~
+
+# Logs & local env
+*.log
+npm-debug.log*
+.env
+.env.local
