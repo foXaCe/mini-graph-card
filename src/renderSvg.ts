@@ -1,12 +1,15 @@
-import { svg } from 'lit-element';
+import { svg, type SVGTemplateResult } from 'lit';
 import { X, Y, V } from './const';
+import type { BarData, CardContext, GradientStop } from './types';
 
 // SVG rendering fragments extracted from MiniGraphCard. Each function takes the
 // card instance and reads its reactive state (config, line, fill, points,
 // gradient, tooltip, entity) plus its computeColor/setTooltip helpers. The
 // entry point is renderSvg(card); the rest are module-internal.
 
-function renderSvgFill(card, fill, i) {
+type SvgFragment = SVGTemplateResult | undefined;
+
+function renderSvgFill(card: CardContext, fill: string, i: number): SvgFragment {
   if (!fill) return undefined;
   const init = card.length[i] || card.config.entities[i].show_line === false;
   return svg`
@@ -31,7 +34,7 @@ function renderSvgFill(card, fill, i) {
     </mask>`;
 }
 
-function renderSvgLine(card, line, i) {
+function renderSvgLine(card: CardContext, line: string, i: number): SvgFragment {
   if (!line) return undefined;
 
   const path = svg`
@@ -54,10 +57,9 @@ function renderSvgLine(card, line, i) {
   `;
 }
 
-function renderSvgPoint(card, point, i) {
+function renderSvgPoint(card: CardContext, point: number[], i: number): SvgFragment {
   const color = card.gradient[i] ? card.computeColor(point[V], i) : 'inherit';
   const onOver = () => card.setTooltip(i, point[3], point[V]);
-  // eslint-disable-next-line no-param-reassign
   const onOut = () => { card.tooltip = {}; };
 
   return svg`
@@ -76,7 +78,7 @@ function renderSvgPoint(card, point, i) {
   `;
 }
 
-function renderSvgPoints(card, points, i) {
+function renderSvgPoints(card: CardContext, points: number[][], i: number): SvgFragment {
   if (!points) return undefined;
   const color = card.computeColor(card.entity[i].state, i);
   return svg`
@@ -93,7 +95,10 @@ function renderSvgPoints(card, points, i) {
     </g>`;
 }
 
-function renderSvgGradient(card, gradients) {
+function renderSvgGradient(
+  card: CardContext,
+  gradients: Array<GradientStop[] | undefined>,
+): SvgFragment {
   if (!gradients) return undefined;
   const items = gradients.map((gradient, i) => {
     if (!gradient) return undefined;
@@ -107,7 +112,7 @@ function renderSvgGradient(card, gradients) {
   return svg`${items}`;
 }
 
-function renderSvgLineRect(card, line, i) {
+function renderSvgLineRect(card: CardContext, line: string, i: number): SvgFragment {
   if (!line) return undefined;
   const fill = card.gradient[i]
     ? `url(#grad-${card.id}-${i})`
@@ -121,7 +126,7 @@ function renderSvgLineRect(card, line, i) {
     />`;
 }
 
-function renderSvgFillRect(card, fill, i) {
+function renderSvgFillRect(card: CardContext, fill: string, i: number): SvgFragment {
   if (!fill) return undefined;
   const svgFill = card.gradient[i]
     ? `url(#grad-${card.id}-${i})`
@@ -135,7 +140,7 @@ function renderSvgFillRect(card, fill, i) {
     />`;
 }
 
-function renderSvgBars(card, bars, index) {
+function renderSvgBars(card: CardContext, bars: BarData[], index: number): SvgFragment {
   if (!bars) return undefined;
   const items = bars.map((bar, i) => {
     const animation = card.config.animate
@@ -146,7 +151,6 @@ function renderSvgBars(card, bars, index) {
       : '';
     const color = card.computeColor(bar.value, index);
     const onOver = () => card.setTooltip(index, i, bar.value);
-    // eslint-disable-next-line no-param-reassign
     const onOut = () => { card.tooltip = {}; };
     return svg`
       <rect class='bar' x=${bar.x} y=${bar.y}
@@ -159,11 +163,11 @@ function renderSvgBars(card, bars, index) {
   return svg`<g class='bars' ?anim=${card.config.animate}>${items}</g>`;
 }
 
-export default function renderSvg(card) {
+export default function renderSvg(card: CardContext): SVGTemplateResult {
   const { height } = card.config;
   return svg`
     <svg width='100%' height='100%' viewBox='0 0 500 ${height}' preserveAspectRatio='none'
-      @click=${(e) => e.stopPropagation()}>
+      @click=${(e: Event) => e.stopPropagation()}>
       <g>
         <defs>
           ${renderSvgGradient(card, card.gradient)}

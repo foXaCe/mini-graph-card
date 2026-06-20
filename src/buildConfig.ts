@@ -7,18 +7,21 @@ import {
   DEFAULT_COLORS,
   DEFAULT_SHOW,
 } from './const';
+import type {
+  ColorThreshold, EntityConfig, MiniGraphCardConfig, RawCardConfig, ShowConfig, StateMapEntry,
+} from './types';
+
+// A threshold stop as authored: a bare colour string or an object whose `value`
+// may be interpolated. Genuinely loose user input, so typed permissively.
+type RawStop = string | { color: string; value?: number | null };
 
 /**
  * Starting from the given index, increment the index until an array element with a
- * "value" property is found
- *
- * @param {Array} stops
- * @param {number} startIndex
- * @returns {number}
+ * "value" property is found.
  */
-const findFirstValuedIndex = (stops, startIndex) => {
+const findFirstValuedIndex = (stops: RawStop[], startIndex: number): number => {
   for (let i = startIndex, l = stops.length; i < l; i += 1) {
-    if (stops[i].value != null) {
+    if ((stops[i] as { value?: number | null }).value != null) {
       return i;
     }
   }
@@ -29,39 +32,31 @@ const findFirstValuedIndex = (stops, startIndex) => {
 };
 
 /**
- * Interpolates the "value" of each stop. Each stop can be a color string or an object of type
- * ```
- * {
- *   color: string
- *   value?: number | null
- * }
- * ```
- * And the values will be interpolated by the nearest valued stops.
+ * Interpolates the "value" of each stop. Each stop can be a color string or an
+ * object of type `{ color: string, value?: number | null }`, and the values
+ * will be interpolated by the nearest valued stops.
  *
- * For example, given values `[ 0, null, null, 4, null, 3]`,
- * the interpolation will output `[ 0, 1.3333, 2.6667, 4, 3.5, 3 ]`
- *
- * Note that values will be interpolated ascending and descending.
- * All that's necessary is that the first and the last elements have values.
- *
- * @param {Array} stops
- * @returns {Array<{ color: string, value: number }>}
+ * For example, given values `[ 0, null, null, 4, null, 3]`, the interpolation
+ * outputs `[ 0, 1.3333, 2.6667, 4, 3.5, 3 ]`. Values are interpolated both
+ * ascending and descending; all that's necessary is that the first and last
+ * elements have values.
  */
-const interpolateStops = (stops) => {
+const interpolateStops = (stops: RawStop[]): ColorThreshold[] => {
   if (!stops || !stops.length) {
-    return stops;
+    return stops as ColorThreshold[];
   }
-  if (stops[0].value == null || stops[stops.length - 1].value == null) {
+  const value = (s: RawStop): number | null | undefined => (typeof s === 'string' ? undefined : s.value);
+  if (value(stops[0]) == null || value(stops[stops.length - 1]) == null) {
     throw new Error(`The first and last thresholds must have a set "value".\n See ${URL_DOCS}`);
   }
 
   let leftValuedIndex = 0;
-  let rightValuedIndex = null;
+  let rightValuedIndex: number | null = null;
 
   return stops.map((stop, stopIndex) => {
-    if (stop.value != null) {
+    if (value(stop) != null) {
       leftValuedIndex = stopIndex;
-      return { ...stop };
+      return { ...(stop as ColorThreshold) };
     }
 
     if (rightValuedIndex == null) {
@@ -71,13 +66,9 @@ const interpolateStops = (stops) => {
       rightValuedIndex = findFirstValuedIndex(stops, stopIndex);
     }
 
-    // y = mx + b
-    // m = dY/dX
-    // x = index in question
-    // b = left value
-
-    const leftValue = stops[leftValuedIndex].value;
-    const rightValue = stops[rightValuedIndex].value;
+    // y = mx + b ; m = dY/dX ; x = index in question ; b = left value
+    const leftValue = value(stops[leftValuedIndex]) as number;
+    const rightValue = value(stops[rightValuedIndex]) as number;
     const m = (rightValue - leftValue) / (rightValuedIndex - leftValuedIndex);
     return {
       color: typeof stop === 'string' ? stop : stop.color,
@@ -86,14 +77,14 @@ const interpolateStops = (stops) => {
   });
 };
 
-const computeThresholds = (stops, type) => {
+const computeThresholds = (stops: RawStop[], type: string): ColorThreshold[] => {
   const valuedStops = interpolateStops(stops);
   valuedStops.sort((a, b) => b.value - a.value);
 
   if (type === 'smooth') {
     return valuedStops;
   } else {
-    const rect = [].concat(...valuedStops.map((stop, i) => ([stop, {
+    const rect = ([] as ColorThreshold[]).concat(...valuedStops.map((stop, i) => ([stop, {
       value: stop.value - 0.0001,
       color: valuedStops[i + 1] ? valuedStops[i + 1].color : stop.color,
     }])));
@@ -101,7 +92,7 @@ const computeThresholds = (stops, type) => {
   }
 };
 
-export default (config) => {
+export default (config: RawCardConfig): MiniGraphCardConfig => {
   if (!Array.isArray(config.entities))
     throw new Error(`Please provide the "entities" option as a list.\n See ${URL_DOCS}`);
   if (config.line_color_above || config.line_color_below)
@@ -133,16 +124,16 @@ export default (config) => {
       action: 'more-info',
     },
     ...JSON.parse(JSON.stringify(config)),
-    show: { ...DEFAULT_SHOW, ...config.show },
-  };
+    show: { ...DEFAULT_SHOW, ...(config.show as Partial<ShowConfig>) },
+  } as MiniGraphCardConfig;
 
-  conf.entities.forEach((entity, i) => {
+  (conf.entities as Array<string | EntityConfig>).forEach((entity, i) => {
     if (typeof entity === 'string') conf.entities[i] = { entity };
   });
 
-  conf.state_map.forEach((state, i) => {
+  (conf.state_map as Array<string | StateMapEntry>).forEach((stateEntry, i) => {
     // convert string values to objects
-    if (typeof state === 'string') conf.state_map[i] = { value: state, label: state };
+    if (typeof stateEntry === 'string') conf.state_map[i] = { value: stateEntry, label: stateEntry };
     // make sure label is set
     conf.state_map[i].label = conf.state_map[i].label || conf.state_map[i].value;
   });
@@ -150,16 +141,18 @@ export default (config) => {
   if (typeof config.line_color === 'string')
     conf.line_color = [config.line_color, ...DEFAULT_COLORS];
 
-  conf.font_size = (config.font_size / 100) * FONT_SIZE || FONT_SIZE;
+  conf.font_size = ((config.font_size as number) / 100) * FONT_SIZE || FONT_SIZE;
   conf.color_thresholds = computeThresholds(
-    conf.color_thresholds,
+    conf.color_thresholds as unknown as RawStop[],
     conf.color_thresholds_transition,
   );
-  const additional = conf.hours_to_show > 24 ? { day: 'numeric', weekday: 'short' } : {};
-  const hourFormat = conf.hour24 ? { hourCycle: 'h23' } : { hour12: true };
+  const additional: Intl.DateTimeFormatOptions = conf.hours_to_show > 24
+    ? { day: 'numeric', weekday: 'short' }
+    : {};
+  const hourFormat: Intl.DateTimeFormatOptions = conf.hour24 ? { hourCycle: 'h23' } : { hour12: true };
   conf.format = { ...hourFormat, ...additional };
 
-  // override points per hour to mach group_by function
+  // override points per hour to match group_by function
   switch (conf.group_by) {
     case 'date':
       conf.points_per_hour = 1 / 24;

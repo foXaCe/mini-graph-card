@@ -11,10 +11,12 @@ describe('mini-graph-card — registration & static API', () => {
     expect(customElements.get('mini-graph-card')).toBeTypeOf('function');
   });
 
-  it('exposes a stub config for the card picker', () => {
+  it('exposes a valid stub config (entities list) the card can accept', () => {
     const stub = customElements.get('mini-graph-card').getStubConfig();
-    expect(stub.type).toBe('custom:mini-graph-card');
-    expect(stub.entity).toBeTypeOf('string');
+    expect(Array.isArray(stub.entities)).toBe(true);
+    expect(stub.entities[0]).toBeTypeOf('string');
+    // The stub must be buildConfig-compatible (entities list, not legacy `entity`)
+    expect(() => make().setConfig(stub)).not.toThrow();
   });
 
   it('returns the visual editor element from getConfigElement', () => {
@@ -214,5 +216,86 @@ describe('mini-graph-card — updateData pipeline (mocked history API)', () => {
 
     const types = card.abs.map(a => a.type);
     expect(types).toEqual(['min', 'avg', 'max']);
+  });
+});
+
+// Renders the card with primed data so render()-dependent assertions work.
+const renderReady = async (config = { entities: ['sensor.a'] }) => {
+  const card = make();
+  card.setConfig(config);
+  const state = {
+    entity_id: 'sensor.a', state: '21', attributes: { friendly_name: 'Temp', unit_of_measurement: '°C' },
+  };
+  card.entity = [state];
+  card._hass = { language: 'en', locale: { language: 'en' }, states: { 'sensor.a': state } };
+  card.Graph[0].history = [{ state: '21', last_changed: new Date().toISOString() }];
+  card.bound = [20, 22];
+  card.line = ['M0,50 250,40 500,30'];
+  document.body.appendChild(card);
+  await card.updateComplete;
+  return card;
+};
+
+describe('mini-graph-card — Sections view (getGridOptions)', () => {
+  it('returns full-width options with columns a multiple of 3', () => {
+    const card = make();
+    card.setConfig({ entities: ['sensor.a'] });
+    const opts = card.getGridOptions();
+    expect(opts.columns).toBe(12);
+    expect(opts.columns % 3).toBe(0);
+    expect(opts.min_columns % 3).toBe(0);
+    expect(opts.rows).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe('mini-graph-card — appearance (premium layer)', () => {
+  it('defaults to premium and reflects it on the host', async () => {
+    const card = await renderReady();
+    expect(card.dataset.appearance).toBe('premium');
+    card.remove();
+  });
+
+  it('honours an explicit minimal appearance', async () => {
+    const card = await renderReady({ entities: ['sensor.a'], appearance: 'minimal' });
+    expect(card.dataset.appearance).toBe('minimal');
+    card.remove();
+  });
+});
+
+describe('mini-graph-card — accessibility', () => {
+  it('is keyboard-focusable with role=button when a tap action is set', async () => {
+    const card = await renderReady({ entities: ['sensor.a'], tap_action: { action: 'more-info' } });
+    const haCard = card.shadowRoot.querySelector('ha-card');
+    expect(haCard.getAttribute('role')).toBe('button');
+    expect(haCard.getAttribute('tabindex')).toBe('0');
+    card.remove();
+  });
+
+  it('is not focusable when the tap action is none', async () => {
+    const card = await renderReady({ entities: ['sensor.a'], tap_action: { action: 'none' } });
+    const haCard = card.shadowRoot.querySelector('ha-card');
+    expect(haCard.getAttribute('tabindex')).toBeNull();
+    expect(haCard.getAttribute('role')).toBeNull();
+    card.remove();
+  });
+
+  it('marks the svg graph as decorative (aria-hidden) for screen readers', async () => {
+    const card = await renderReady({ entities: ['sensor.a'], show: { graph: 'line' } });
+    expect(card.shadowRoot.querySelector('[aria-hidden="true"] svg')).toBeTruthy();
+    card.remove();
+  });
+
+  it('_handleKeydown activates the tap action on Enter and Space', () => {
+    const card = make();
+    card.setConfig({ entities: ['sensor.a'], tap_action: { action: 'more-info' } });
+    card._hass = { language: 'en', locale: { language: 'en' }, states: {} };
+    const spy = vi.fn();
+    card.addEventListener('hass-more-info', spy);
+    const ev = (key) => ({ key, preventDefault: vi.fn(), stopPropagation: vi.fn() });
+    card._handleKeydown(ev('Enter'), 'sensor.a');
+    card._handleKeydown(ev(' '), 'sensor.a');
+    expect(spy).toHaveBeenCalledTimes(2);
+    card._handleKeydown(ev('Tab'), 'sensor.a');
+    expect(spy).toHaveBeenCalledTimes(2); // Tab is ignored
   });
 });

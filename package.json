@@ -2,6 +2,7 @@
   "name": "mini-graph-card",
   "version": "0.23.0",
   "description": "A minimalistic and customizable graph card for Home Assistant Lovelace UI",
+  "type": "module",
   "keywords": [
     "home-assistant",
     "homeassistant",
@@ -13,53 +14,55 @@
     "svg",
     "custom-cards"
   ],
-  "main": "src/main.js",
-  "module": "src/main.js",
+  "main": "src/main.ts",
+  "module": "src/main.ts",
   "repository": "git@github.com:foXaCe/mini-graph-card.git",
   "author": "Karl Kihlström <mrkihlstrom@gmail.com>",
   "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "@kalkih/lz-string": "^1.4.5",
-    "custom-card-helpers": "^1.6.6",
+    "custom-card-helpers": "^1.9.0",
     "d3-interpolate": "^3.0.1",
-    "lit-element": "^2.2.1",
-    "localforage": "^1.7.3",
-    "spark-md5": "^3.0.1"
+    "lit": "^3.2.1",
+    "localforage": "^1.10.0",
+    "spark-md5": "^3.0.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.29.7",
-    "@babel/core": "^7.29.7",
-    "@babel/plugin-proposal-class-properties": "^7.3.3",
-    "@babel/plugin-proposal-decorators": "^7.3.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.3.4",
-    "@babel/plugin-transform-spread": "^7.2.2",
-    "@babel/plugin-transform-template-literals": "^7.2.0",
-    "@babel/preset-env": "^7.29.7",
-    "@rollup/plugin-commonjs": "^17.1.0",
-    "@rollup/plugin-json": "^4.1.0",
-    "@types/spark-md5": "^3.0.2",
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.1",
+    "@types/d3-interpolate": "^3.0.4",
+    "@types/spark-md5": "^3.0.5",
     "@vitest/coverage-v8": "^4.1.9",
-    "babel-preset-minify": "^0.5.0",
-    "eslint": "^8.57.1",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.25.2",
+    "eslint": "^9.15.0",
+    "globals": "^15.12.0",
     "jsdom": "^25.0.1",
-    "rollup": "^2.33.1",
-    "rollup-plugin-node-resolve": "^3.4.0",
-    "rollup-plugin-serve": "^1.1.0",
+    "rollup": "^4.27.4",
+    "tslib": "^2.8.1",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.16.0",
     "vitest": "^4.1.9"
   },
+  "overrides": {
+    "serialize-javascript": "^7.0.6"
+  },
   "scripts": {
-    "build": "npm run lint && npm run rollup && npm run babel",
+    "build": "rollup -c",
     "rollup": "rollup -c",
-    "babel": "babel dist/mini-graph-card-bundle.js --out-file dist/mini-graph-card-bundle.js",
-    "lint": "eslint src/ --ext .js",
     "watch": "rollup -c --watch",
+    "dev": "rollup -c --watch",
+    "lint": "eslint \"src/**/*.{ts,js}\"",
+    "lint:fix": "eslint \"src/**/*.{ts,js}\" --fix",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "postversion": "npm run build",
-    "hooks": "pre-commit install"
+    "hooks": "prek install"
   }
 }

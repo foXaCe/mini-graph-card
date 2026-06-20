@@ -27,6 +27,7 @@
       "advanced_options_and_performance_settings": "Options avancées et paramètres de performance"
     },
     "labels": {
+      "appearance": "Apparence",
       "primary_entity_will_be_converted_to_entities_list": "Entité principale (sera convertie en liste d'entités)",
       "card_name": "Nom de la carte",
       "icon": "Icône",
@@ -77,6 +78,8 @@
       "upper_bound_example": "100 ou ~100"
     },
     "options": {
+      "premium": "Premium",
+      "minimal": "Minimal",
       "default": "Par défaut",
       "left": "Gauche",
       "right": "Droite",
@@ -141,7 +144,9 @@
   },
   "card": {
     "error": {
-      "entity_not_available": "Entité non disponible :"
+      "entity_not_available": "Entité non disponible :",
+      "invalid_config": "Configuration invalide.",
+      "no_entities": "Veuillez définir au moins une entité via l’option « entities »."
     },
     "a11y": {
       "loading": "Chargement"

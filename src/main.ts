@@ -1,5 +1,7 @@
-import { LitElement, html, svg } from 'lit-element';
-import localForage from 'localforage/src/localforage';
+import {
+  LitElement, html, svg, nothing, type TemplateResult, type PropertyValues,
+} from 'lit';
+import localForage from 'localforage';
 import SparkMD5 from 'spark-md5';
 import Graph from './graph';
 import style from './style';
@@ -14,11 +16,7 @@ import './initialize';
 import { version } from '../package.json';
 import './editor/editor';
 
-import {
-  UPDATE_PROPS,
-  V,
-  ONE_HOUR,
-} from './const';
+import { UPDATE_PROPS, V, ONE_HOUR } from './const';
 import {
   getMin, getAvg, getMax,
   getTime, getMilli,
@@ -26,14 +24,67 @@ import {
   compareArray,
   log,
 } from './utils';
+import type {
+  BarData, EntityState, GradientStop, HomeAssistant, MiniGraphCardConfig, RawCardConfig, Tooltip,
+} from './types';
+
+interface AbsEntry {
+  type: 'min' | 'avg' | 'max';
+  state: number | string;
+  last_changed?: string;
+}
 
 class MiniGraphCard extends LitElement {
+  public id: string;
+
+  private _hass!: HomeAssistant;
+
+  public config!: MiniGraphCardConfig;
+
+  public bound: number[];
+
+  public boundSecondary: number[];
+
+  public length: Array<number | string>;
+
+  public entity: EntityState[];
+
+  public Graph!: Graph[];
+
+  public line: string[];
+
+  public bar: BarData[][];
+
+  public abs: AbsEntry[];
+
+  public fill: string[];
+
+  public points: number[][][];
+
+  public gradient: Array<GradientStop[] | undefined>;
+
+  public tooltip: Tooltip;
+
+  public updateQueue: string[];
+
+  public updating: boolean;
+
+  public stateChanged: boolean;
+
+  public initial: boolean;
+
+  public color?: string;
+
+  private _md5Config?: string;
+
+  private interval?: ReturnType<typeof setInterval>;
+
   constructor() {
     super();
     this.id = Math.random()
       .toString(36)
-      .substr(2, 9);
-    this.config = {};
+      .substring(2, 11);
+    this.config = {} as MiniGraphCardConfig;
     this.bound = [0, 0];
     this.boundSecondary = [0, 0];
     this.length = [];
@@ -56,13 +107,13 @@ class MiniGraphCard extends LitElement {
     return style;
   }
 
-  set hass(hass) {
+  set hass(hass: HomeAssistant) {
     this._hass = hass;
     let updated = false;
-    const queue = [];
+    const queue: string[] = [];
     this.config.entities.forEach((entity, index) => {
       this.config.entities[index].index = index; // Required for filtered views
-      const entityState = hass && hass.states[entity.entity] || undefined;
+      const entityState = (hass && hass.states[entity.entity]) as EntityState | undefined;
       if (entityState && this.entity[index] !== entityState) {
         this.entity[index] = entityState;
         queue.push(`${entityState.entity_id}-${index}`);
@@ -83,27 +134,37 @@ class MiniGraphCard extends LitElement {
     }
   }
 
+  get hass(): HomeAssistant {
+    return this._hass;
+  }
+
   static get properties() {
     return {
-      id: String,
-      _hass: {},
-      config: {},
-      entity: [],
-      Graph: [],
-      line: [],
-      shadow: [],
-      length: Number,
-      bound: [],
-      boundSecondary: [],
-      abs: [],
-      tooltip: {},
-      updateQueue: [],
-      color: String,
+      // `id` is reactive so Lit's accessor stores it internally; assigning it in
+      // the constructor must not touch the native id attribute (forbidden there).
+      id: { state: true },
+      _hass: { state: true },
+      config: { state: true },
+      entity: { state: true },
+      Graph: { state: true },
+      line: { state: true },
+      length: { state: true },
+      bound: { state: true },
+      boundSecondary: { state: true },
+      abs: { state: true },
+      tooltip: { state: true },
+      updateQueue: { state: true },
+      color: { state: true },
     };
   }
 
-  setConfig(config) {
-    this.config = buildConfig(config, this.config);
+  setConfig(config: RawCardConfig): void {
+    if (!config) throw new Error(localize('card.error.invalid_config', this._hass));
+    if (!Array.isArray(config.entities) || config.entities.length === 0) {
+      throw new Error(localize('card.error.no_entities', this._hass));
+    }
+
+    this.config = buildConfig(config);
     this._md5Config = SparkMD5.hash(JSON.stringify(this.config));
     const entitiesChanged = !compareArray(this.config.entities || [], config.entities);
 
@@ -129,7 +190,7 @@ class MiniGraphCard extends LitElement {
     }
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     super.connectedCallback();
 
     if (this.config.update_interval) {
@@ -143,14 +204,14 @@ class MiniGraphCard extends LitElement {
     }
   }
 
-  disconnectedCallback() {
+  disconnectedCallback(): void {
     if (this.interval) {
       clearInterval(this.interval);
     }
     super.disconnectedCallback();
   }
 
-  shouldUpdate(changedProps) {
+  shouldUpdate(changedProps: PropertyValues): boolean {
     if (UPDATE_PROPS.some((prop) => changedProps.has(prop))) {
       // Guard against a configured entity that is entirely absent from hass
       // (entity[0] undefined): compute the colour from the value we have, so
@@ -158,20 +219,21 @@ class MiniGraphCard extends LitElement {
       const stateValue = this.tooltip.value !== undefined
         ? this.tooltip.value
         : (this.entity[0] !== undefined ? this.getEntityState(0) : undefined);
-      this.color = this.computeColor(stateValue, this.tooltip.entity || 0);
+      this.color = this.computeColor(stateValue ?? 0, this.tooltip.entity || 0);
       return true;
     }
+    return false;
   }
 
-  firstUpdated() {
+  firstUpdated(): void {
     this.initial = false;
   }
 
-  updated(changedProperties) {
+  updated(changedProperties: PropertyValues): void {
     if (this.config.animate && changedProperties.has('line')) {
       if (this.length.length < this.entity.length) {
-        this.shadowRoot.querySelectorAll('svg path.line').forEach((ele) => {
-          this.length[ele.id] = ele.getTotalLength();
+        this.shadowRoot!.querySelectorAll('svg path.line').forEach((ele) => {
+          this.length[Number((ele as SVGPathElement).id)] = (ele as SVGPathElement).getTotalLength();
         });
         this.length = [...this.length];
       } else {
@@ -180,12 +242,17 @@ class MiniGraphCard extends LitElement {
     }
   }
 
-  render({ config } = this) {
+  render(): TemplateResult | typeof nothing {
+    const { config } = this;
     if (!config || !this.entity || !this._hass)
-      return html``;
+      return nothing;
+    // Premium layer is opt-out via `appearance: minimal` (see style.ts).
+    this.dataset.appearance = config.appearance ?? 'premium';
     if (this.config.entities.some((_, index) => this.entity[index] === undefined)) {
       return this.renderWarnings();
     }
+    const interactive = config.tap_action.action !== 'none';
+    const cardTarget = config.tap_action.entity || this.entity[0];
     return html`
       <ha-card
         class="flex"
@@ -195,9 +262,13 @@ class MiniGraphCard extends LitElement {
         ?labels=${config.show.labels === 'hover'}
         ?labels-secondary=${config.show.labels_secondary === 'hover'}
         ?gradient=${config.color_thresholds.length > 0}
-        ?hover=${config.tap_action.action !== 'none'}
+        ?hover=${interactive}
+        role=${interactive ? 'button' : nothing}
+        tabindex=${interactive ? '0' : nothing}
+        aria-label=${config.name || this.computeName(0)}
         style="font-size: ${config.font_size}px;"
-        @click=${(e) => this.handlePopup(e, config.tap_action.entity || this.entity[0])}
+        @click=${(e: Event) => this.handlePopup(e, cardTarget)}
+        @keydown=${(e: KeyboardEvent) => this._handleKeydown(e, cardTarget)}
       >
         ${this.renderHeader()} ${this.renderStates()} ${this.renderGraph()} ${this.renderInfo()}
       </ha-card>
@@ -267,17 +338,18 @@ class MiniGraphCard extends LitElement {
       return html`
         <div class="states flex" loc=${this.config.align_state}>
           ${this.renderState(0)}
-          <div class="states--secondary">${this.config.entities.map((_, i) => i > 0 && this.renderState(i) || '')}</div>
+          <div class="states--secondary">${this.config.entities.map((_, i) => (i > 0 && this.renderState(i)) || '')}</div>
           ${this.config.align_icon === 'state' ? this.renderIcon() : ''}
         </div>
       `;
+    return undefined;
   }
 
-  getObjectAttr(obj, path) {
+  getObjectAttr(obj: Record<string, any>, path: string): any {
     return path.split('.').reduce((res, key) => res && res[key], obj);
   }
 
-  getEntityState(id) {
+  getEntityState(id: number): number | string {
     const entityConfig = this.config.entities[id];
     if (this.config.show.state === 'last') {
       return this.points[id][this.points[id].length - 1][V];
@@ -288,20 +360,20 @@ class MiniGraphCard extends LitElement {
     }
   }
 
-  renderState(id) {
+  renderState(id: number) {
     const isPrimary = id === 0; // rendering main state element?
     if (isPrimary || this.config.entities[id].show_state) {
       const state = this.getEntityState(id);
       // use tooltip data for main state element, if tooltip is active
       const { entity: tooltipEntity, value: tooltipValue } = this.tooltip;
       const isTooltip = isPrimary && tooltipEntity !== undefined;
-      const value = isTooltip ? tooltipValue : state;
-      const entity = isTooltip ? tooltipEntity : id;
+      const value = isTooltip ? tooltipValue! : state;
+      const entity = isTooltip ? tooltipEntity! : id;
       const entityConfig = this.config.entities[entity];
       return html`
         <div
-          class="state ${!isPrimary && 'state--small'}"
-          @click=${(e) => this.handlePopup(e, this.entity[id])}
+          class="state ${!isPrimary ? 'state--small' : ''}"
+          @click=${(e: Event) => this.handlePopup(e, this.entity[id])}
           style=${entityConfig.state_adaptive_color ? `color: ${this.computeColor(value, entity)}` : ''}>
           ${entityConfig.show_indicator ? this.renderIndicator(value, entity) : ''}
           <span class="state__value ellipsis">
@@ -310,21 +382,22 @@ class MiniGraphCard extends LitElement {
           <span class="state__uom ellipsis">
             ${this.computeUom(entity)}
           </span>
-          ${isPrimary && this.renderStateTime() || ''}
+          ${(isPrimary && this.renderStateTime()) || ''}
         </div>
       `;
     }
+    return undefined;
   }
 
   renderStateTime() {
-    if (this.tooltip.value === undefined) return;
+    if (this.tooltip.value === undefined) return undefined;
     return html`
       <div class="state__time">
         ${this.tooltip.label ? html`
           <span class="tooltip--label">${this.tooltip.label}</span>
         ` : html`
-          <span>${this.tooltip.time[0]}</span> -
-          <span>${this.tooltip.time[1]}</span>
+          <span>${this.tooltip.time![0]}</span> -
+          <span>${this.tooltip.time![1]}</span>
         `}
       </div>
     `;
@@ -332,7 +405,7 @@ class MiniGraphCard extends LitElement {
 
   renderGraph() {
     const ready = (this.entity[0] && !this.Graph.some(
-      (element, index) => element._history === undefined
+      (element, index) => (element as any)._history === undefined
       && this.config.entities[index].show_graph !== false,
     ))
     || this.config.show.loading_indicator === false;
@@ -342,7 +415,7 @@ class MiniGraphCard extends LitElement {
             <div class="graph__container">
               ${this.renderLabels()}
               ${this.renderLabelsSecondary()}
-              <div class="graph__container__svg">
+              <div class="graph__container__svg" aria-hidden="true">
                 ${renderSvg(this)}
               </div>
             </div>
@@ -351,7 +424,7 @@ class MiniGraphCard extends LitElement {
       </div>` : '';
   }
 
-  computeLegend(index) {
+  computeLegend(index: number): string {
     let legend = this.computeName(index);
     const state = this.getEntityState(index);
 
@@ -359,7 +432,7 @@ class MiniGraphCard extends LitElement {
 
     if (show_legend_state) {
       legend += ` (${this.computeState(state)}`;
-      if (!(['unavailable'].includes(state))) {
+      if (!(['unavailable'].includes(String(state)))) {
         const uom = this.computeUom(index);
         if (!(['%', ''].includes(uom)))
           legend += ' ';
@@ -372,29 +445,32 @@ class MiniGraphCard extends LitElement {
   }
 
   renderLegend() {
-    if (this.visibleLegends.length <= 1 || !this.config.show.legend) return;
+    if (this.visibleLegends.length <= 1 || !this.config.show.legend) return undefined;
+    const interactive = this.config.tap_action.action !== 'none';
 
-    /* eslint-disable indent */
     return html`
-      <div class="graph__legend">
+      <div class="graph__legend" role="list">
         ${this.visibleLegends.map((entity) => {
-          const legend = this.computeLegend(entity.index);
-          return html`
+    const legend = this.computeLegend(entity.index!);
+    return html`
             <div class="graph__legend__item"
-              @click=${(e) => this.handlePopup(e, this.entity[entity.index])}
-              @mouseenter=${() => this.setTooltip(entity.index, -1, this.getEntityState(entity.index), localize('card.labels.current', this._hass))}
-              @mouseleave=${() => (this.tooltip = {})}>
-              ${this.renderIndicator(this.getEntityState(entity.index), entity.index)}
+              role=${interactive ? 'button' : 'listitem'}
+              tabindex=${interactive ? '0' : nothing}
+              aria-label=${legend}
+              @click=${(e: Event) => this.handlePopup(e, this.entity[entity.index!])}
+              @keydown=${(e: KeyboardEvent) => this._handleKeydown(e, this.entity[entity.index!])}
+              @mouseenter=${() => this.setTooltip(entity.index!, -1, this.getEntityState(entity.index!), localize('card.labels.current', this._hass))}
+              @mouseleave=${() => { this.tooltip = {}; }}>
+              ${this.renderIndicator(this.getEntityState(entity.index!), entity.index!)}
               <span class="ellipsis">${legend}</span>
             </div>
           `;
-        })}
+  })}
       </div>
     `;
-    /* eslint-enable indent */
   }
 
-  renderIndicator(state, index) {
+  renderIndicator(state: number | string, index: number) {
     return svg`
       <svg width='10' height='10'>
         <rect width='10' height='10' fill=${this.computeColor(state, index)} />
@@ -402,7 +478,7 @@ class MiniGraphCard extends LitElement {
     `;
   }
 
-  setTooltip(entity, index, value, label = null) {
+  setTooltip(entity: number, index: number, value: number | string, label: string | null = null): void {
     const {
       group_by,
       points_per_hour,
@@ -440,7 +516,7 @@ class MiniGraphCard extends LitElement {
   }
 
   renderLabels() {
-    if (!this.config.show.labels || this.primaryYaxisSeries.length === 0) return;
+    if (!this.config.show.labels || this.primaryYaxisSeries.length === 0) return undefined;
     return html`
       <div class="graph__labels --primary flex">
         <span class="label--max">${this.computeState(this.bound[1])}</span>
@@ -450,7 +526,7 @@ class MiniGraphCard extends LitElement {
   }
 
   renderLabelsSecondary() {
-    if (!this.config.show.labels_secondary || this.secondaryYaxisSeries.length === 0) return;
+    if (!this.config.show.labels_secondary || this.secondaryYaxisSeries.length === 0) return undefined;
     return html`
       <div class="graph__labels --secondary flex">
         <span class="label--max">${this.computeState(this.boundSecondary[1])}</span>
@@ -469,7 +545,7 @@ class MiniGraphCard extends LitElement {
               ${this.computeState(entry.state)} ${this.computeUom(0)}
             </span>
             <span class="info__item__time">
-              ${entry.type !== 'avg' ? getTime(new Date(entry.last_changed), this.config.format, this._hass.language) : ''}
+              ${entry.type !== 'avg' ? getTime(new Date(entry.last_changed!), this.config.format, this._hass.language) : ''}
             </span>
           </div>
         `)}
@@ -477,9 +553,18 @@ class MiniGraphCard extends LitElement {
     ` : html``;
   }
 
-  handlePopup(e, entity) {
+  handlePopup(e: Event, entity: EntityState | string): void {
     e.stopPropagation();
-    handleClick(this, this._hass, this.config, this.config.tap_action, entity.entity_id || entity);
+    const entityId = typeof entity === 'string' ? entity : entity.entity_id;
+    handleClick(this, this._hass, this.config, this.config.tap_action, entityId);
+  }
+
+  // Keyboard activation for the focusable card and legend items (Enter / Space).
+  _handleKeydown(e: KeyboardEvent, entity: EntityState | string): void {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      this.handlePopup(e, entity);
+    }
   }
 
   get visibleEntities() {
@@ -500,41 +585,42 @@ class MiniGraphCard extends LitElement {
   }
 
   get primaryYaxisSeries() {
-    return this.primaryYaxisEntities.map((entity) => this.Graph[entity.index]);
+    return this.primaryYaxisEntities.map((entity) => this.Graph[entity.index!]);
   }
 
   get secondaryYaxisSeries() {
-    return this.secondaryYaxisEntities.map((entity) => this.Graph[entity.index]);
+    return this.secondaryYaxisEntities.map((entity) => this.Graph[entity.index!]);
   }
 
-  computeColor(inState, i) {
+  computeColor(inState: number | string, i: number): string {
     return compute.color(this.config, inState, i);
   }
 
-  computeName(index) {
+  computeName(index: number): string {
     return compute.name(this.config, this.entity[index], index);
   }
 
-  computeIcon(entity) {
+  computeIcon(entity: EntityState): string {
     return compute.icon(this.config, entity);
   }
 
-  computeUom(index) {
+  computeUom(index: number): string {
     return compute.uom(this.config, this.entity[index], index);
   }
 
-  computeState(inState) {
+  computeState(inState: number | string): string {
     return compute.state(this.config, inState, this._hass.language);
   }
 
-  updateOnInterval() {
+  updateOnInterval(): void {
     if (this.stateChanged && !this.updating) {
       this.stateChanged = false;
       this.updateData();
     }
   }
 
-  async updateData({ config } = this) {
+  async updateData(): Promise<void> {
+    const { config } = this;
     this.updating = true;
 
     const end = this.getEndDate();
@@ -587,7 +673,8 @@ class MiniGraphCard extends LitElement {
     this.setNextUpdate();
   }
 
-  updateBounds({ config } = this) {
+  updateBounds(): void {
+    const { config } = this;
     this.bound = getBoundaries(
       this.primaryYaxisSeries,
       config.lower_bound,
@@ -605,20 +692,20 @@ class MiniGraphCard extends LitElement {
     );
   }
 
-  async updateEntity(entity, index, initStart, end) {
+  async updateEntity(entity: EntityState, index: number, initStart: Date, end: Date): Promise<void> {
     if (!entity
       || !this.updateQueue.includes(`${entity.entity_id}-${index}`)
       || this.config.entities[index].show_graph === false
     ) return;
     this.updateQueue = this.updateQueue.filter((entry) => entry !== `${entity.entity_id}-${index}`);
 
-    let stateHistory = [];
+    let stateHistory: any[] = [];
     let start = initStart;
     let skipInitialState = false;
 
     let history = null;
     if (this.config.cache) {
-      history = await getCache(this._md5Config, `${entity.entity_id}_${index}`, this.config.compress);
+      history = await getCache(this._md5Config!, `${entity.entity_id}_${index}`, this.config.compress) as any;
       if (history && history.hours_to_show === this.config.hours_to_show) {
         stateHistory = history.data;
       }
@@ -644,11 +731,11 @@ class MiniGraphCard extends LitElement {
 
       const lastFetched = new Date(history.last_fetched);
       if (lastFetched > start) {
-        start = new Date(lastFetched - 1);
+        start = new Date(lastFetched.getTime() - 1);
       }
     }
 
-    let newStateHistory = await fetchRecent(
+    let newStateHistory: any[] = await fetchRecent(
       this._hass,
       entity.entity_id,
       start,
@@ -666,11 +753,9 @@ class MiniGraphCard extends LitElement {
       }
       // check if we should convert states to numeric values
       if (this.config.state_map.length > 0 || this.config.entities[index].attribute) {
-        newStateHistory[0].forEach((item) => {
+        newStateHistory[0].forEach((item: any) => {
           if (this.config.entities[index].attribute) {
-            // eslint-disable-next-line no-param-reassign
-            item.state = this.getObjectAttr(item.attributes, this.config.entities[index].attribute);
-            // eslint-disable-next-line no-param-reassign
+            item.state = this.getObjectAttr(item.attributes, this.config.entities[index].attribute!);
             delete item.attributes;
           }
           if (this.config.state_map.length > 0)
@@ -678,8 +763,8 @@ class MiniGraphCard extends LitElement {
         });
       }
 
-      newStateHistory = newStateHistory[0].filter((item) => !Number.isNaN(parseFloat(item.state)));
-      newStateHistory = newStateHistory.map((item) => ({
+      newStateHistory = newStateHistory[0].filter((item: any) => !Number.isNaN(parseFloat(item.state)));
+      newStateHistory = newStateHistory.map((item: any) => ({
         last_changed: this.config.entities[index].attribute ? item.last_updated : item.last_changed,
         state: item.state,
       }));
@@ -687,7 +772,7 @@ class MiniGraphCard extends LitElement {
 
       // Save to cache
       if (this.config.cache) {
-        setCache(this._md5Config, `${entity.entity_id}_${index}`, {
+        setCache(this._md5Config!, `${entity.entity_id}_${index}`, {
           hours_to_show: this.config.hours_to_show,
           last_fetched: new Date(),
           data: stateHistory,
@@ -714,25 +799,25 @@ class MiniGraphCard extends LitElement {
     }
   }
 
-  updateExtrema(history) {
+  updateExtrema(history: any[]): void {
     const { extrema, average } = this.config.show;
     this.abs = [
       ...(extrema ? [{
-        type: 'min',
+        type: 'min' as const,
         ...getMin(history, 'state'),
       }] : []),
       ...(average ? [{
-        type: 'avg',
+        type: 'avg' as const,
         state: getAvg(history, 'state'),
       }] : []),
       ...(extrema ? [{
-        type: 'max',
+        type: 'max' as const,
         ...getMax(history, 'state'),
       }] : []),
-    ];
+    ] as AbsEntry[];
   }
 
-  _convertState(res) {
+  _convertState(res: { state: any }): void {
     const resultIndex = this.config.state_map.findIndex((s) => s.value === res.state);
     if (resultIndex === -1) {
       return;
@@ -741,7 +826,7 @@ class MiniGraphCard extends LitElement {
     res.state = resultIndex;
   }
 
-  getEndDate() {
+  getEndDate(): Date {
     const date = new Date();
     switch (this.config.group_by) {
       case 'date':
@@ -758,7 +843,7 @@ class MiniGraphCard extends LitElement {
     return date;
   }
 
-  setNextUpdate() {
+  setNextUpdate(): void {
     if (!this.config.update_interval) {
       const interval = 1 / this.config.points_per_hour;
       clearInterval(this.interval);
@@ -768,7 +853,18 @@ class MiniGraphCard extends LitElement {
     }
   }
 
-  getCardSize() {
+  // Sections view (HA 2025+): graphs benefit from width, so default to full
+  // width; rows track the configured content height. columns stay multiples of 3.
+  getGridOptions() {
+    return {
+      columns: 12,
+      rows: Math.max(2, this.calculateCardSize()),
+      min_columns: 6,
+      min_rows: 1,
+    };
+  }
+
+  getCardSize(): number {
     // Prefer measuring the rendered height to match HA's new layout behavior
     try {
       const card = this.shadowRoot && this.shadowRoot.querySelector('ha-card');
@@ -776,13 +872,13 @@ class MiniGraphCard extends LitElement {
         const measured = Math.ceil(card.getBoundingClientRect().height / 50);
         if (Number.isFinite(measured) && measured > 0) return measured;
       }
-    } catch (e) {
+    } catch {
       // noop – fall back to calculated size below
     }
     return this.config.card_size || this.calculateCardSize();
   }
 
-  calculateCardSize() {
+  calculateCardSize(): number {
     let size = 1; // Base size
 
     // Add size for header (name/icon)
@@ -804,18 +900,22 @@ class MiniGraphCard extends LitElement {
 
     return size;
   }
+
+  // Visual editor (custom element defined in ./editor/editor).
+  static getConfigElement(): HTMLElement {
+    return document.createElement('mini-graph-card-editor');
+  }
+
+  // Stub config for the Lovelace card picker. Picks a real numeric entity when
+  // one is available so the preview shows live data; `entities` (not `entity`)
+  // is what buildConfig requires.
+  static getStubConfig(hass?: HomeAssistant): Record<string, unknown> {
+    const entity = hass
+      ? Object.keys(hass.states).find((id) => isNumericEntity(hass, id))
+      : undefined;
+    return { entities: [entity || 'sensor.example'] };
+  }
 }
-
-// Add getConfigElement method for visual editor
-MiniGraphCard.getConfigElement = function getConfigElement() {
-  return document.createElement('mini-graph-card-editor');
-};
-
-// Add stub config for Lovelace card picker
-MiniGraphCard.getStubConfig = () => ({
-  type: 'custom:mini-graph-card',
-  entity: 'sensor.example',
-});
 
 customElements.define('mini-graph-card', MiniGraphCard);
 
@@ -823,7 +923,7 @@ customElements.define('mini-graph-card', MiniGraphCard);
 // plus sensors that expose a unit or a state_class (i.e. numeric sensors).
 const NUMERIC_DOMAINS = ['counter', 'input_number', 'number'];
 
-const isNumericEntity = (hass, entityId) => {
+const isNumericEntity = (hass: HomeAssistant, entityId: string): boolean => {
   const domain = entityId.split('.')[0];
   if (NUMERIC_DOMAINS.includes(domain)) return true;
   if (domain !== 'sensor') return false;
@@ -840,11 +940,12 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'mini-graph-card',
   name: localize('card.picker.name'),
-  preview: false,
+  preview: true,
   description: localize('card.picker.description'),
+  documentationURL: 'https://github.com/foXaCe/mini-graph-card',
   // Offer the card as a suggestion when a numeric entity is added to a
   // dashboard (Home Assistant 2026.6+ card-picker entity suggestion).
-  getEntitySuggestion: (hass, entityId) => (isNumericEntity(hass, entityId)
+  getEntitySuggestion: (hass: HomeAssistant, entityId: string) => (isNumericEntity(hass, entityId)
     ? { config: { type: 'custom:mini-graph-card', entities: [{ entity: entityId }] } }
     : null),
 });

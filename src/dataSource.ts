@@ -1,11 +1,19 @@
-import localForage from 'localforage/src/localforage';
+import localForage from 'localforage';
 import { compress, decompress } from './utils';
+import type { HistoryItem, HomeAssistant } from './types';
 
 // Data access layer extracted from MiniGraphCard: the Home Assistant history
 // API and the localForage history cache. The cache `store` is injectable so the
 // (de)compression and key logic can be unit tested without IndexedDB.
 
-export async function fetchRecent(hass, entityId, start, end, skipInitialState, withAttributes) {
+export async function fetchRecent(
+  hass: HomeAssistant,
+  entityId: string,
+  start: Date | undefined,
+  end: Date | undefined,
+  skipInitialState: boolean,
+  withAttributes: boolean,
+): Promise<HistoryItem[][]> {
   let url = 'history/period';
   if (start) url += `/${start.toISOString()}`;
   url += `?filter_entity_id=${entityId}`;
@@ -18,16 +26,27 @@ export async function fetchRecent(hass, entityId, start, end, skipInitialState, 
 
 // Compressed entries are stored under `${key}_${md5}`; raw (uncompressed)
 // entries get a `_raw` suffix so the two never collide.
-export function cacheKey(md5Config, key, compressed) {
+export function cacheKey(md5Config: string, key: string, compressed: boolean): string {
   return `${key}_${md5Config}${compressed ? '' : '_raw'}`;
 }
 
-export async function getCache(md5Config, key, compressed, store = localForage) {
+export async function getCache(
+  md5Config: string,
+  key: string,
+  compressed: boolean,
+  store: LocalForage = localForage,
+): Promise<unknown> {
   const data = await store.getItem(cacheKey(md5Config, key, compressed));
   return data ? (compressed ? decompress(data) : data) : null;
 }
 
-export async function setCache(md5Config, key, data, compressed, store = localForage) {
+export async function setCache(
+  md5Config: string,
+  key: string,
+  data: unknown,
+  compressed: boolean,
+  store: LocalForage = localForage,
+): Promise<unknown> {
   return compressed
     ? store.setItem(cacheKey(md5Config, key, true), compress(data))
     : store.setItem(cacheKey(md5Config, key, false), data);

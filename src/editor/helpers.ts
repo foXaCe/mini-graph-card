@@ -1,7 +1,16 @@
 // Pure entity-metadata helpers for the visual editor. Kept free of `this`/DOM
 // so they can be unit tested directly.
+import type { HomeAssistant } from '../types';
 
-const DEFAULT_ICONS = {
+export interface EntityInfo {
+  entityId: string;
+  friendlyName: string;
+  icon: string;
+  domain: string;
+  state?: string;
+}
+
+const DEFAULT_ICONS: Record<string, string> = {
   sensor: 'mdi:gauge',
   binary_sensor: 'mdi:radiobox-blank',
   switch: 'mdi:toggle-switch',
@@ -17,12 +26,12 @@ const DEFAULT_ICONS = {
   weather: 'mdi:weather-partly-cloudy',
 };
 
-export function getDefaultIcon(entityId) {
+export function getDefaultIcon(entityId: string): string {
   const domain = entityId.split('.')[0];
   return DEFAULT_ICONS[domain] || 'mdi:help-circle';
 }
 
-export function getEntityInfo(hass, entityId) {
+export function getEntityInfo(hass: HomeAssistant | undefined | null, entityId: string): EntityInfo {
   const domain = entityId.split('.')[0] || 'unknown';
 
   if (!hass || !hass.states) {

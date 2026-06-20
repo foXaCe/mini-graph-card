@@ -9,8 +9,8 @@ export default defineConfig({
     environment: 'node',
     coverage: {
       provider: 'v8',
-      include: ['src/**/*.js'],
-      exclude: ['src/translations/**'],
+      include: ['src/**/*.ts'],
+      exclude: ['src/translations/**', 'src/types.ts', 'src/**/*.d.ts'],
       reporter: ['text', 'html'],
     },
   },

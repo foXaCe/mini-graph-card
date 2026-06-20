@@ -2,16 +2,17 @@ import { stateIcon } from 'custom-card-helpers';
 import { interpolateRgb } from 'd3-interpolate';
 import { ICONS } from './const';
 import { log } from './utils';
+import type { EntityState, MiniGraphCardConfig } from './types';
 
 // Pure value/presentation helpers extracted from MiniGraphCard. Each takes the
 // data it needs explicitly (config, entity state, language) so it can be unit
 // tested in isolation; the card keeps thin delegating methods.
 
-export function color(config, inState, i) {
+export function color(config: MiniGraphCardConfig, inState: number | string, i: number): string {
   const { color_thresholds, line_color } = config;
   const numericState = Number(inState) || 0;
 
-  let intColor;
+  let intColor: string | undefined;
   if (color_thresholds.length > 0) {
     const { color: found } = color_thresholds.find((ele) => ele.value < numericState)
       || color_thresholds.slice(-1)[0];
@@ -32,22 +33,22 @@ export function color(config, inState, i) {
   return config.entities[i].color || intColor || line_color[i] || line_color[0];
 }
 
-export function name(config, entityState, index) {
+export function name(config: MiniGraphCardConfig, entityState: EntityState, index: number): string {
   return config.entities[index].name
     || entityState.attributes.friendly_name
     || entityState.entity_id;
 }
 
-export function icon(config, entityState) {
+export function icon(config: MiniGraphCardConfig, entityState: EntityState): string {
   return (
     config.icon
-    || entityState.attributes.icon
-    || stateIcon(entityState)
+    || (entityState.attributes.icon as string)
+    || stateIcon(entityState as never)
     || ICONS.temperature
   );
 }
 
-export function uom(config, entityState, index) {
+export function uom(config: MiniGraphCardConfig, entityState: EntityState, index: number): string {
   return (
     config.entities[index].unit !== undefined
       ? config.entities[index].unit
@@ -60,19 +61,19 @@ export function uom(config, entityState, index) {
               : ''
           )
       )
-  );
+  ) as string;
 }
 
-export function numberFormat(num, language, dec) {
+export function numberFormat(num: number | string, language: string | undefined, dec?: number): string {
   if (!Number.isNaN(Number(num)) && Intl)
     return new Intl.NumberFormat(language, { minimumFractionDigits: dec }).format(Number(num));
   return num.toString();
 }
 
-export function state(config, inState, language) {
+export function state(config: MiniGraphCardConfig, inState: number | string, language?: string): string {
   if (config.state_map.length > 0) {
     const stateMap = Number.isInteger(inState)
-      ? config.state_map[inState]
+      ? config.state_map[inState as number]
       : config.state_map.find((s) => s.value === inState);
 
     if (stateMap) {
@@ -84,7 +85,7 @@ export function state(config, inState, language) {
     }
   }
 
-  let value;
+  let value: number;
   if (typeof inState === 'string') {
     value = parseFloat(inState.replace(/,/g, '.'));
   } else {

@@ -1,11 +1,57 @@
-import { css } from 'lit-element';
+import { css } from 'lit';
 
 const style = css`
   :host {
+    /* ── Premium design tokens ──────────────────────────────────────────────
+       Everything derives from the active Home Assistant theme via color-mix in
+       oklab, so the card stays coherent in light, dark and exotic themes — no
+       hard-coded colours. Users can still override the --mcg-* hooks. */
+
+    /* Radius — Apple-like, rounder than stock Material */
+    --p-radius-sm: 10px;
+    --p-radius-md: 14px;
+    --p-radius-lg: 18px;
+    --p-radius-pill: 9999px;
+
+    /* Typography — system stack (SF Pro / Roboto spirit), no web fonts */
+    --p-font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+      'Segoe UI', Roboto, system-ui, sans-serif;
+
+    /* Foreground / surface, derived from HA */
+    --p-fg-1: var(--primary-text-color);
+    --p-accent: var(--primary-color);
+    --p-surface: var(--ha-card-background, var(--card-background-color, #fff));
+    --p-divider: color-mix(in oklab, var(--p-fg-1) 12%, transparent);
+
+    /* Multi-layer shadows (Apple-style, never a single hard shadow), tinted by
+       the foreground so they read correctly on any background */
+    --p-elev-1:
+      0 1px 2px color-mix(in oklab, var(--p-fg-1) 7%, transparent),
+      0 1px 3px color-mix(in oklab, var(--p-fg-1) 5%, transparent);
+    --p-elev-2:
+      0 2px 6px color-mix(in oklab, var(--p-fg-1) 9%, transparent),
+      0 10px 28px color-mix(in oklab, var(--p-fg-1) 12%, transparent);
+    --p-elev-pill:
+      0 1px 2px color-mix(in oklab, var(--p-fg-1) 8%, transparent),
+      0 2px 6px color-mix(in oklab, var(--p-fg-1) 6%, transparent);
+    --p-elev-pressed: inset 0 1px 2px color-mix(in oklab, var(--p-fg-1) 12%, transparent);
+
+    /* Motion — spring physics, never linear/ease */
+    --p-ease: cubic-bezier(0.32, 0.72, 0, 1);
+    --p-motion-fast: 150ms var(--p-ease);
+    --p-motion-normal: 240ms var(--p-ease);
+
+    /* Liquid Glass */
+    --p-blur-glass: saturate(180%) blur(16px);
+    --p-glass-bg: color-mix(in oklab, var(--p-surface) 72%, transparent);
+    --p-glass-border: color-mix(in oklab, var(--p-fg-1) 10%, transparent);
+
     display: flex;
     flex-direction: column;
     height: 100%;
     box-sizing: border-box;
+    container-type: inline-size;
+    font-family: var(--p-font);
   }
   ha-card {
     flex-direction: column;
@@ -13,19 +59,18 @@ const style = css`
     padding: 0;
     position: relative;
     overflow: hidden;
-    border-radius: 12px;
-    box-shadow:
-      0 2px 8px rgba(0, 0, 0, 0.1),
-      0 1px 3px rgba(0, 0, 0, 0.06),
-      0 0 0 1px rgba(255, 255, 255, 0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--ha-card-border-radius, var(--p-radius-lg));
+    box-shadow: var(--ha-card-box-shadow, var(--p-elev-1));
+    border: 1px solid var(--p-divider);
+    transition:
+      box-shadow var(--p-motion-normal),
+      transform var(--p-motion-normal);
     display: flex;
     height: auto; /* let HA grid define height */
     min-height: 0;
     box-sizing: border-box;
     gap: 0;
+    isolation: isolate;
   }
   ha-card > div {
     padding: 0 16px;
@@ -55,12 +100,12 @@ const style = css`
   ha-card[points] .line--points,
   ha-card[labels] .graph__labels.--primary {
     opacity: 0;
-    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity var(--p-motion-normal);
     animation: none;
   }
   ha-card[labels-secondary] .graph__labels.--secondary {
     opacity: 0;
-    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity var(--p-motion-normal);
     animation: none;
   }
   ha-card[points]:hover .line--points,
@@ -90,19 +135,18 @@ const style = css`
   ha-card[hover] {
     cursor: pointer;
   }
-  ha-card:hover {
-    box-shadow:
-      0 8px 25px rgba(0, 0, 0, 0.15),
-      0 4px 10px rgba(0, 0, 0, 0.08),
-      0 0 0 1px rgba(255, 255, 255, 0.1);
+  ha-card[hover]:hover {
+    box-shadow: var(--p-elev-2);
     transform: translateY(-2px);
   }
-  ha-card[hover]:hover {
-    box-shadow:
-      0 12px 35px rgba(0, 0, 0, 0.2),
-      0 6px 15px rgba(0, 0, 0, 0.12),
-      0 0 0 1px rgba(255, 255, 255, 0.15);
-    transform: translateY(-4px);
+  ha-card[hover]:active {
+    transform: translateY(0) scale(0.997);
+    box-shadow: var(--p-elev-1);
+    transition-duration: 90ms;
+  }
+  ha-card:focus-visible {
+    outline: 2px solid var(--p-accent);
+    outline-offset: 2px;
   }
   ha-spinner {
     margin: 4px auto;
@@ -128,7 +172,7 @@ const style = css`
   .name {
     align-items: center;
     min-width: 0;
-    letter-spacing: var(--mcg-title-letter-spacing, normal);
+    letter-spacing: var(--mcg-title-letter-spacing, -0.01em);
   }
   .name > span {
     font-size: 1.2em;
@@ -136,9 +180,10 @@ const style = css`
     max-height: 1.4em;
     min-height: 1.4em;
     opacity: .65;
+    text-wrap: pretty;
   }
   .icon {
-    color: var(--state-icon-color, #44739e);
+    color: var(--state-icon-color, var(--p-accent));
     display: inline-block;
     flex: 0 0 1.7em;
     text-align: center;
@@ -243,7 +288,10 @@ const style = css`
     font-size: 2.4em;
     margin-right: .25rem;
     line-height: 1.2em;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+    transition: color var(--p-motion-normal);
   }
   .state__uom {
     flex: 1;
@@ -267,8 +315,9 @@ const style = css`
     opacity: .75;
     position: absolute;
     white-space: nowrap;
-    animation: fade 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-variant-numeric: tabular-nums;
+    animation: fade 0.3s var(--p-ease);
+    transition: opacity var(--p-motion-fast);
   }
   .states[loc="right"] .state__time {
     left: initial;
@@ -348,12 +397,15 @@ const style = css`
     cursor: pointer;
     fill: var(--primary-background-color, white);
     stroke-width: inherit;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      transform var(--p-motion-fast),
+      filter var(--p-motion-fast),
+      fill var(--p-motion-fast);
   }
   .line--point:hover {
     fill: var(--mcg-hover, inherit) !important;
     transform: scale(1.15);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 2px 4px color-mix(in oklab, var(--p-fg-1) 20%, transparent));
   }
   .bars {
     animation: pop .25s cubic-bezier(0.215, 0.61, 0.355, 1);
@@ -362,12 +414,15 @@ const style = css`
     animation: bars .5s cubic-bezier(0.215, 0.61, 0.355, 1);
   }
   .bar {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      transform var(--p-motion-fast),
+      opacity var(--p-motion-fast),
+      filter var(--p-motion-fast);
   }
   .bar:hover {
-    opacity: 0.8;
+    opacity: 0.85;
     cursor: pointer;
-    filter: brightness(1.1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+    filter: brightness(1.08) drop-shadow(0 2px 4px color-mix(in oklab, var(--p-fg-1) 16%, transparent));
     transform: translateY(-1px);
   }
   ha-card[gradient] .line--point:hover {
@@ -399,33 +454,40 @@ const style = css`
     align-items: flex-start;
     flex-direction: column;
     font-size: calc(.15em + 8.5px);
-    font-weight: 400;
+    font-weight: 500;
     justify-content: space-between;
     margin-right: 10px;
     padding: .6em;
     position: absolute;
     pointer-events: none;
     top: 0; bottom: 0;
-    opacity: .75;
+    opacity: .85;
+    font-variant-numeric: tabular-nums;
   }
   .graph__labels > span {
     cursor: pointer;
-    background: var(--primary-background-color, white);
-    border-radius: 0.75em;
+    color: var(--p-fg-1);
+    background: var(--p-glass-bg);
+    border-radius: var(--p-radius-pill);
     padding: .3em .8em;
-    box-shadow:
-      0 2px 4px rgba(0, 0, 0, 0.08),
-      0 1px 2px rgba(0, 0, 0, 0.04);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: var(--p-elev-pill);
+    border: 1px solid var(--p-glass-border);
+    backdrop-filter: var(--p-blur-glass);
+    -webkit-backdrop-filter: var(--p-blur-glass);
+    transition:
+      transform var(--p-motion-fast),
+      box-shadow var(--p-motion-fast),
+      background var(--p-motion-fast);
   }
   .graph__labels > span:hover {
-    box-shadow:
-      0 4px 8px rgba(0, 0, 0, 0.12),
-      0 2px 4px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--p-elev-2);
     transform: translateY(-1px);
-    background: var(--card-background-color, white);
+    background: color-mix(in oklab, var(--p-surface) 88%, transparent);
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .graph__labels > span {
+      background: color-mix(in oklab, var(--p-surface) 92%, var(--p-fg-1));
+    }
   }
   .graph__legend {
     display: flex;
@@ -443,15 +505,25 @@ const style = css`
     margin: .4em;
     align-items: center;
     padding: 0.3em 0.6em;
-    border-radius: 0.5em;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: var(--p-radius-sm);
+    transition:
+      transform var(--p-motion-fast),
+      box-shadow var(--p-motion-fast),
+      background var(--p-motion-fast);
   }
   .graph__legend__item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: color-mix(in oklab, var(--p-fg-1) 6%, transparent);
     transform: translateY(-1px);
-    box-shadow:
-      0 2px 4px rgba(0, 0, 0, 0.08),
-      0 1px 2px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--p-elev-1);
+  }
+  .graph__legend__item:active {
+    transform: scale(0.96);
+    box-shadow: var(--p-elev-pressed);
+    transition-duration: 80ms;
+  }
+  .graph__legend__item:focus-visible {
+    outline: 2px solid var(--p-accent);
+    outline-offset: 2px;
   }
   .graph__legend__item span {
     opacity: .75;
@@ -487,12 +559,51 @@ const style = css`
   .info__item__time,
   .info__item__value {
     opacity: .75;
+    font-variant-numeric: tabular-nums;
   }
   .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+  /* Opt-out of the premium layer (appearance: minimal): flat surfaces, no glass
+     blur, no hover lift — for users who prefer a quieter card. */
+  :host([data-appearance="minimal"]) .graph__labels > span {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: color-mix(in oklab, var(--p-surface) 92%, var(--p-fg-1));
+  }
+  :host([data-appearance="minimal"]) ha-card[hover]:hover {
+    transform: none;
+    box-shadow: var(--ha-card-box-shadow, var(--p-elev-1));
+  }
+
+  /* Honour the user's reduced-motion preference: collapse spring durations and
+     stop decorative animations. */
+  @media (prefers-reduced-motion: reduce) {
+    :host {
+      --p-motion-fast: 1ms var(--p-ease);
+      --p-motion-normal: 1ms var(--p-ease);
+    }
+    ha-card,
+    ha-card[hover]:hover,
+    .line--point,
+    .bar,
+    .graph__legend__item,
+    .graph__labels > span {
+      transition-duration: 1ms;
+    }
+    .fill,
+    .line,
+    .line--points,
+    .bars,
+    .state__time {
+      animation: none !important;
+      opacity: 1;
+    }
+  }
+
   @keyframes fade {
     0% {
       opacity: 0;

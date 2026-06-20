@@ -15,7 +15,7 @@ repos:
       - id: check-json
         # Skip JSONC files (comments / trailing commas) tolerated by their own tools,
         # plus the huge tool-generated lockfile.
-        exclude: ^(package-lock\.json|\.babelrc|\.vscode/.*|\.devcontainer/.*)$
+        exclude: ^(package-lock\.json|\.vscode/.*|\.devcontainer/.*)$
       - id: check-merge-conflict
 
   - repo: local
@@ -24,5 +24,5 @@ repos:
         name: eslint (npm run lint)
         entry: npm run lint
         language: system
-        files: ^src/.*\.js$
+        files: ^src/.*\.(ts|js)$
         pass_filenames: false

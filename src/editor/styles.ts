@@ -1,10 +1,29 @@
-import { css } from 'lit-element';
+import { css } from 'lit';
 
 // Visual editor styles — extracted from editor.js to keep the component lean.
 export default css`
       :host {
         display: block;
         font-family: var(--paper-font-body1_-_font-family);
+      }
+
+      /* Native HA controls — make them fill the form layout and breathe. */
+      ha-textfield,
+      ha-select {
+        width: 100%;
+        display: block;
+      }
+      ha-formfield {
+        display: flex;
+        align-items: center;
+        min-height: 40px;
+        --mdc-typography-body2-font-size: 0.95em;
+      }
+      .form-group ha-formfield {
+        padding: 4px 0;
+      }
+      .threshold-row ha-textfield {
+        flex: 1;
       }
 
       .loading, .error {

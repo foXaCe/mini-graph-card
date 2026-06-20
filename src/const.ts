@@ -1,8 +1,11 @@
-const URL_DOCS = 'https://github.com/foXaCe/mini-graph-card/blob/main/README.md';
-const FONT_SIZE = 14;
-const FONT_SIZE_HEADER = 14;
-const MAX_BARS = 96;
-const ICONS = {
+import type { ShowConfig } from './types';
+
+export const URL_DOCS = 'https://github.com/foXaCe/mini-graph-card/blob/main/README.md';
+export const FONT_SIZE = 14;
+export const FONT_SIZE_HEADER = 14;
+export const MAX_BARS = 96;
+
+export const ICONS: Record<string, string> = {
   humidity: 'hass:water-percent',
   illuminance: 'hass:brightness-5',
   temperature: 'hass:thermometer',
@@ -16,7 +19,8 @@ const ICONS = {
   presence: 'hass:account',
   light: 'hass:lightbulb',
 };
-const DEFAULT_COLORS = [
+
+export const DEFAULT_COLORS: string[] = [
   'var(--accent-color)',
   '#3498db',
   '#e74c3c',
@@ -31,8 +35,10 @@ const DEFAULT_COLORS = [
   '#2980b9',
   '#8e44ad',
 ];
-const UPDATE_PROPS = ['entity', 'line', 'length', 'fill', 'points', 'tooltip', 'abs', 'config'];
-const DEFAULT_SHOW = {
+
+export const UPDATE_PROPS: string[] = ['entity', 'line', 'length', 'fill', 'points', 'tooltip', 'abs', 'config'];
+
+export const DEFAULT_SHOW: Partial<ShowConfig> = {
   name: true,
   icon: true,
   state: true,
@@ -45,22 +51,9 @@ const DEFAULT_SHOW = {
   points: 'hover',
 };
 
-const X = 0;
-const Y = 1;
-const V = 2;
-const ONE_HOUR = 1000 * 3600;
+// Coordinate tuple indices: [X, Y, V] = [x, y, value].
+export const X = 0;
+export const Y = 1;
+export const V = 2;
 
-export {
-  URL_DOCS,
-  FONT_SIZE,
-  FONT_SIZE_HEADER,
-  MAX_BARS,
-  ICONS,
-  DEFAULT_COLORS,
-  UPDATE_PROPS,
-  DEFAULT_SHOW,
-  X,
-  Y,
-  V,
-  ONE_HOUR,
-};
+export const ONE_HOUR = 1000 * 3600;
