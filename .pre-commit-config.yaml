@@ -1,0 +1,22 @@
+# Pre-commit configuration for mini-graph-card (Lovelace card).
+# Install once per clone:  pre-commit install   (or: prek install / npm run hooks)
+# The eslint hook mirrors the CI lint job so a commit never breaks the pipeline.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+        # Skip JSONC files (comments / trailing commas) tolerated by their own tools,
+        # plus the huge tool-generated lockfile.
+        exclude: ^(package-lock\.json|\.babelrc|\.vscode/.*|\.devcontainer/.*)$
+      - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint (npm run lint)
+        entry: npm run lint
+        language: system
+        files: ^src/.*\.js$
+        pass_filenames: false

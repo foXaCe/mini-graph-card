@@ -63,6 +63,6 @@
     "lint": "eslint src/main.js src/buildConfig.js src/editor.js src/localize.js src/microInteractionsSimple.js src/intelligentCacheSimple.js src/advancedChartsSimple.js src/zoomPanSimple.js --ext .js",
     "watch": "rollup -c --watch",
     "postversion": "npm run build",
-    "hooks": "git config core.hooksPath .githooks"
+    "hooks": "pre-commit install"
   }
 }
