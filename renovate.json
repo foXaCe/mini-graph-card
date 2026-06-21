@@ -7,7 +7,6 @@
     ":semanticCommitTypeAll(chore)",
     "group:allNonMajor",
     ":dependencyDashboard",
-    ":enableVulnerabilityAlertsWithLabel(security)",
     ":timezone(Europe/Paris)"
   ],
   "labels": ["dependencies"],
