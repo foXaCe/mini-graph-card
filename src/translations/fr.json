@@ -155,7 +155,8 @@
       "thresholds_need_value": "Les premier et dernier seuils doivent avoir une « value » définie.\n Voir {url}"
     },
     "a11y": {
-      "loading": "Chargement"
+      "loading": "Chargement",
+      "graph_summary": "{name} : actuel {current}, plage sur {hours} h de {min} à {max}."
     },
     "labels": {
       "current": "Actuel"

@@ -155,7 +155,8 @@
       "thresholds_need_value": "The first and last thresholds must have a set \"value\".\n See {url}"
     },
     "a11y": {
-      "loading": "Loading"
+      "loading": "Loading",
+      "graph_summary": "{name}: current {current}, range over {hours}h from {min} to {max}."
     },
     "labels": {
       "current": "Current"

@@ -566,6 +566,18 @@ const style = css`
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  /* Visually hidden but exposed to screen readers (graph text alternative). */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 
   /* Opt-out of the premium layer (appearance: minimal): flat surfaces, no glass
      blur, no hover lift — for users who prefer a quieter card. */

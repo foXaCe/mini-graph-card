@@ -34,16 +34,16 @@ interface AbsEntry {
   last_changed?: string;
 }
 
+// Local equivalent of custom-card-helpers' hasAction, accepting this project's
+// looser ActionConfig (an action is "active" when set and not 'none').
+const hasAction = (cfg?: ActionConfig): boolean => !!cfg && cfg.action !== 'none';
+
 // Shape of a cached history entry as written by setCache / read by getCache.
 interface CachedHistory {
   hours_to_show: number;
   last_fetched: string;
   data: HistoryItem[];
 }
-
-// Local equivalent of custom-card-helpers' hasAction, accepting this project's
-// looser ActionConfig (an action is "active" when set and not 'none').
-const hasAction = (cfg?: ActionConfig): boolean => !!cfg && cfg.action !== 'none';
 
 class MiniGraphCard extends LitElement {
   public id: string;
@@ -442,9 +442,31 @@ class MiniGraphCard extends LitElement {
                 ${renderSvg(this)}
               </div>
             </div>
+            ${this.renderGraphSummary()}
             ${this.renderLegend()}
         ` : html`<ha-spinner aria-label="${localize('card.a11y.loading', this._hass)}" size="small"></ha-spinner>`}
       </div>` : '';
+  }
+
+  // Screen-reader text alternative for the (aria-hidden) SVG graph: one line per
+  // visible entity with its current value and the period's axis range. Not an
+  // aria-live region — it must not announce on every poll.
+  renderGraphSummary() {
+    if (!this.bound) return undefined;
+    const lines: string[] = [];
+    this.config.entities.forEach((entity, i) => {
+      if (entity.show_graph === false || !this.entity[i]) return;
+      const bound = entity.y_axis === 'secondary' ? this.boundSecondary : this.bound;
+      lines.push(localize('card.a11y.graph_summary', this._hass, {
+        name: this.computeName(i),
+        current: `${this.computeState(this.entity[i].state)} ${this.computeUom(i)}`.trim(),
+        hours: this.config.hours_to_show,
+        min: this.computeState(bound[0]),
+        max: this.computeState(bound[1]),
+      }));
+    });
+    if (lines.length === 0) return undefined;
+    return html`<div class="sr-only">${lines.join(' ')}</div>`;
   }
 
   computeLegend(index: number): string {

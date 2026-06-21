@@ -285,6 +285,14 @@ describe('mini-graph-card — accessibility', () => {
     card.remove();
   });
 
+  it('exposes a visually-hidden screen-reader summary of the graph', async () => {
+    const card = await renderReady({ entities: ['sensor.a'], show: { graph: 'line' } });
+    const summary = card.shadowRoot.querySelector('.sr-only');
+    expect(summary).toBeTruthy();
+    expect(summary.textContent).toContain('Temp'); // entity friendly name
+    card.remove();
+  });
+
   it('_handleKeydown activates the tap action on Enter and Space', () => {
     const card = make();
     card.setConfig({ entities: ['sensor.a'], tap_action: { action: 'more-info' } });
