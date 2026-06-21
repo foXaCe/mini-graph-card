@@ -616,6 +616,22 @@ const style = css`
     }
   }
 
+  /* Responsive: the card declares container-type on :host, so adapt typography
+     and padding to the card's own width (e.g. narrow Sections-view columns).
+     Defaults are untouched above these thresholds. */
+  @container (max-width: 240px) {
+    .state__value { font-size: 2em; }
+    .state__uom { font-size: 1.2em; }
+    .name > span { font-size: 1.1em; }
+    ha-card > div { padding: 0 12px; }
+    ha-card > div:first-child { padding-top: 12px; }
+  }
+  @container (max-width: 160px) {
+    .state__value { font-size: 1.6em; }
+    .state__uom { font-size: 1em; }
+    .graph__legend { display: none; } /* too cramped to be useful */
+  }
+
   @keyframes fade {
     0% {
       opacity: 0;
