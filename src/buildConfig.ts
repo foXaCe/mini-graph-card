@@ -153,6 +153,9 @@ export default (config: RawCardConfig): MiniGraphCardConfig => {
 
   // override points per hour to match group_by function
   switch (conf.group_by) {
+    case 'month':
+      conf.points_per_hour = 1 / 24;
+      break;
     case 'date':
       conf.points_per_hour = 1 / 24;
       break;

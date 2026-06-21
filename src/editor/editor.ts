@@ -423,6 +423,7 @@ export default class MiniGraphCardEditor extends LitElement {
     { value: 'interval', label: t('editor.options.interval') },
     { value: 'date', label: t('editor.options.date') },
     { value: 'hour', label: t('editor.options.hour') },
+    { value: 'month', label: t('editor.options.month') },
   ])}
       </div>
 

@@ -50,6 +50,10 @@ describe('buildConfig — group_by overrides points_per_hour', () => {
   it('group_by=date forces points_per_hour=1/24', () => {
     expect(buildConfig({ ...base, group_by: 'date' }).points_per_hour).toBe(1 / 24);
   });
+
+  it('group_by=month forces points_per_hour=1/24', () => {
+    expect(buildConfig({ ...base, group_by: 'month' }).points_per_hour).toBe(1 / 24);
+  });
 });
 
 describe('buildConfig — color thresholds', () => {

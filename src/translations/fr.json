@@ -96,6 +96,7 @@
       "interval": "Intervalle",
       "date": "Date",
       "hour": "Heure",
+      "month": "Mois",
       "smooth": "Progressive",
       "hard": "Nette",
       "primary": "Principal",
