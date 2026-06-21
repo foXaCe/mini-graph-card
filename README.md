@@ -259,13 +259,32 @@ These buckets are converted later to single point/bar on the graph. Aggregate fu
 | `delta` | v0.9.4 | Calculates difference between max and min value
 | `diff` | v0.11.0 | Calculates difference between first and last value
 
-### Theme variables
-The following theme variables can be set in your HA theme to customize the appearance of the card.
+### Theming
+
+The card derives every colour from the **active Home Assistant theme** (via
+`color-mix` in the oklab colour space), so it adapts automatically to light,
+dark and custom themes — there are no hard-coded colours. Set
+`appearance: minimal` to opt out of the premium layer (Liquid-Glass labels +
+hover lift) for a flat look.
+
+These variables can be overridden in your HA theme, or per-card via
+[card-mod](https://github.com/thomasloven/lovelace-card-mod):
 
 | Name | Default | Description |
 |------|:-------:|-------------|
-| mcg-title-letter-spacing |  | Letter spacing of the card title (`name` option).
-| mcg-title-font-weight | 500 | Font weight of the card title.
+| `--mcg-title-letter-spacing` | `-0.01em` | Letter spacing of the card title (`name` option). |
+| `--mcg-title-font-weight` | `500` | Font weight of the card title. |
+| `--mcg-hover` | `inherit` | Fill colour of a graph point on hover. |
+
+<details>
+<summary>Advanced — premium design tokens</summary>
+
+For fine-tuning, the premium layer exposes `--p-*` tokens (all derived from your
+theme) that you can override: radius (`--p-radius-sm` / `-md` / `-lg` / `-pill`),
+motion (`--p-ease`, `--p-motion-fast` / `-normal`), elevation (`--p-elev-1` /
+`-2`) and Liquid Glass (`--p-glass-bg`, `--p-glass-border`, `--p-blur-glass`).
+See [`src/style.ts`](src/style.ts) for the full token set.
+</details>
 
 ### Example usage
 

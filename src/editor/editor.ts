@@ -194,7 +194,7 @@ export default class MiniGraphCardEditor extends LitElement {
           .value=${value}
           .naturalMenuWidth=${true}
           .fixedMenuPosition=${true}
-          @selected=${(e: Event) => this._valueChanged(e, key)}
+          @selected=${(e: Event) => this._selectChanged(e, key, value)}
           @closed=${(e: Event) => e.stopPropagation()}
         >
           ${options.map((o) => html`<ha-list-item value=${o.value}>${o.label}</ha-list-item>`)}
@@ -654,7 +654,7 @@ export default class MiniGraphCardEditor extends LitElement {
               .value="${(config.y_axis as string) || 'primary'}"
               .naturalMenuWidth=${true}
               .fixedMenuPosition=${true}
-              @selected="${(ev: Event) => this._entityConfigChanged(ev, index, 'y_axis')}"
+              @selected="${(ev: Event) => this._entitySelectChanged(ev, index, 'y_axis', (config.y_axis as string) || 'primary')}"
               @closed="${(ev: Event) => ev.stopPropagation()}"
             >
               <ha-list-item value="primary">${t('editor.options.primary')}</ha-list-item>
@@ -703,6 +703,21 @@ export default class MiniGraphCardEditor extends LitElement {
     if (detail && detail.value !== undefined) return detail.value;
     if (target.type === 'number') return target.value === '' ? undefined : Number(target.value);
     return target.value;
+  }
+
+  // ha-select fires `selected` once on mount reporting its displayed value.
+  // Only treat it as a real change when the value differs from what is shown,
+  // so opening the editor never materialises default options into the config.
+  private _selectChanged(ev: Event, key: string, current: string): void {
+    const value = (ev.target as HTMLInputElement).value;
+    if (value === undefined || value === current) return;
+    this._valueChanged(ev, key);
+  }
+
+  private _entitySelectChanged(ev: Event, index: number, field: string, current: string): void {
+    const value = (ev.target as HTMLInputElement).value;
+    if (value === undefined || value === current) return;
+    this._entityConfigChanged(ev, index, field);
   }
 
   // Event handlers
@@ -803,6 +818,8 @@ export default class MiniGraphCardEditor extends LitElement {
 
   _tapActionChanged(ev: Event, field: string): void {
     const value = (ev.target as HTMLInputElement).value;
+    // Ignore the ha-select mount re-fire (and genuine no-ops).
+    if (value === this._tap_action[field]) return;
 
     const tapAction = { ...this._tap_action, [field]: value };
     this._config = { ...this._config, tap_action: tapAction };
