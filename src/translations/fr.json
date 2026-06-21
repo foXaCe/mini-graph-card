@@ -1,10 +1,10 @@
 {
   "editor": {
     "messages": {
-      "loading_home_assistant": "Chargement de Home Assistant...",
-      "please_wait_while_the_editor_loads": "Veuillez patienter pendant le chargement de l'éditeur.",
-      "editor_error": "Erreur de l'éditeur",
-      "an_error_occurred_while_rendering_the_editor": "Une erreur s'est produite lors du rendu de l'éditeur :"
+      "loading_home_assistant": "Chargement de Home Assistant…",
+      "please_wait_while_the_editor_loads": "Veuillez patienter pendant le chargement de l’éditeur.",
+      "editor_error": "Erreur de l’éditeur",
+      "an_error_occurred_while_rendering_the_editor": "Une erreur s’est produite lors du rendu de l’éditeur :"
     },
     "headers": {
       "mini_graph_card_configuration": "Configuration Mini Graph Card",
@@ -13,14 +13,14 @@
     "sections": {
       "entities": "Entités",
       "add_configure_and_manage_all_your_entities": "Ajoutez, configurez et gérez toutes vos entités",
-      "display_options": "Options d'affichage",
-      "name_icon_and_visual_appearance_settings": "Nom, icône et paramètres d'apparence visuelle",
+      "display_options": "Options d’affichage",
+      "name_icon_and_visual_appearance_settings": "Nom, icône et paramètres d’apparence visuelle",
       "graph_settings": "Paramètres du graphique",
       "graph_type_colors_and_visual_properties": "Type de graphique, couleurs et propriétés visuelles",
       "data_time": "Données et période",
       "data_aggregation_and_time_configuration": "Agrégation des données et configuration temporelle",
       "scale_bounds": "Échelle et limites",
-      "y_axis_bounds_and_scaling_options": "Limites de l'axe Y et options d'échelle",
+      "y_axis_bounds_and_scaling_options": "Limites de l’axe Y et options d’échelle",
       "colors_thresholds": "Couleurs et seuils",
       "color_configuration_and_dynamic_thresholds": "Configuration des couleurs et seuils dynamiques",
       "advanced_options": "Options avancées",
@@ -28,27 +28,27 @@
     },
     "labels": {
       "appearance": "Apparence",
-      "primary_entity_will_be_converted_to_entities_list": "Entité principale (sera convertie en liste d'entités)",
+      "primary_entity_will_be_converted_to_entities_list": "Entité principale (sera convertie en liste d’entités)",
       "card_name": "Nom de la carte",
       "icon": "Icône",
-      "icon_image_url": "URL de l'image d'icône",
+      "icon_image_url": "URL de l’image d’icône",
       "unit": "Unité",
       "font_size": "Taille de police (%)",
-      "header_font_size_px": "Taille de police de l'en-tête (px)",
-      "header_alignment": "Alignement de l'en-tête",
-      "icon_alignment": "Alignement de l'icône",
-      "state_alignment": "Alignement de l'état",
+      "header_font_size_px": "Taille de police de l’en-tête (px)",
+      "header_alignment": "Alignement de l’en-tête",
+      "icon_alignment": "Alignement de l’icône",
+      "state_alignment": "Alignement de l’état",
       "decimal_places": "Nombre de décimales",
       "height_px": "Hauteur (px)",
       "line_width": "Épaisseur de ligne",
       "line_colors_comma_separated": "Couleurs de ligne (séparées par des virgules)",
       "bar_spacing": "Espacement des barres",
-      "enable_animation": "Activer l'animation",
+      "enable_animation": "Activer l’animation",
       "smooth_lines": "Lignes lissées",
       "logarithmic_scale": "Échelle logarithmique",
       "hours_to_show": "Heures à afficher",
       "points_per_hour": "Points par heure",
-      "aggregate_function": "Fonction d'agrégation",
+      "aggregate_function": "Fonction d’agrégation",
       "group_by": "Grouper par",
       "update_interval_seconds": "Intervalle de mise à jour (secondes)",
       "primary_y_axis": "Axe Y principal",
@@ -65,7 +65,7 @@
     "buttons": {
       "hide": "Masquer",
       "configure": "Configurer",
-      "remove_entity": "Supprimer l'entité",
+      "remove_entity": "Supprimer l’entité",
       "add_entity": "Ajouter une entité",
       "add_threshold": "Ajouter un seuil",
       "remove": "Supprimer"
@@ -84,7 +84,7 @@
       "left": "Gauche",
       "right": "Droite",
       "center": "Centre",
-      "with_state": "Avec l'état",
+      "with_state": "Avec l’état",
       "median": "Médiane",
       "minimum": "Minimum",
       "maximum": "Maximum",
@@ -116,9 +116,9 @@
       "secondary_labels": "Étiquettes secondaires"
     },
     "tap_action": {
-      "tap_action": "Action lors de l'appui",
-      "action_type": "Type d'action",
-      "more_info": "Plus d'infos",
+      "tap_action": "Action lors de l’appui",
+      "action_type": "Type d’action",
+      "more_info": "Plus d’infos",
       "navigate": "Naviguer",
       "call_service": "Appeler un service",
       "open_url": "Ouvrir une URL",
@@ -130,9 +130,9 @@
     "entity": {
       "custom_name": "Nom personnalisé",
       "custom_color": "Couleur personnalisée",
-      "attribute_instead_of_state": "Attribut (au lieu de l'état)",
+      "attribute_instead_of_state": "Attribut (au lieu de l’état)",
       "y_axis": "Axe Y",
-      "show_state": "Afficher l'état",
+      "show_state": "Afficher l’état",
       "show_in_graph": "Afficher dans le graphique",
       "show_line": "Afficher la ligne",
       "show_fill": "Afficher le remplissage",
@@ -146,7 +146,10 @@
     "error": {
       "entity_not_available": "Entité non disponible :",
       "invalid_config": "Configuration invalide.",
-      "no_entities": "Veuillez définir au moins une entité via l’option « entities »."
+      "no_entities": "Veuillez définir au moins une entité via l’option « entities ».",
+      "entities_not_a_list": "Veuillez fournir l’option « entities » sous forme de liste.\n Voir {url}",
+      "line_color_options_removed": "« line_color_above/line_color_below » a été supprimé, veuillez utiliser « color_thresholds ».\n Voir {url}",
+      "thresholds_need_value": "Les premier et dernier seuils doivent avoir une « value » définie.\n Voir {url}"
     },
     "a11y": {
       "loading": "Chargement"

@@ -1,4 +1,5 @@
 import { log } from './utils';
+import { localize } from './localize';
 import {
   URL_DOCS,
   FONT_SIZE,
@@ -47,7 +48,7 @@ const interpolateStops = (stops: RawStop[]): ColorThreshold[] => {
   }
   const value = (s: RawStop): number | null | undefined => (typeof s === 'string' ? undefined : s.value);
   if (value(stops[0]) == null || value(stops[stops.length - 1]) == null) {
-    throw new Error(`The first and last thresholds must have a set "value".\n See ${URL_DOCS}`);
+    throw new Error(localize('card.error.thresholds_need_value', null, { url: URL_DOCS }));
   }
 
   let leftValuedIndex = 0;
@@ -94,11 +95,9 @@ const computeThresholds = (stops: RawStop[], type: string): ColorThreshold[] => 
 
 export default (config: RawCardConfig): MiniGraphCardConfig => {
   if (!Array.isArray(config.entities))
-    throw new Error(`Please provide the "entities" option as a list.\n See ${URL_DOCS}`);
+    throw new Error(localize('card.error.entities_not_a_list', null, { url: URL_DOCS }));
   if (config.line_color_above || config.line_color_below)
-    throw new Error(
-      `"line_color_above/line_color_below" was removed, please use "color_thresholds".\n See ${URL_DOCS}`,
-    );
+    throw new Error(localize('card.error.line_color_options_removed', null, { url: URL_DOCS }));
 
   const conf = {
     animate: false,
