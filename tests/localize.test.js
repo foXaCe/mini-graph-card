@@ -29,12 +29,24 @@ describe('resolveLang', () => {
   it('honours hass.language when locale is absent', () => {
     expect(resolveLang({ language: 'fr' })).toBe('fr');
   });
+
+  it('resolves Spanish, including region variants', () => {
+    expect(resolveLang({ locale: { language: 'es' } })).toBe('es');
+    expect(resolveLang({ locale: { language: 'es-ES' } })).toBe('es');
+    expect(resolveLang({ locale: { language: 'es-419' } })).toBe('es');
+  });
 });
 
 describe('localize', () => {
   it('resolves a known hierarchical key in the active language', () => {
     expect(localize('editor.buttons.add_entity', hassEn)).toBe('Add Entity');
     expect(typeof localize('editor.buttons.add_entity', hassFr)).toBe('string');
+  });
+
+  it('resolves Spanish translations', () => {
+    const hassEs = { locale: { language: 'es' } };
+    expect(localize('editor.buttons.add_entity', hassEs)).toBe('Añadir entidad');
+    expect(localize('editor.buttons.remove', hassEs)).toBe('Eliminar');
   });
 
   it('falls back to English when the key is missing in the active language', () => {

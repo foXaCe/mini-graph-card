@@ -1,0 +1,174 @@
+{
+  "editor": {
+    "messages": {
+      "loading_home_assistant": "Cargando Home Assistant…",
+      "please_wait_while_the_editor_loads": "Espere mientras se carga el editor.",
+      "editor_error": "Error del editor",
+      "an_error_occurred_while_rendering_the_editor": "Se produjo un error al renderizar el editor:"
+    },
+    "headers": {
+      "mini_graph_card_configuration": "Configuración de Mini Graph Card",
+      "complete_configuration_for_all_options": "Configuración completa de todas las opciones"
+    },
+    "sections": {
+      "entities": "Entidades",
+      "add_configure_and_manage_all_your_entities": "Añade, configura y gestiona todas tus entidades",
+      "display_options": "Opciones de visualización",
+      "name_icon_and_visual_appearance_settings": "Nombre, icono y ajustes de apariencia visual",
+      "graph_settings": "Ajustes del gráfico",
+      "graph_type_colors_and_visual_properties": "Tipo de gráfico, colores y propiedades visuales",
+      "data_time": "Datos y período",
+      "data_aggregation_and_time_configuration": "Agregación de datos y configuración temporal",
+      "scale_bounds": "Escala y límites",
+      "y_axis_bounds_and_scaling_options": "Límites del eje Y y opciones de escala",
+      "colors_thresholds": "Colores y umbrales",
+      "color_configuration_and_dynamic_thresholds": "Configuración de colores y umbrales dinámicos",
+      "advanced_options": "Opciones avanzadas",
+      "advanced_options_and_performance_settings": "Opciones avanzadas y ajustes de rendimiento"
+    },
+    "labels": {
+      "appearance": "Apariencia",
+      "primary_entity_will_be_converted_to_entities_list": "Entidad principal (se convertirá en lista de entidades)",
+      "card_name": "Nombre de la tarjeta",
+      "icon": "Icono",
+      "icon_image_url": "URL de la imagen del icono",
+      "unit": "Unidad",
+      "font_size": "Tamaño de fuente (%)",
+      "header_font_size_px": "Tamaño de fuente del encabezado (px)",
+      "header_alignment": "Alineación del encabezado",
+      "icon_alignment": "Alineación del icono",
+      "state_alignment": "Alineación del estado",
+      "decimal_places": "Decimales",
+      "height_px": "Altura (px)",
+      "line_width": "Grosor de línea",
+      "line_colors_comma_separated": "Colores de línea (separados por comas)",
+      "bar_spacing": "Espaciado de barras",
+      "enable_animation": "Activar animación",
+      "smooth_lines": "Líneas suavizadas",
+      "logarithmic_scale": "Escala logarítmica",
+      "hours_to_show": "Horas a mostrar",
+      "points_per_hour": "Puntos por hora",
+      "aggregate_function": "Función de agregación",
+      "group_by": "Agrupar por",
+      "update_interval_seconds": "Intervalo de actualización (segundos)",
+      "primary_y_axis": "Eje Y principal",
+      "lower_bound_use_n_for_soft": "Límite inferior (use ~N para suave)",
+      "upper_bound_use_n_for_soft": "Límite superior (use ~N para suave)",
+      "minimum_range": "Rango mínimo",
+      "threshold_transition": "Transición de umbrales",
+      "color_thresholds": "Umbrales de color",
+      "cache_data": "Almacenar datos en caché",
+      "compress_data": "Comprimir datos",
+      "group_entities": "Agrupar entidades",
+      "time_format_24h": "Formato de 24 horas"
+    },
+    "buttons": {
+      "hide": "Ocultar",
+      "configure": "Configurar",
+      "remove_entity": "Eliminar entidad",
+      "add_entity": "Añadir entidad",
+      "add_threshold": "Añadir umbral",
+      "remove": "Eliminar"
+    },
+    "placeholders": {
+      "card_title": "Título de la tarjeta",
+      "value": "Valor",
+      "unit_example": "°C, kW, etc.",
+      "lower_bound_example": "0 o ~0",
+      "upper_bound_example": "100 o ~100"
+    },
+    "options": {
+      "premium": "Premium",
+      "minimal": "Mínimo",
+      "default": "Predeterminado",
+      "left": "Izquierda",
+      "right": "Derecha",
+      "center": "Centro",
+      "with_state": "Con el estado",
+      "median": "Mediana",
+      "minimum": "Mínimo",
+      "maximum": "Máximo",
+      "first": "Primero",
+      "last": "Último",
+      "sum": "Suma",
+      "delta": "Delta",
+      "difference": "Diferencia",
+      "interval": "Intervalo",
+      "date": "Fecha",
+      "hour": "Hora",
+      "month": "Mes",
+      "smooth": "Progresiva",
+      "hard": "Brusca",
+      "primary": "Principal",
+      "secondary": "Secundario",
+      "average": "Media"
+    },
+    "visibility": {
+      "visibility_options": "Opciones de visibilidad",
+      "name": "Nombre",
+      "state": "Estado",
+      "graph": "Gráfico",
+      "fill": "Relleno",
+      "points": "Puntos",
+      "legend": "Leyenda",
+      "extrema": "Extremos",
+      "average": "Media",
+      "labels": "Etiquetas",
+      "secondary_labels": "Etiquetas secundarias"
+    },
+    "tap_action": {
+      "tap_action": "Acción al tocar",
+      "hold_action": "Acción al mantener pulsado",
+      "double_tap_action": "Acción al tocar dos veces",
+      "action_type": "Tipo de acción",
+      "more_info": "Más información",
+      "navigate": "Navegar",
+      "call_service": "Llamar a un servicio",
+      "open_url": "Abrir URL",
+      "no_action": "Ninguna acción",
+      "navigation_path": "Ruta de navegación",
+      "url": "URL",
+      "service": "Servicio"
+    },
+    "entity": {
+      "custom_name": "Nombre personalizado",
+      "custom_color": "Color personalizado",
+      "attribute_instead_of_state": "Atributo (en lugar del estado)",
+      "y_axis": "Eje Y",
+      "show_state": "Mostrar el estado",
+      "show_in_graph": "Mostrar en el gráfico",
+      "show_line": "Mostrar la línea",
+      "show_fill": "Mostrar el relleno",
+      "show_points": "Mostrar los puntos",
+      "show_in_legend": "Mostrar en la leyenda",
+      "smoothing": "Suavizado",
+      "fixed_value": "Valor fijo"
+    }
+  },
+  "card": {
+    "error": {
+      "entity_not_available": "Entidad no disponible:",
+      "invalid_config": "Configuración no válida.",
+      "no_entities": "Defina al menos una entidad mediante la opción «entities».",
+      "entities_not_a_list": "Proporcione la opción «entities» como una lista.\n Consulte {url}",
+      "line_color_options_removed": "«line_color_above/line_color_below» se ha eliminado, use «color_thresholds».\n Consulte {url}",
+      "thresholds_need_value": "El primer y el último umbral deben tener un «value» definido.\n Consulte {url}"
+    },
+    "a11y": {
+      "loading": "Cargando",
+      "graph_summary": "{name}: actual {current}, rango en {hours} h de {min} a {max}."
+    },
+    "labels": {
+      "current": "Actual"
+    },
+    "display_type": {
+      "min": "mín",
+      "avg": "med",
+      "max": "máx"
+    },
+    "picker": {
+      "name": "Mini Graph Card",
+      "description": "La tarjeta Mini Graph es una tarjeta de gráfico minimalista y personalizable"
+    }
+  }
+}

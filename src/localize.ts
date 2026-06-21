@@ -5,10 +5,11 @@
 import type { HomeAssistant } from './types';
 import en from './translations/en.json';
 import fr from './translations/fr.json';
+import es from './translations/es.json';
 
 type TranslationDict = { [key: string]: string | TranslationDict };
 
-const LANGUAGES: Record<string, TranslationDict> = { en, fr };
+const LANGUAGES: Record<string, TranslationDict> = { en, fr, es };
 const DEFAULT_LANG = 'en';
 
 // Resolve the active language code from the Home Assistant object, falling back
