@@ -1,3 +1,7 @@
 {
-  "markdown.extension.tableFormatter.enabled": false
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": ["typescript", "javascript"],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
