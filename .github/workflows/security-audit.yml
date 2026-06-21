@@ -1,0 +1,102 @@
+name: Security audit
+
+# Active CVE surveillance on top of Renovate vulnerabilityAlerts and CodeQL.
+# Runs on every PR (gate) and daily on a schedule — CVEs don't wait for Monday.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  npm-audit:
+    name: npm audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Use Node.js 24.17.0
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.17.0
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Audit production dependencies (gate — these ship in the bundle)
+        run: npm audit --omit=dev --audit-level=high
+      - name: Audit all dependencies (informational)
+        run: npm audit --audit-level=moderate || true
+
+  dependency-review:
+    name: Dependency review
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure
+
+  secret-scan:
+    name: Gitleaks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # full history for a retroactive secret scan
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  osv-scanner:
+    name: OSV-Scanner
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.3.8
+    with:
+      scan-args: |-
+        --recursive
+        --skip-git
+        ./
+
+  lockfile-freshness:
+    name: Lockfile age check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Check package-lock.json age
+        run: |
+          lock=package-lock.json
+          [ -f "$lock" ] || { echo "No $lock — skipping"; exit 0; }
+          age=$(( ( $(date +%s) - $(git log -1 --format=%ct -- "$lock") ) / 86400 ))
+          if [ "$age" -gt 90 ]; then
+            echo "::error file=$lock::$lock not refreshed for $age days → probable CVE drift, run 'npm install' to regenerate"
+            exit 1
+          elif [ "$age" -gt 60 ]; then
+            echo "::warning file=$lock::$lock is aging ($age days)"
+          else
+            echo "$lock fresh ($age days)"
+          fi

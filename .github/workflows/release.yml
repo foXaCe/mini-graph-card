@@ -8,9 +8,22 @@ name: Release
 on:
   workflow_dispatch:
 
+# semantic-release pushes the release commit/tag and creates the GitHub release,
+# so the default GITHUB_TOKEN needs write scope here even if the repo default is
+# hardened to read-only.
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false # never cancel a release mid-flight
+
 jobs:
   release-bundle:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: github.ref == 'refs/heads/main'
 
     outputs:
@@ -19,17 +32,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - name: Use Node.js 20.x
+      - name: Use Node.js 24.17.0
         uses: actions/setup-node@v6
         with:
-          node-version: 24.16.0
+          node-version: 24.17.0
       - name: Cache Node.js modules
         uses: actions/cache@v5
         with:
           path: ~/.npm # npm cache files are stored in `~/.npm` on Linux/macOS
-          key: ${{ runner.OS }}-node-20.x-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.OS }}-node-24.17.0-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.OS }}-node-20.x
+            ${{ runner.OS }}-node-24.17.0
             ${{ runner.OS }}-
       - name: Install dependencies
         run: npm ci
