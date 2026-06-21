@@ -41,16 +41,19 @@
       "labels": ["dependencies", "github_actions"]
     },
     {
-      "description": "Build/lint toolchain: skip MAJOR bumps entirely (they break the build/lint). Minor & patch still flow and auto-merge.",
+      "description": "Build / lint / test toolchain: skip MAJOR bumps (breaking — review manually). Minor & patch still flow and auto-merge.",
       "matchPackageNames": [
         "eslint",
-        "eslint-config-airbnb-base",
-        "eslint-plugin-import",
+        "typescript",
+        "typescript-eslint",
         "rollup",
-        "/^@babel\\//",
+        "vitest",
+        "jsdom",
+        "globals",
+        "tslib",
         "/^@rollup\\//",
-        "/^rollup-plugin/",
-        "/^babel-/"
+        "/^@vitest\\//",
+        "/^@typescript-eslint\\//"
       ],
       "matchUpdateTypes": ["major"],
       "enabled": false
