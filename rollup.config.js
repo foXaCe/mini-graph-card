@@ -16,6 +16,15 @@ export default {
     format: 'es',
     sourcemap: dev ? 'inline' : false,
   },
+  // Silence benign warnings that originate entirely from third-party deps
+  // (@formatjs `this`-rewrite, d3-interpolate internal cycles). Anything from
+  // our own src/ still surfaces normally.
+  onwarn(warning, warn) {
+    const benign = warning.code === 'THIS_IS_UNDEFINED' || warning.code === 'CIRCULAR_DEPENDENCY';
+    const files = [warning.id, ...(warning.ids ?? []), ...(warning.cycle ?? [])].filter(Boolean);
+    if (benign && files.length > 0 && files.every(f => f.includes('node_modules'))) return;
+    warn(warning);
+  },
   plugins: [
     typescript({
       tsconfig: './tsconfig.json',
