@@ -170,3 +170,49 @@ describe('mini-graph-card — updateData branches', () => {
     expect(card.Graph[0]._history[0]).toEqual(card.Graph[0]._history[1]);
   });
 });
+
+describe('mini-graph-card — card size fallback', () => {
+  it('getCardSize falls back to the calculated size when no DOM measurement', () => {
+    const card = ready({ entities: ['sensor.a'] });
+    // not appended → no ha-card to measure → returns card_size || calculateCardSize
+    expect(card.getCardSize()).toBeGreaterThanOrEqual(1);
+  });
+
+  it('getCardSize honours an explicit card_size', () => {
+    const card = ready({ entities: ['sensor.a'], card_size: 9 });
+    expect(card.getCardSize()).toBe(9);
+  });
+
+  it('calculateCardSize is 1 for a bare card (everything off)', () => {
+    const card = ready({
+      entities: ['sensor.a'],
+      show: {
+        name: false, icon: false, state: false, graph: false, legend: false,
+      },
+    });
+    expect(card.calculateCardSize()).toBe(1);
+  });
+});
+
+describe('mini-graph-card — refresh scheduling', () => {
+  it('setNextUpdate schedules a points-per-hour interval (no update_interval)', () => {
+    vi.useFakeTimers();
+    const card = ready({ entities: ['sensor.a'] });
+    card.setNextUpdate();
+    expect(card.interval).toBeDefined();
+    clearInterval(card.interval);
+    vi.useRealTimers();
+  });
+
+  it('updateOnInterval refreshes only when state changed and not updating', () => {
+    const card = ready({ entities: ['sensor.a'] });
+    const spy = vi.spyOn(card, 'updateData').mockResolvedValue();
+    card.updating = false;
+    card.stateChanged = false;
+    card.updateOnInterval();
+    expect(spy).not.toHaveBeenCalled();
+    card.stateChanged = true;
+    card.updateOnInterval();
+    expect(spy).toHaveBeenCalledOnce();
+  });
+});

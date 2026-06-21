@@ -134,3 +134,90 @@ describe('editor — threshold handlers', () => {
     expect(thresholds[0].value).toBe(10);
   });
 });
+
+describe('editor — full render (sections + expanded entity)', () => {
+  it('renders all sections, the per-entity config, thresholds and tap-action', async () => {
+    const el = make();
+    el.setConfig({
+      entities: [{ entity: 'sensor.a', name: 'Temp' }],
+      color_thresholds: [{ value: 0, color: '#ff0000' }],
+      tap_action: { action: 'navigate', navigation_path: '/x' },
+    });
+    el.hass = hass;
+    el._expandedSections = {
+      entities: true, display: true, graph: true, data: true, bounds: true, colors: true, advanced: true,
+    };
+    el._expandedEntities = [0];
+    document.body.appendChild(el);
+    await el.updateComplete;
+
+    const root = el.shadowRoot;
+    expect(root.querySelector('.card-config')).toBeTruthy();
+    expect(root.querySelector('.entity-config-content')).toBeTruthy(); // renderEntityConfig
+    expect(root.querySelector('.thresholds-section')).toBeTruthy(); // renderColorsSection
+    expect(root.querySelector('.tap-action-section')).toBeTruthy(); // renderAdvancedSection
+    el.remove();
+  });
+
+  it('renders the loading state when hass is absent', async () => {
+    const el = make();
+    el.setConfig({ entities: ['sensor.a'] });
+    document.body.appendChild(el);
+    await el.updateComplete;
+    expect(el.shadowRoot.querySelector('.loading')).toBeTruthy();
+    el.remove();
+  });
+});
+
+describe('editor — more handlers', () => {
+  it('_showChanged updates the show map', () => {
+    const el = ready({ entities: ['sensor.a'] });
+    const spy = onChange(el);
+    el._showChanged({ target: { checked: false } }, 'name');
+    expect(spy.mock.calls[0][0].detail.config.show.name).toBe(false);
+  });
+
+  it('_addEntity appends an empty slot', () => {
+    const el = ready({ entities: ['sensor.a'] });
+    const spy = onChange(el);
+    el._addEntity();
+    expect(spy.mock.calls[0][0].detail.config.entities).toHaveLength(2);
+  });
+
+  it('_addThreshold then _thresholdChanged sets a numeric value', () => {
+    const el = ready({ entities: ['sensor.a'] });
+    const spy = onChange(el);
+    el._addThreshold();
+    expect(spy.mock.calls[0][0].detail.config.color_thresholds).toHaveLength(1);
+    el._thresholdChanged({ target: { value: '15' } }, 0, 'value');
+    expect(spy.mock.calls.at(-1)[0].detail.config.color_thresholds[0].value).toBe(15);
+  });
+
+  it('_tapActionChanged sets the navigation path', () => {
+    const el = ready({ entities: ['sensor.a'] });
+    const spy = onChange(el);
+    el._tapActionChanged({ target: { value: '/lovelace/0' } }, 'navigation_path');
+    expect(spy.mock.calls[0][0].detail.config.tap_action.navigation_path).toBe('/lovelace/0');
+  });
+});
+
+describe('editor — config getters (fallbacks)', () => {
+  it('every generated getter resolves without throwing and applies defaults', () => {
+    const el = ready({ entities: ['sensor.a'] });
+    const keys = [
+      'entity', 'entities', 'name', 'icon', 'icon_image', 'unit', 'height', 'line_width',
+      'bar_spacing', 'hours_to_show', 'points_per_hour', 'aggregate_func', 'group_by',
+      'update_interval', 'hour24', 'min_bound_range', 'logarithmic', 'color_thresholds',
+      'color_thresholds_transition', 'font_size', 'font_size_header', 'align_header',
+      'align_icon', 'align_state', 'group', 'appearance', 'show', 'tap_action',
+      'line_color', 'animate', 'smoothing', 'cache', 'compress', 'lower_bound',
+      'upper_bound', 'decimals',
+    ];
+    const values = keys.map((k) => el[`_${k}`]);
+    expect(values).toHaveLength(keys.length);
+    expect(el._height).toBe(100);
+    expect(el._aggregate_func).toBe('avg');
+    expect(el._appearance).toBe('premium');
+    expect(el._animate).toBe(true);
+  });
+});
