@@ -1,7 +1,13 @@
 # Lovelace Mini Graph Card
-A minimalistic and customizable graph card for [Home Assistant](https://github.com/home-assistant/home-assistant) Lovelace UI.
 
-The card works with entities from within the **sensor** & **binary_sensor** domain and displays the sensors current state as well as a line graph representation of the history.
+[![Release](https://img.shields.io/github/v/release/foXaCe/mini-graph-card?sort=semver)](https://github.com/foXaCe/mini-graph-card/releases/latest)
+[![CI](https://img.shields.io/github/actions/workflow/status/foXaCe/mini-graph-card/ci.yml?branch=main&label=CI)](https://github.com/foXaCe/mini-graph-card/actions/workflows/ci.yml)
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz)
+[![License: MIT](https://img.shields.io/github/license/foXaCe/mini-graph-card)](LICENSE)
+
+A minimalistic and customizable graph card for [Home Assistant](https://github.com/home-assistant/home-assistant) Lovelace UI — rebuilt with **TypeScript + Lit 3** and a premium, theme-adaptive UI (Liquid-Glass labels, spring motion, full keyboard accessibility, and Sections-view support).
+
+The card works with any numeric entity — the **sensor** & **binary_sensor** domains plus `number`, `counter` and `input_number` — and displays the current state along with a line or bar graph of its history.
 
 ![Preview](https://user-images.githubusercontent.com/457678/52977264-edf34980-33cc-11e9-903b-cee43b307ed8.png)
 
@@ -616,43 +622,40 @@ resources:
 
 ### Instructions
 
-*Requires `nodejs` & `npm`.*
+The card is written in **TypeScript** (Lit 3) and bundled with **Rollup 4 + terser** to a single ES2022 file. Requires **Node.js ≥ 20**. See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the module layout.
 
-1. Move into the `mini-graph-card` repo, checkout the *dev* branch & install dependencies:
+1. Move into the `mini-graph-card` repo and install dependencies:
 ```console
-$ cd mini-graph-card && git checkout dev && npm install
+$ cd mini-graph-card && npm install
 ```
 
-2. Make changes to the source code.
+2. Make changes to the source in `src/` (`.ts`).
 
-3. Build the source by running:
+3. Build / type-check / lint / test:
 ```console
-$ npm run build
+$ npm run build       # rollup 4 + typescript + terser → dist/
+$ npm run typecheck   # tsc --noEmit (strict)
+$ npm run lint        # eslint 9 (flat config) + typescript-eslint
+$ npm test            # vitest
 ```
 
-4. Refresh the browser to see changes.
+4. Refresh the browser to see changes *(clear or disable the cache)*.
 
-    *Make sure cache is cleared or disabled.*
-
-5. *(Optional)* Watch the source and automatically rebuild on save:
+5. *(Optional)* Watch the source and rebuild on save:
 ```console
 $ npm run watch
 ```
 
-*The new `mini-graph-card-bundle.js` will be build and ready inside `/dist`.*
-
-Note that the `dev` branch is the most up-to-date and matches our beta releases.
+*The bundled `mini-graph-card-bundle.js` is written into `/dist`. Development happens on `main` (pre-commit hooks run via [prek](https://github.com/j178/prek)).*
 
 Please refer to the [Contribution Guidelines](./CONTRIBUTING.md) if you're interested in contributing to the project. (And thanks for considering!)
 
 ## Getting errors?
-Make sure you have `javascript_version: latest` in your `configuration.yaml` under `frontend:`.
 
-Make sure you have the latest versions of `mini-graph-card.js` & `mini-graph-lib.js`.
-
-If you have issues after updating the card, try clearing your browser cache.
-
-If you have issues displaying the card in older browsers, try changing `type: module` to `type: js` at the card reference in `ui-lovelace.yaml`.
+- Make sure the resource is registered as a **JavaScript Module** (`type: module`), not a plain script — the card ships as an ES2022 module.
+- After updating, **hard-refresh** your browser (or bump the `?v=` on the resource URL) to bypass the cache.
+- Open the browser console (F12): a `MINI-GRAPH-CARD <version>` banner confirms the bundle loaded; any error there points at the cause.
+- The card targets evergreen browsers — make sure you're on a reasonably recent Home Assistant.
 
 ## License
 This project is under the MIT license.
