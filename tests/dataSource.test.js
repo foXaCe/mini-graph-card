@@ -71,3 +71,59 @@ describe('fetchRecent', () => {
     expect(captured).not.toContain('no_attributes');
   });
 });
+
+describe('fetchRecent (WebSocket history_during_period)', () => {
+  it('calls callWS and remaps compact rows to HistoryItem[][]', async () => {
+    let msg;
+    const hass = {
+      callWS: (m) => {
+        msg = m;
+        return {
+          'sensor.x': [
+            { s: '20', lu: 1735689600, lc: 1735689600, a: { unit_of_measurement: '°C' } },
+            { s: '22', lu: 1735693200 },
+          ],
+        };
+      },
+    };
+    const start = new Date('2026-01-01T00:00:00.000Z');
+    const end = new Date('2026-01-02T00:00:00.000Z');
+    const res = await fetchRecent(hass, 'sensor.x', start, end, false, false);
+
+    expect(msg.type).toBe('history/history_during_period');
+    expect(msg.entity_ids).toEqual(['sensor.x']);
+    expect(msg.start_time).toBe('2026-01-01T00:00:00.000Z');
+    expect(msg.end_time).toBe('2026-01-02T00:00:00.000Z');
+    expect(res).toHaveLength(1);
+    expect(res[0]).toHaveLength(2);
+    expect(res[0][0].state).toBe('20');
+    expect(res[0][0].last_changed).toBe(new Date(1735689600 * 1000).toISOString());
+    expect(res[0][1].state).toBe('22');
+    // lc absent on the second row → falls back to lu
+    expect(res[0][1].last_changed).toBe(new Date(1735693200 * 1000).toISOString());
+  });
+
+  it('drops the synthesised first row when skipInitialState', async () => {
+    const hass = { callWS: () => ({ 'sensor.x': [{ s: '1', lu: 1 }, { s: '2', lu: 2 }] }) };
+    const res = await fetchRecent(hass, 'sensor.x', new Date(), new Date(), true, false);
+    expect(res[0]).toHaveLength(1);
+    expect(res[0][0].state).toBe('2');
+  });
+
+  it('returns [[]] when the entity is absent from the WS result', async () => {
+    const hass = { callWS: () => ({}) };
+    const res = await fetchRecent(hass, 'sensor.x', new Date(), new Date(), false, false);
+    expect(res).toEqual([[]]);
+  });
+
+  it('falls back to the REST endpoint when callWS throws', async () => {
+    let restUrl = '';
+    const hass = {
+      callWS: () => { throw new Error('unknown_command'); },
+      callApi: (m, url) => { restUrl = url; return [['rest']]; },
+    };
+    const res = await fetchRecent(hass, 'sensor.x', new Date('2026-01-01T00:00:00.000Z'), undefined, false, false);
+    expect(restUrl).toContain('history/period');
+    expect(res).toEqual([['rest']]);
+  });
+});
