@@ -1,3 +1,26 @@
+# [0.24.0](https://github.com/foXaCe/mini-graph-card/compare/v0.23.0...v0.24.0) (2026-06-21)
+
+
+### Bug Fixes
+
+* **editor:** suppress ha-select mount re-fire that bloated the config ([a2d21cd](https://github.com/foXaCe/mini-graph-card/commit/a2d21cd2460648a06e6b6dcb274cc77287d56584))
+* **graph:** correct points_per_hour for group_by month and expose it in the editor ([37832bf](https://github.com/foXaCe/mini-graph-card/commit/37832bff7407421e74ca9448a1c7af2dd44b9035))
+* **i18n:** localize buildConfig errors and refine FR typography ([3f34062](https://github.com/foXaCe/mini-graph-card/commit/3f340622a3d8bfeb2df0a055e40dd362e41a3179))
+
+
+### Features
+
+* **a11y:** add screen-reader summary for the graph ([f5de985](https://github.com/foXaCe/mini-graph-card/commit/f5de9850e64ffd4c0b90f2ee9babd89b6bf209e0))
+* **actions:** add hold_action and double_tap_action ([3efeb33](https://github.com/foXaCe/mini-graph-card/commit/3efeb3397c125a243b4a39a214b58d6accbd58fa))
+* **i18n:** add Spanish (es) translation ([95815a9](https://github.com/foXaCe/mini-graph-card/commit/95815a9091504661ca666c344e6c5ce1ddc2a15b))
+* TypeScript + Lit 3 migration with premium UI overhaul ([d47e308](https://github.com/foXaCe/mini-graph-card/commit/d47e30878555274955ce449bb75802173cc912ef))
+* **ui:** adapt typography and padding via container queries ([b202e89](https://github.com/foXaCe/mini-graph-card/commit/b202e8941b8a2b3ec61094e041f6677662ad703d))
+
+
+### Performance Improvements
+
+* **data:** fetch history via WebSocket with REST fallback ([ff5b349](https://github.com/foXaCe/mini-graph-card/commit/ff5b3493b9958c1534804422f148ea955c5b9410))
+
 # [0.23.0](https://github.com/foXaCe/mini-graph-card/compare/v0.22.9...v0.23.0) (2026-06-20)
 
 
