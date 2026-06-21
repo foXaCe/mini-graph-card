@@ -8,8 +8,6 @@ export default tseslint.config(
       'coverage/**',
       'node_modules/**',
       '**/*.config.js',
-      'i18n-migrate.js',
-      'i18n-patch.js',
       'scripts/**',
     ],
   },
