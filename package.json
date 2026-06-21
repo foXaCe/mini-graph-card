@@ -20,7 +20,7 @@
   "author": "Karl Kihlström <mrkihlstrom@gmail.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=20.20.2"
+    "node": ">=24.17.0"
   },
   "dependencies": {
     "@kalkih/lz-string": "^1.4.5",
