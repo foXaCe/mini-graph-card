@@ -194,6 +194,42 @@ describe('mini-graph-card — card size fallback', () => {
   });
 });
 
+describe('mini-graph-card — tap/hold/double-tap routing', () => {
+  it('_dispatchAction routes each kind to its own action config', () => {
+    const card = ready({
+      entities: ['sensor.a'],
+      tap_action: { action: 'more-info' },
+      hold_action: { action: 'navigate', navigation_path: '/x' },
+    });
+    const moreInfo = vi.fn();
+    const navigate = vi.fn();
+    card.addEventListener('hass-more-info', moreInfo);
+    window.addEventListener('location-changed', navigate);
+    card._dispatchAction('tap', 'sensor.a'); // → more-info
+    card._dispatchAction('hold', 'sensor.a'); // → navigate
+    window.removeEventListener('location-changed', navigate);
+    expect(moreInfo).toHaveBeenCalledTimes(1);
+    expect(navigate).toHaveBeenCalledTimes(1);
+  });
+
+  it('_dispatchAction does nothing for a none / unset action', () => {
+    const card = ready({ entities: ['sensor.a'], tap_action: { action: 'none' } });
+    const moreInfo = vi.fn();
+    card.addEventListener('hass-more-info', moreInfo);
+    card._dispatchAction('tap', 'sensor.a'); // none
+    card._dispatchAction('hold', 'sensor.a'); // hold_action undefined
+    expect(moreInfo).not.toHaveBeenCalled();
+  });
+
+  it('_onCardTap fires tap immediately when no double_tap is configured', () => {
+    const card = ready({ entities: ['sensor.a'], tap_action: { action: 'more-info' } });
+    const moreInfo = vi.fn();
+    card.addEventListener('hass-more-info', moreInfo);
+    card._onCardTap({ stopPropagation() {} }, 'sensor.a');
+    expect(moreInfo).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('mini-graph-card — refresh scheduling', () => {
   it('setNextUpdate schedules a points-per-hour interval (no update_interval)', () => {
     vi.useFakeTimers();

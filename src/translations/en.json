@@ -118,6 +118,8 @@
     },
     "tap_action": {
       "tap_action": "Tap Action",
+      "hold_action": "Hold Action",
+      "double_tap_action": "Double Tap Action",
       "action_type": "Action Type",
       "more_info": "More Info",
       "navigate": "Navigate",

@@ -118,6 +118,8 @@
     },
     "tap_action": {
       "tap_action": "Action lors de l’appui",
+      "hold_action": "Action lors d’un appui long",
+      "double_tap_action": "Action lors d’un double appui",
       "action_type": "Type d’action",
       "more_info": "Plus d’infos",
       "navigate": "Naviguer",

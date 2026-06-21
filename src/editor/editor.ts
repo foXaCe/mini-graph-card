@@ -17,6 +17,10 @@ type EditorConfig = {
 
 type Option = { value: string; label: string };
 
+type ActionForm = {
+  action: string; navigation_path?: string; url?: string; service?: string; [key: string]: unknown;
+};
+
 // Editor-scoped translation helper. The active hass is captured at render
 // time (see render()) so every t('...') call resolves to the user's
 // Home Assistant language via the shared localize module.
@@ -492,16 +496,30 @@ export default class MiniGraphCardEditor extends LitElement {
     { value: 'minimal', label: t('editor.options.minimal') },
   ])}
 
+      ${this.renderActionSection('tap_action', 'editor.tap_action.tap_action')}
+      ${this.renderActionSection('hold_action', 'editor.tap_action.hold_action')}
+      ${this.renderActionSection('double_tap_action', 'editor.tap_action.double_tap_action')}
+    `;
+  }
+
+  // One action sub-form (action-type select + the conditional path/url/service
+  // field), shared by tap / hold / double-tap.
+  renderActionSection(
+    key: 'tap_action' | 'hold_action' | 'double_tap_action',
+    titleKey: string,
+  ): TemplateResult {
+    const action = this._actionFor(key);
+    return html`
       <div class="tap-action-section">
-        <h4>${t('editor.tap_action.tap_action')}</h4>
+        <h4>${t(titleKey)}</h4>
         <div class="form-row">
           <div class="form-group">
             <label>${t('editor.tap_action.action_type')}:</label>
             <ha-select
-              .value=${this._tap_action.action}
+              .value=${action.action}
               .naturalMenuWidth=${true}
               .fixedMenuPosition=${true}
-              @selected=${(ev: Event) => this._tapActionChanged(ev, 'action')}
+              @selected=${(ev: Event) => this._actionChanged(ev, key, 'action')}
               @closed=${(ev: Event) => ev.stopPropagation()}
             >
               <ha-list-item value="more-info">${t('editor.tap_action.more_info')}</ha-list-item>
@@ -512,34 +530,34 @@ export default class MiniGraphCardEditor extends LitElement {
             </ha-select>
           </div>
 
-          ${this._tap_action.action === 'navigate' ? html`
+          ${action.action === 'navigate' ? html`
             <div class="form-group">
               <label>${t('editor.tap_action.navigation_path')}:</label>
               <ha-textfield
-                .value=${this._tap_action.navigation_path || ''}
-                @change=${(ev: Event) => this._tapActionChanged(ev, 'navigation_path')}
+                .value=${action.navigation_path || ''}
+                @change=${(ev: Event) => this._actionChanged(ev, key, 'navigation_path')}
                 placeholder="/lovelace/dashboard"
               ></ha-textfield>
             </div>
           ` : ''}
 
-          ${this._tap_action.action === 'url' ? html`
+          ${action.action === 'url' ? html`
             <div class="form-group">
               <label>${t('editor.tap_action.url')}:</label>
               <ha-textfield
-                .value=${this._tap_action.url || ''}
-                @change=${(ev: Event) => this._tapActionChanged(ev, 'url')}
+                .value=${action.url || ''}
+                @change=${(ev: Event) => this._actionChanged(ev, key, 'url')}
                 placeholder="https://example.com"
               ></ha-textfield>
             </div>
           ` : ''}
 
-          ${this._tap_action.action === 'call-service' ? html`
+          ${action.action === 'call-service' ? html`
             <div class="form-group">
               <label>${t('editor.tap_action.service')}:</label>
               <ha-textfield
-                .value=${this._tap_action.service || ''}
-                @change=${(ev: Event) => this._tapActionChanged(ev, 'service')}
+                .value=${action.service || ''}
+                @change=${(ev: Event) => this._actionChanged(ev, key, 'service')}
                 placeholder="light.toggle"
               ></ha-textfield>
             </div>
@@ -817,14 +835,31 @@ export default class MiniGraphCardEditor extends LitElement {
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
-  _tapActionChanged(ev: Event, field: string): void {
-    const value = (ev.target as HTMLInputElement).value;
-    // Ignore the ha-select mount re-fire (and genuine no-ops).
-    if (value === this._tap_action[field]) return;
+  // Resolve an action sub-config with the right default per trigger.
+  _actionFor(key: 'tap_action' | 'hold_action' | 'double_tap_action'): ActionForm {
+    const fallback: ActionForm = key === 'tap_action' ? { action: 'more-info' } : { action: 'none' };
+    const cfg = this._config ? this._config[key] : undefined;
+    return (cfg as ActionForm) || fallback;
+  }
 
-    const tapAction = { ...this._tap_action, [field]: value };
-    this._config = { ...this._config, tap_action: tapAction };
+  _actionChanged(
+    ev: Event,
+    key: 'tap_action' | 'hold_action' | 'double_tap_action',
+    field: string,
+  ): void {
+    const value = (ev.target as HTMLInputElement).value;
+    const current = this._actionFor(key);
+    // Ignore the ha-select mount re-fire (and genuine no-ops).
+    if (value === current[field]) return;
+
+    const updated = { ...current, [field]: value };
+    this._config = { ...this._config, [key]: updated };
     fireEvent(this, 'config-changed', { config: this._config });
+  }
+
+  // Back-compat wrapper (kept for existing call sites/tests).
+  _tapActionChanged(ev: Event, field: string): void {
+    this._actionChanged(ev, 'tap_action', field);
   }
 
   _toggleEntityConfig(index: number): void {

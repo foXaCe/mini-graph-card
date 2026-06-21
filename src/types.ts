@@ -177,6 +177,8 @@ export interface MiniGraphCardConfig {
 
   // Interaction
   tap_action: ActionConfig;
+  hold_action?: ActionConfig;
+  double_tap_action?: ActionConfig;
 
   // Derived at build time
   format: Intl.DateTimeFormatOptions;

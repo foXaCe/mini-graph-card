@@ -25,7 +25,7 @@ import {
   log,
 } from './utils';
 import type {
-  BarData, EntityState, GradientStop, HistoryItem, HomeAssistant, MiniGraphCardConfig, RawCardConfig, Tooltip,
+  ActionConfig, BarData, EntityState, GradientStop, HistoryItem, HomeAssistant, MiniGraphCardConfig, RawCardConfig, Tooltip,
 } from './types';
 
 interface AbsEntry {
@@ -40,6 +40,10 @@ interface CachedHistory {
   last_fetched: string;
   data: HistoryItem[];
 }
+
+// Local equivalent of custom-card-helpers' hasAction, accepting this project's
+// looser ActionConfig (an action is "active" when set and not 'none').
+const hasAction = (cfg?: ActionConfig): boolean => !!cfg && cfg.action !== 'none';
 
 class MiniGraphCard extends LitElement {
   public id: string;
@@ -83,6 +87,13 @@ class MiniGraphCard extends LitElement {
   public color?: string;
 
   private _md5Config?: string;
+
+  // Tap/hold/double-tap gesture state (additive to the existing tap path).
+  private _held = false;
+
+  private _holdTimer?: ReturnType<typeof setTimeout>;
+
+  private _tapTimer?: ReturnType<typeof setTimeout>;
 
   private interval?: ReturnType<typeof setInterval>;
 
@@ -258,7 +269,8 @@ class MiniGraphCard extends LitElement {
     if (this.config.entities.some((_, index) => this.entity[index] === undefined)) {
       return this.renderWarnings();
     }
-    const interactive = config.tap_action.action !== 'none';
+    const interactive = [config.tap_action, config.hold_action, config.double_tap_action]
+      .some((a) => !!a && a.action !== 'none');
     const cardTarget = config.tap_action.entity || this.entity[0];
     return html`
       <ha-card
@@ -274,7 +286,11 @@ class MiniGraphCard extends LitElement {
         tabindex=${interactive ? '0' : nothing}
         aria-label=${config.name || this.computeName(0)}
         style="font-size: ${config.font_size}px;"
-        @click=${(e: Event) => this.handlePopup(e, cardTarget)}
+        @click=${(e: Event) => this._onCardTap(e, cardTarget)}
+        @dblclick=${(e: Event) => this._onCardDblTap(e, cardTarget)}
+        @pointerdown=${() => this._onCardPointerDown(cardTarget)}
+        @pointerup=${() => this._onCardPointerUp()}
+        @pointercancel=${() => this._onCardPointerUp()}
         @keydown=${(e: KeyboardEvent) => this._handleKeydown(e, cardTarget)}
       >
         ${this.renderHeader()} ${this.renderStates()} ${this.renderGraph()} ${this.renderInfo()}
@@ -572,6 +588,64 @@ class MiniGraphCard extends LitElement {
       e.preventDefault();
       this.handlePopup(e, entity);
     }
+  }
+
+  // ── Tap / hold / double-tap routing for the card ──────────────────────────
+  // Hold is detected with a pointer-down timer; double-tap uses the native
+  // dblclick. The single tap is debounced only when a double_tap action is set,
+  // so the default (tap-only) path stays immediate and unchanged.
+  private _actionConfigFor(kind: 'tap' | 'hold' | 'double_tap'): ActionConfig | undefined {
+    if (kind === 'hold') return this.config.hold_action;
+    if (kind === 'double_tap') return this.config.double_tap_action;
+    return this.config.tap_action;
+  }
+
+  _dispatchAction(kind: 'tap' | 'hold' | 'double_tap', entity: EntityState | string): void {
+    const cfg = this._actionConfigFor(kind);
+    if (!cfg || cfg.action === 'none') return;
+    const entityId = typeof entity === 'string' ? entity : entity.entity_id;
+    handleClick(this, this._hass, this.config, cfg, entityId);
+  }
+
+  _onCardPointerDown(entity: EntityState | string): void {
+    this._held = false;
+    if (hasAction(this.config.hold_action)) {
+      this._holdTimer = setTimeout(() => {
+        this._held = true;
+        this._dispatchAction('hold', entity);
+      }, 500);
+    }
+  }
+
+  _onCardPointerUp(): void {
+    if (this._holdTimer) {
+      clearTimeout(this._holdTimer);
+      this._holdTimer = undefined;
+    }
+  }
+
+  _onCardTap(e: Event, entity: EntityState | string): void {
+    e.stopPropagation();
+    if (this._held) { this._held = false; return; } // a hold already fired
+    if (hasAction(this.config.double_tap_action)) {
+      // wait briefly to see whether a dblclick follows before firing tap
+      if (this._tapTimer) return;
+      this._tapTimer = setTimeout(() => {
+        this._tapTimer = undefined;
+        this._dispatchAction('tap', entity);
+      }, 250);
+    } else {
+      this._dispatchAction('tap', entity);
+    }
+  }
+
+  _onCardDblTap(e: Event, entity: EntityState | string): void {
+    e.stopPropagation();
+    if (this._tapTimer) {
+      clearTimeout(this._tapTimer);
+      this._tapTimer = undefined;
+    }
+    this._dispatchAction('double_tap', entity);
   }
 
   get visibleEntities() {

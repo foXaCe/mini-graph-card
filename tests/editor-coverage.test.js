@@ -199,6 +199,31 @@ describe('editor — more handlers', () => {
     el._tapActionChanged({ target: { value: '/lovelace/0' } }, 'navigation_path');
     expect(spy.mock.calls[0][0].detail.config.tap_action.navigation_path).toBe('/lovelace/0');
   });
+
+  it('_actionChanged sets a hold_action (separate from tap)', () => {
+    const el = ready({ entities: ['sensor.a'] });
+    const spy = onChange(el);
+    el._actionChanged({ target: { value: 'navigate' } }, 'hold_action', 'action');
+    expect(spy.mock.calls[0][0].detail.config.hold_action.action).toBe('navigate');
+  });
+
+  it('renders three action sub-forms (tap, hold, double-tap)', async () => {
+    const el = make();
+    el.setConfig({ entities: ['sensor.a'] });
+    el.hass = hass;
+    el._expandedSections = { advanced: true };
+    document.body.appendChild(el);
+    await el.updateComplete;
+    expect(el.shadowRoot.querySelectorAll('.tap-action-section')).toHaveLength(3);
+    el.remove();
+  });
+
+  it('_removeEntity drops the right slot', () => {
+    const el = ready({ entities: ['sensor.a', 'sensor.b'] });
+    const spy = onChange(el);
+    el._removeEntity(0);
+    expect(spy.mock.calls[0][0].detail.config.entities).toEqual([{ entity: 'sensor.b' }]);
+  });
 });
 
 describe('editor — config getters (fallbacks)', () => {
@@ -215,6 +240,7 @@ describe('editor — config getters (fallbacks)', () => {
     ];
     const values = keys.map((k) => el[`_${k}`]);
     expect(values).toHaveLength(keys.length);
+    // a few default sanity checks
     expect(el._height).toBe(100);
     expect(el._aggregate_func).toBe('avg');
     expect(el._appearance).toBe('premium');
