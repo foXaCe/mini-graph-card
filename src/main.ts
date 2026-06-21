@@ -25,13 +25,20 @@ import {
   log,
 } from './utils';
 import type {
-  BarData, EntityState, GradientStop, HomeAssistant, MiniGraphCardConfig, RawCardConfig, Tooltip,
+  BarData, EntityState, GradientStop, HistoryItem, HomeAssistant, MiniGraphCardConfig, RawCardConfig, Tooltip,
 } from './types';
 
 interface AbsEntry {
   type: 'min' | 'avg' | 'max';
   state: number | string;
   last_changed?: string;
+}
+
+// Shape of a cached history entry as written by setCache / read by getCache.
+interface CachedHistory {
+  hours_to_show: number;
+  last_fetched: string;
+  data: HistoryItem[];
 }
 
 class MiniGraphCard extends LitElement {
@@ -699,13 +706,13 @@ class MiniGraphCard extends LitElement {
     ) return;
     this.updateQueue = this.updateQueue.filter((entry) => entry !== `${entity.entity_id}-${index}`);
 
-    let stateHistory: any[] = [];
+    let stateHistory: HistoryItem[] = [];
     let start = initStart;
     let skipInitialState = false;
 
-    let history = null;
+    let history: CachedHistory | null = null;
     if (this.config.cache) {
-      history = await getCache(this._md5Config!, `${entity.entity_id}_${index}`, this.config.compress) as any;
+      history = await getCache(this._md5Config!, `${entity.entity_id}_${index}`, this.config.compress) as CachedHistory | null;
       if (history && history.hours_to_show === this.config.hours_to_show) {
         stateHistory = history.data;
       }
@@ -718,7 +725,7 @@ class MiniGraphCard extends LitElement {
           // include previous item
           currDataIndex -= 1;
           // but change it's last changed time
-          stateHistory[currDataIndex].last_changed = initStart;
+          stateHistory[currDataIndex].last_changed = initStart as unknown as string;
         }
 
         stateHistory = stateHistory.slice(currDataIndex, stateHistory.length);
@@ -729,13 +736,15 @@ class MiniGraphCard extends LitElement {
         stateHistory = [];
       }
 
-      const lastFetched = new Date(history.last_fetched);
+      // Non-null: this branch is only reached when the cache populated
+      // stateHistory above (which requires history to be set).
+      const lastFetched = new Date(history!.last_fetched);
       if (lastFetched > start) {
         start = new Date(lastFetched.getTime() - 1);
       }
     }
 
-    let newStateHistory: any[] = await fetchRecent(
+    const fetched: HistoryItem[][] = await fetchRecent(
       this._hass,
       entity.entity_id,
       start,
@@ -743,19 +752,20 @@ class MiniGraphCard extends LitElement {
       this.config.entities[index].attribute ? false : skipInitialState,
       !!this.config.entities[index].attribute,
     );
-    if (newStateHistory[0] && newStateHistory[0].length > 0) {
+    if (fetched[0] && fetched[0].length > 0) {
+      const rows = fetched[0];
       /**
       * hack because HA doesn't return anything if skipInitialState is false
       * when retrieving for attributes so we retrieve it and we remove it.*
       */
       if (this.config.entities[index].attribute && skipInitialState) {
-        newStateHistory[0].shift();
+        rows.shift();
       }
       // check if we should convert states to numeric values
       if (this.config.state_map.length > 0 || this.config.entities[index].attribute) {
-        newStateHistory[0].forEach((item: any) => {
+        rows.forEach((item: HistoryItem) => {
           if (this.config.entities[index].attribute) {
-            item.state = this.getObjectAttr(item.attributes, this.config.entities[index].attribute!);
+            item.state = this.getObjectAttr(item.attributes as Record<string, unknown>, this.config.entities[index].attribute!);
             delete item.attributes;
           }
           if (this.config.state_map.length > 0)
@@ -763,11 +773,12 @@ class MiniGraphCard extends LitElement {
         });
       }
 
-      newStateHistory = newStateHistory[0].filter((item: any) => !Number.isNaN(parseFloat(item.state)));
-      newStateHistory = newStateHistory.map((item: any) => ({
-        last_changed: this.config.entities[index].attribute ? item.last_updated : item.last_changed,
-        state: item.state,
-      }));
+      const newStateHistory: HistoryItem[] = rows
+        .filter((item) => !Number.isNaN(parseFloat(item.state as string)))
+        .map((item) => ({
+          last_changed: (this.config.entities[index].attribute ? item.last_updated : item.last_changed) as string,
+          state: item.state,
+        }));
       stateHistory = [...stateHistory, ...newStateHistory];
 
       // Save to cache
