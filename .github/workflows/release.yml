@@ -35,7 +35,7 @@ jobs:
       - name: Use Node.js 24.17.0
         uses: actions/setup-node@v6
         with:
-          node-version: 24.17.0
+          node-version: 24.18.0
       - name: Cache Node.js modules
         uses: actions/cache@v6
         with:
