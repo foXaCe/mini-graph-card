@@ -9,15 +9,22 @@
     ":dependencyDashboard",
     ":timezone(Europe/Paris)"
   ],
-  "labels": ["dependencies"],
-  "assignees": ["foXaCe"],
+  "labels": [
+    "dependencies"
+  ],
+  "assignees": [
+    "foXaCe"
+  ],
   "rangeStrategy": "bump",
   "rebaseWhen": "behind-base-branch",
   "minimumReleaseAge": "3 days",
   "internalChecksFilter": "strict",
   "dependencyDashboard": true,
-  "dependencyDashboardTitle": "📦 Renovate Dependency Dashboard",
-  "dependencyDashboardLabels": ["dependencies", "dashboard"],
+  "dependencyDashboardTitle": "\ud83d\udce6 Renovate Dependency Dashboard",
+  "dependencyDashboardLabels": [
+    "dependencies",
+    "dashboard"
+  ],
   "prConcurrentLimit": 5,
   "prHourlyLimit": 2,
   "automerge": true,
@@ -26,22 +33,36 @@
   "pruneStaleBranches": true,
   "lockFileMaintenance": {
     "enabled": true,
-    "schedule": ["before 6am on monday"],
+    "schedule": [
+      "before 6am on monday"
+    ],
     "automerge": true
   },
   "packageRules": [
     {
-      "description": "Low-risk updates (patch / pin / digest) — auto-merge once CI is green",
-      "matchUpdateTypes": ["patch", "pin", "digest"],
-      "labels": ["dependencies", "auto-merge"]
+      "description": "Low-risk updates (patch / pin / digest) \u2014 auto-merge once CI is green",
+      "matchUpdateTypes": [
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "labels": [
+        "dependencies",
+        "auto-merge"
+      ]
     },
     {
-      "description": "GitHub Actions — own label, auto-merge once CI is green",
-      "matchManagers": ["github-actions"],
-      "labels": ["dependencies", "github_actions"]
+      "description": "GitHub Actions \u2014 own label, auto-merge once CI is green",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "labels": [
+        "dependencies",
+        "github_actions"
+      ]
     },
     {
-      "description": "Build / lint / test toolchain: skip MAJOR bumps (breaking — review manually). Minor & patch still flow and auto-merge.",
+      "description": "Build / lint / test toolchain: skip MAJOR bumps (breaking \u2014 review manually). Minor & patch still flow and auto-merge.",
       "matchPackageNames": [
         "eslint",
         "typescript",
@@ -55,14 +76,35 @@
         "/^@vitest\\//",
         "/^@typescript-eslint\\//"
       ],
-      "matchUpdateTypes": ["major"],
+      "matchUpdateTypes": [
+        "major"
+      ],
       "enabled": false
     },
     {
       "description": "Major updates (non-toolchain): individual PR, still auto-merged when the full CI (lint + build + tests) passes",
-      "matchUpdateTypes": ["major"],
-      "labels": ["dependencies", "major"]
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "labels": [
+        "dependencies",
+        "major"
+      ]
+    },
+    {
+      "description": "Tout ce qui monte se fusionne seul quand la CI est verte (op\u00e9rateur, 2026-10-14)",
+      "matchUpdateTypes": [
+        "minor",
+        "major"
+      ],
+      "automerge": true,
+      "platformAutomerge": true
     }
   ],
-  "ignorePaths": ["**/node_modules/**", "**/dist/**", "**/coverage/**"]
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/coverage/**"
+  ],
+  "rollbackPrs": false
 }
