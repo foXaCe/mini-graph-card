@@ -1,4 +1,5 @@
 {
+  "rollbackPrs": false,
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "forkProcessing": "enabled",
   "extends": [
@@ -62,6 +63,12 @@
       "description": "Major updates (non-toolchain): individual PR, still auto-merged when the full CI (lint + build + tests) passes",
       "matchUpdateTypes": ["major"],
       "labels": ["dependencies", "major"]
+    },
+    {
+      "description": "Tout ce qui monte se fusionne seul quand la CI est verte (opérateur, 2026-10-14)",
+      "matchUpdateTypes": ["minor", "major"],
+      "automerge": true,
+      "platformAutomerge": true
     }
   ],
   "ignorePaths": ["**/node_modules/**", "**/dist/**", "**/coverage/**"]
